@@ -1,0 +1,8 @@
+.news { padding: 48px 0 64px; text-align: center; }
+.news__title { margin: 0; font-size: 32px; font-weight: 800; }
+.news__text { max-width: 720px; margin: 12px auto 0; color: #666; font-size: 18px; }
+.news__actions { margin-top: 20px; display: flex; justify-content: center; }
+.news__btn {
+  background: #13a4ec; color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; font-weight: 800; cursor: pointer;
+}
+.news__btn:hover { transform: translateY(-1px); }

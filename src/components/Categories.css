@@ -1,0 +1,14 @@
+.cats { padding: 40px 0; }
+.cats__title { margin: 0 0 16px; font-size: 28px; font-weight: 800; }
+.cats__grid {
+  display: grid; gap: 12px; grid-template-columns: repeat(2,1fr);
+}
+@media (min-width: 800px){ .cats__grid{ grid-template-columns: repeat(6,1fr); } }
+
+.cat {
+  display: grid; place-items: center; gap: 10px; padding: 16px; border: 1px solid #eee; border-radius: 12px;
+  text-decoration: none; color: inherit; background: #f0f2f5;
+}
+.cat:hover { filter: brightness(1.02); }
+.cat__icon { font-size: 28px; }
+.cat__label { margin: 0; font-size: 14px; font-weight: 800; text-align: center; }

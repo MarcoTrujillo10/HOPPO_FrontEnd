@@ -1,0 +1,6 @@
+.ftr { border-top: 1px solid #e5e7eb; padding: 28px 0; background: #f6f7f8; }
+.ftr__links { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-bottom: 16px; }
+.ftr__links a { color: #666; text-decoration: none; font-size: 14px; }
+.ftr__links a:hover { color: #13a4ec; }
+.ftr__social { display: flex; gap: 16px; justify-content: center; margin-bottom: 12px; font-size: 22px; }
+.ftr__copy { text-align: center; margin: 0; color: #777; font-size: 13px; }

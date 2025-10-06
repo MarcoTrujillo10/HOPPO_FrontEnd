@@ -1,0 +1,15 @@
+.new { padding: 40px 0; }
+.new__title { margin: 0 0 16px; font-size: 28px; font-weight: 800; }
+.new__grid {
+  display: grid; gap: 16px; grid-template-columns: repeat(2,1fr);
+}
+@media (min-width: 960px){ .new__grid{ grid-template-columns: repeat(4,1fr); } }
+
+.newcard { display: flex; flex-direction: column; gap: 10px; }
+.newcard__img {
+  width: 100%; aspect-ratio: 1/1; border-radius: 12px; background-size: cover; background-position: center;
+  transition: transform .25s;
+}
+.newcard:hover .newcard__img { transform: scale(1.03); }
+.newcard__h { margin: 0 0 4px; font-weight: 700; }
+.newcard__p { margin: 0; color: #666; font-size: 14px; }

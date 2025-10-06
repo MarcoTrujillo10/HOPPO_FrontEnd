@@ -1,0 +1,43 @@
+.productList { display: flex; flex-direction: column; gap: 24px; }
+@media (min-width: 992px) { .productList { flex-direction: row; align-items: flex-start; } }
+
+.filters {
+  width: 100%; max-width: 260px; border: 1px solid #e5e7eb; border-radius: 12px;
+  padding: 16px; background: #fafafa;
+  position: sticky; top: 16px;
+}
+.filters__head { display: flex; justify-content: space-between; align-items: center; }
+.filters__title { margin: 0; font-size: 18px; font-weight: 800; }
+.filters__clear { background: none; border: 0; color: #646cff; cursor: pointer; font-weight: 700; }
+.filters__clear:hover { text-decoration: underline; }
+.filters__block { margin-top: 14px; }
+.filters__block h3 { margin: 0 0 6px; font-size: 14px; font-weight: 700; }
+.filters__search {
+  width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; outline: none;
+}
+.filters__checks { display: grid; gap: 6px; }
+.filters__price { display: flex; gap: 8px; align-items: center; }
+.filters__price input {
+  width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 10px; outline: none;
+}
+
+.list { flex: 1; }
+.list__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.list__title { margin: 0; font-size: 22px; font-weight: 800; }
+.list__count { color: #666; font-size: 14px; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px){ .grid { grid-template-columns: repeat(4, 1fr); } }
+
+.product { display: flex; flex-direction: column; gap: 6px; }
+.product__img {
+  width: 100%; aspect-ratio: 1/1; border-radius: 12px; background-size: cover; background-position: center;
+  transition: opacity .25s;
+}
+.product:hover .product__img { opacity: .88; }
+.product__body { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.product__title { font-size: 14px; margin: 0; color: #111; font-weight: 800; }
+.product__desc { font-size: 13px; color: #666; margin: 4px 0 0; }
+.product__meta { display: block; color: #888; }
+.product__price { font-weight: 800; color: #111; font-size: 14px; }

@@ -1,0 +1,14 @@
+.offers { padding: 40px 0; }
+.offers__title { margin: 0 0 16px; font-size: 28px; font-weight: 800; }
+.offers__wrap {
+  border-radius: 16px; overflow: hidden; border: 1px solid #eee; display: grid; grid-template-columns: 1fr; background: #f6f7f8;
+}
+@media (min-width: 800px){ .offers__wrap{ grid-template-columns: 1fr 1fr; } }
+.offers__img { min-height: 260px; background-size: cover; background-position: center; }
+.offers__body { padding: 24px; display: grid; align-content: center; gap: 10px; }
+.offers__body h3 { margin: 0; font-size: 20px; font-weight: 800; }
+.offers__body p { margin: 0; color: #666; }
+.offers__btn {
+  margin-top: 10px; align-self: start; background: #13a4ec; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer;
+}
+.offers__btn:hover { transform: translateY(-1px); }

@@ -1,0 +1,14 @@
+.hero {
+  position: relative; min-height: 480px; border-radius: 16px; overflow: hidden;
+  background-size: cover; background-position: center;
+  display: flex; align-items: flex-end; padding: 24px;
+  color: #fff;
+}
+.hero__box { max-width: 640px; }
+.hero__title { margin: 0 0 8px; font-size: 44px; font-weight: 800; letter-spacing: -.5px; }
+.hero__text { margin: 0 0 16px; opacity: .9; font-size: 18px; }
+.hero__btn {
+  background: #13a4ec; color: #fff; border: 0; border-radius: 10px;
+  padding: 12px 18px; font-weight: 800; cursor: pointer;
+}
+.hero__btn:hover { transform: translateY(-1px); }

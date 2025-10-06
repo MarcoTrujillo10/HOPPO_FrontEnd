@@ -1,0 +1,28 @@
+.hdr {
+  position: sticky; top: 0; z-index: 50;
+  background: #f6f7f8cc; backdrop-filter: blur(6px);
+  border-bottom: 1px solid #e5e7eb;
+}
+.hdr__inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.hdr__left { display: flex; align-items: center; gap: 24px; }
+.brand { display: flex; align-items: center; gap: 8px; color: #111; text-decoration: none; }
+.brand__icon { width: 32px; height: 32px; color: #13a4ec; }
+.brand__text { margin: 0; font-size: 18px; font-weight: 800; }
+
+.nav { display: none; gap: 20px; }
+@media (min-width: 768px){ .nav{ display:flex; } }
+.nav__link { font-size: 14px; font-weight: 600; color: #333; text-decoration: none; }
+.nav__link:hover { color: #13a4ec; }
+
+.hdr__right { display: flex; align-items: center; gap: 10px; }
+.search { position: relative; max-width: 280px; width: 100%; }
+.search__icon { position: absolute; left: 10px; top: 8px; opacity: .55; }
+.search__input {
+  width: 100%; padding: 8px 12px 8px 30px; border: 1px solid #e5e7eb; border-radius: 10px;
+  background: #f0f2f5;
+}
+.iconbtn {
+  width: 40px; height: 40px; border: 0; border-radius: 999px; cursor: pointer;
+  background: #f0f2f5;
+}
+.iconbtn:hover { filter: brightness(1.05); }
