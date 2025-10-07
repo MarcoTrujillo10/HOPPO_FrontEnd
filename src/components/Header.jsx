@@ -31,8 +31,8 @@ const Header = () => {
             <span className="search__icon">🔍</span>
             <input className="search__input" placeholder="Buscar" />
           </div>
-          <button className="iconbtn" title="Cuenta">👤</button>
-          <button className="iconbtn" title="Carrito">🛒</button>
+          <Link to="/profile" className="iconbtn" title="Cuenta">👤</Link>
+          <Link to="/cart" className="iconbtn" title="Carrito">🛒</Link>
         </div>
       </div>
     </header>
