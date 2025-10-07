@@ -1,6 +1,7 @@
 .cart {
+  background-color: #ffffff;
+  min-height: calc(100vh - 64px);
   padding: 2rem 0;
-  min-height: 60vh;
 }
 
 .cart__header {

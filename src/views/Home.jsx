@@ -1,3 +1,4 @@
+import "./Home.css";
 import Hero from "../components/Hero";
 import Featured from "../components/Featured";
 import NewArrivals from "../components/NewArrivals";
@@ -8,14 +9,15 @@ import Footer from "../components/Footer";
 
 const Home = () => {
   return (
-    <main className="container">
-      
+    <main className="home">
       <Hero />
-      <Featured />
-      <NewArrivals />
-      <Offers />
-      <Categories />
-      <Newsletter />
+      <div className="container">
+        <Featured />
+        <NewArrivals />
+        <Offers />
+        <Categories />
+        <Newsletter />
+      </div>
       <Footer />
     </main>
   );
