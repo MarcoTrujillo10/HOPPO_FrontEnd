@@ -5,6 +5,8 @@ import Home from "./views/Home";
 import Contact from "./views/Contact";
 import ProductList from "./views/ProductList";
 import ProductDetail from "./views/ProductDetail";
+import Cart from "./views/Cart";
+import Profile from "./views/Profile";
 
 
 const App = () => {
@@ -16,6 +18,8 @@ const App = () => {
         <Route path="/productos" element={<ProductList />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/productos/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </>
   );

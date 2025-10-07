@@ -1,0 +1,8 @@
+.home {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.home .container {
+  padding: 2rem 0;
+}
