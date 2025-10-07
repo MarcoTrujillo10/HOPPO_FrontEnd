@@ -17,6 +17,7 @@ const Home = () => {
       <Categories />
       <Newsletter />
       <Footer />
+      
     </main>
   );
 };
