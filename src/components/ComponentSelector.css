@@ -1,0 +1,312 @@
+.component-selector {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.component-selector__header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.component-selector__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.component-selector__selected {
+  font-size: 1rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.component-selector__selected strong {
+  color: #155724;
+}
+
+/* Filters */
+.component-selector__filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.component-selector__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.component-selector__filter label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.component-selector__search,
+.component-selector__select,
+.component-selector__price-input {
+  padding: 0.8rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.component-selector__search:focus,
+.component-selector__select:focus,
+.component-selector__price-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.component-selector__search {
+  background: #f8f9fa;
+}
+
+.component-selector__select {
+  background: white;
+  cursor: pointer;
+}
+
+.component-selector__price-input {
+  background: #f8f9fa;
+}
+
+/* Components Grid */
+.component-selector__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  overflow-y: auto;
+  max-height: 600px;
+  padding-right: 0.5rem;
+}
+
+.component-selector__grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.component-selector__grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.component-selector__grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.component-selector__grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.component-selector__item {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.component-selector__item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.component-selector__item--selected {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #f8fff8, #e8f5e8);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(40, 167, 69, 0.2);
+}
+
+.component-selector__item--selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.component-selector__item-image {
+  width: 100%;
+  height: 120px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.component-selector__item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.component-selector__item:hover .component-selector__item-image img {
+  transform: scale(1.05);
+}
+
+.component-selector__item-info {
+  margin-bottom: 1rem;
+}
+
+.component-selector__item-brand {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.component-selector__item-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.component-selector__item-specs {
+  margin-bottom: 1rem;
+}
+
+.component-selector__spec {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.component-selector__spec-key {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.component-selector__spec-value {
+  color: #495057;
+  font-weight: 600;
+}
+
+.component-selector__item-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #28a745;
+  margin-bottom: 0.5rem;
+}
+
+.component-selector__item-stock {
+  font-size: 0.8rem;
+  color: #dc3545;
+  font-weight: 600;
+  background: #f8d7da;
+  padding: 0.3rem 0.6rem;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.component-selector__select-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.component-selector__item:not(.component-selector__item--selected) .component-selector__select-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.component-selector__item:not(.component-selector__item--selected) .component-selector__select-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.component-selector__item--selected .component-selector__select-btn {
+  background: #28a745;
+  color: white;
+}
+
+.component-selector__item--selected .component-selector__select-btn:hover {
+  background: #218838;
+}
+
+.component-selector__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .component-selector__filters {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+  
+  .component-selector__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-height: 500px;
+  }
+  
+  .component-selector__item {
+    padding: 1rem;
+  }
+  
+  .component-selector__item-image {
+    height: 100px;
+  }
+  
+  .component-selector__title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .component-selector__title {
+    font-size: 1.3rem;
+  }
+  
+  .component-selector__item-name {
+    font-size: 1rem;
+  }
+  
+  .component-selector__item-price {
+    font-size: 1.1rem;
+  }
+  
+  .component-selector__select-btn {
+    padding: 0.7rem;
+    font-size: 0.8rem;
+  }
+}

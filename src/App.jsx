@@ -7,6 +7,7 @@ import ProductList from "./views/ProductList";
 import ProductDetail from "./views/ProductDetail";
 import Cart from "./views/Cart";
 import Profile from "./views/Profile";
+import PCBuilder from "./views/PCBuilder";
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/productos/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/pc-builder" element={<PCBuilder />} />
       </Routes>
     </>
   );

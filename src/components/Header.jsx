@@ -53,6 +53,7 @@ const Header = () => {
               </div>
             </div>
             <Link className="nav__link" style={isActive("/productos")} to="/productos">Todos los Productos</Link>
+            <Link className="nav__link" style={isActive("/pc-builder")} to="/pc-builder">🛠️ Armador de PC</Link>
             <Link className="nav__link nav__link--sale" to="/productos?oferta=true">Ofertas</Link>
             <Link className="nav__link" style={isActive("/contact")} to="/contact">Contacto</Link>
           </nav>
@@ -188,6 +189,14 @@ const Header = () => {
             onClick={closeMobileMenu}
           >
             📦 Todos los Productos
+          </Link>
+          <Link 
+            className="mobile-menu__link" 
+            style={isActive("/pc-builder")} 
+            to="/pc-builder" 
+            onClick={closeMobileMenu}
+          >
+            🛠️ Armador de PC
           </Link>
           <Link 
             className="mobile-menu__link mobile-menu__link--sale" 
