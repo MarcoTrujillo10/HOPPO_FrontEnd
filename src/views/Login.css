@@ -39,9 +39,32 @@
   border-bottom:1px solid var(--border);
 }
 
-.login__brand{display:flex;align-items:center;gap:10px}
-.login__brand h1{font-weight:700;font-size:18px}
-.login__logo{width:28px;height:28px;color:var(--primary)}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111;
+  text-decoration: none;
+}
+
+.brand__icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  object-fit: contain;  
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.brand:hover .brand__icon {
+  transform: scale(1.05);
+  filter: saturate(1.05);
+}
+
+.brand__text {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
 
 .login__nav{display:flex;gap:18px}
 .login__nav a{
