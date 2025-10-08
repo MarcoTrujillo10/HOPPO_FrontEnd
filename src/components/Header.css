@@ -74,3 +74,25 @@
   color: #13a4ec;
   transform: scale(1.05);
 }
+
+.btn-login {
+  background: #f2f3f5;
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin-right: 12px;
+  color: #111;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.iconbtn svg {
+  width: 22px;
+  height: 22px;
+}

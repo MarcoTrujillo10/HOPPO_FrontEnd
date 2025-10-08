@@ -6,9 +6,10 @@ const Footer = () => {
     <footer className="ftr">
       <div className="container">
         <nav className="ftr__links">
-          {["Acerca de nosotros","Contacto","Política de privacidad","Términos de servicio"].map((t)=>(
-            <a key={t} href="#">{t}</a>
-          ))}
+          <Link to="/acerca-de-nosotros">Acerca de nosotros</Link>
+          <Link to="/contact">Contacto</Link>
+          <Link to="/politica-de-privacidad">Política de privacidad</Link>
+          <Link to="/terminos-de-servicio">Términos de servicio</Link>
         </nav>
 
         <div className="ftr__social">

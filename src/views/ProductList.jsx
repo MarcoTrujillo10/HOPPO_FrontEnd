@@ -3,7 +3,6 @@ import ProductFilters from "../components/ProductFilters";
 import ProductGrid from "../components/ProductGrid";
 import "./ProductList.css";
 
-// Datos mock (podés pasarlos a /src/data/products.js si querés)
 const RAW = [
   { id: "cpu-i7", nombre: "Intel Core i7", detalle: "12C/24T", categoria: "Componentes", marca: "Intel", precio: 350, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAeEZ3wJRC_iZRmm61SLDO7Hi9nNZH8JXC79xQghK3aAPKFAla1BuCoEgF5u9KSYQAnDjHh-gD84neVLlw7nMMWa0oOyQHLLoWj3ginyHsAyba8OqVibkfYkqt8MLJBoFUICfeCyD4kFYmUULzHUFKxjQHqe9tdal1DYaiEZ4nTUK61Wp6fsDFeSL_a5O-doU0VUWN6fijTVSN6Zv-6JTBy0GmLzOUp5TyXFK6GVPzbuUsj8oR_2cBz50PDnE_ex-kGcPRG5Ad2r-4" },
   { id: "gpu-3080", nombre: "NVIDIA RTX 3080", detalle: "10 GB GDDR6X", categoria: "Componentes", marca: "NVIDIA", precio: 1200, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAQ3WJvAue9tfr-7SvXGxS5UadyO2OGS21_qDzIY-w_NKQkCDS46H7JrkLa1fmVVHYcXSB3A5SYgNcf2Y9h7hMnlJzYKi8h8RQuMQ5Bmt2NLL4bUrNR4HNK804Agij6KzPhlrT0xE6X8HDN6BFRmHORKpki6uymsi6a8T29f_OUUfrwVgWjJqOjjoubpI5qJsO7JwrnUZtNvMr-VTmhwXx2TAJC17cNqTNCm9SnTLbnVE7swMulVPoEkmnlmtPtSmxNidAEIMvlZgk" },
@@ -19,7 +18,6 @@ const uniq = (arr) => [...new Set(arr)];
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
 const ProductList = () => {
-  // Estado de filtros de toda la vista
   const [filters, setFilters] = useState({
     q: "",
     categoria: "Todos",
@@ -29,19 +27,16 @@ const ProductList = () => {
     orden: "relevancia",
   });
 
-  // Opciones dinámicas para selects/checkboxes
   const categorias = useMemo(
     () => ["Todos", ...uniq(RAW.map((p) => p.categoria))],
     []
   );
   const marcasOpts = useMemo(() => uniq(RAW.map((p) => p.marca)).sort(), []);
 
-  // Filtrado + orden (memorizado)
   const productos = useMemo(() => {
     let out = RAW.slice();
     const { q, categoria, marcas, min, max, orden } = filters;
 
-    // Búsqueda
     if (q.trim()) {
       const t = q.trim().toLowerCase();
       out = out.filter(
@@ -52,18 +47,14 @@ const ProductList = () => {
       );
     }
 
-    // Categoría
     if (categoria !== "Todos") out = out.filter((p) => p.categoria === categoria);
 
-    // Marcas (multi)
     if (marcas.length) out = out.filter((p) => marcas.includes(p.marca));
 
-    // Precio
     const nMin = min === "" ? -Infinity : Number(min);
     const nMax = max === "" ? +Infinity : Number(max);
     out = out.filter((p) => p.precio >= nMin && p.precio <= nMax);
 
-    // Orden
     switch (orden) {
       case "precio-asc":
         out.sort((a, b) => a.precio - b.precio);
@@ -78,13 +69,12 @@ const ProductList = () => {
         out.sort((a, b) => b.nombre.localeCompare(a.nombre));
         break;
       default:
-        break; // relevancia: orden original
+        break; 
     }
 
     return out;
   }, [filters]);
 
-  // Helpers que pasan a los inputs de precio
   const clampMin = (v) =>
     setFilters((f) => ({ ...f, min: v === "" ? "" : clamp(+v, 0, 100000) }));
   const clampMax = (v) =>

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import "./Cart.css";
 
 const Cart = () => {
-  // Datos mock del carrito
   const cartItems = [
     {
       id: "cpu-i7",
@@ -30,7 +29,6 @@ const Cart = () => {
     }
   ];
 
-  // Cálculos del carrito
   const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
   const shipping = subtotal > 500 ? 0 : 25;
   const tax = subtotal * 0.21; // 21% IVA
@@ -46,7 +44,6 @@ const Cart = () => {
       </div>
 
       <div className="cart__content">
-        {/* Lista de productos */}
         <section className="cart__items">
           <div className="cart__items-header">
             <h2>Productos ({cartItems.length})</h2>
@@ -91,7 +88,6 @@ const Cart = () => {
             ))}
           </div>
 
-          {/* Cupón de descuento */}
           <div className="cart__coupon">
             <h3>Aplicar cupón de descuento</h3>
             <div className="coupon-form">
@@ -105,7 +101,6 @@ const Cart = () => {
           </div>
         </section>
 
-        {/* Resumen del pedido */}
         <aside className="cart__summary">
           <div className="summary-card">
             <h3 className="summary__title">Resumen del pedido</h3>
@@ -163,7 +158,6 @@ const Cart = () => {
         </aside>
       </div>
 
-      {/* Productos relacionados */}
       <section className="cart__related">
         <h3>Productos que te pueden interesar</h3>
         <div className="related-grid">
