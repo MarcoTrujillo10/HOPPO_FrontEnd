@@ -1,10 +1,26 @@
+import { useState } from 'react';
+
 const ProductFilters = ({ filters, setFilters, categorias, marcasOpts, clampMin, clampMax }) => {
+  const [expandedFilters, setExpandedFilters] = useState({
+    categoria: false,
+    marcas: false,
+    precio: false,
+    orden: false
+  });
+
   const toggleMarca = (m) => {
     setFilters((f) => ({
       ...f,
       marcas: f.marcas.includes(m)
         ? f.marcas.filter((x) => x !== m)
         : [...f.marcas, m],
+    }));
+  };
+
+  const toggleFilter = (filterName) => {
+    setExpandedFilters(prev => ({
+      ...prev,
+      [filterName]: !prev[filterName]
     }));
   };
 
@@ -29,67 +45,115 @@ const ProductFilters = ({ filters, setFilters, categorias, marcasOpts, clampMin,
         />
       </div>
 
-      <div className="filters__block">
-        <h3>Categoría</h3>
-        <select
-          value={filters.categoria}
-          onChange={(e) => setFilters((f) => ({ ...f, categoria: e.target.value }))}
+      {/* Categoría Dropdown */}
+      <div className="filters__dropdown">
+        <button 
+          className="filters__dropdown-header"
+          onClick={() => toggleFilter('categoria')}
         >
-          {categorias.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="filters__block">
-        <h3>Marcas</h3>
-        <div className="filters__checks">
-          {marcasOpts.map((m) => (
-            <label key={m}>
-              <input
-                type="checkbox"
-                checked={filters.marcas.includes(m)}
-                onChange={() => toggleMarca(m)}
-              />
-              {m}
-            </label>
-          ))}
+          <h3>📁 Categoría</h3>
+          <span className={`filters__dropdown-icon ${expandedFilters.categoria ? 'expanded' : ''}`}>
+            ▼
+          </span>
+        </button>
+        <div className={`filters__dropdown-content ${expandedFilters.categoria ? 'expanded' : ''}`}>
+          <select
+            value={filters.categoria}
+            onChange={(e) => setFilters((f) => ({ ...f, categoria: e.target.value }))}
+            className="filters__select"
+          >
+            {categorias.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
       </div>
 
-      <div className="filters__block">
-        <h3>Precio</h3>
-        <div className="filters__price">
-          <input
-            type="number"
-            min="0"
-            placeholder="Mín"
-            value={filters.min}
-            onChange={(e) => clampMin(e.target.value)}
-          />
-          <span>—</span>
-          <input
-            type="number"
-            min="0"
-            placeholder="Máx"
-            value={filters.max}
-            onChange={(e) => clampMax(e.target.value)}
-          />
+      {/* Marcas Dropdown */}
+      <div className="filters__dropdown">
+        <button 
+          className="filters__dropdown-header"
+          onClick={() => toggleFilter('marcas')}
+        >
+          <h3>🏷️ Marcas {filters.marcas.length > 0 && `(${filters.marcas.length})`}</h3>
+          <span className={`filters__dropdown-icon ${expandedFilters.marcas ? 'expanded' : ''}`}>
+            ▼
+          </span>
+        </button>
+        <div className={`filters__dropdown-content ${expandedFilters.marcas ? 'expanded' : ''}`}>
+          <div className="filters__checks">
+            {marcasOpts.map((m) => (
+              <label key={m} className="filters__checkbox">
+                <input
+                  type="checkbox"
+                  checked={filters.marcas.includes(m)}
+                  onChange={() => toggleMarca(m)}
+                />
+                <span className="filters__checkbox-label">{m}</span>
+              </label>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="filters__block">
-        <h3>Ordenar</h3>
-        <select
-          value={filters.orden}
-          onChange={(e) => setFilters((f) => ({ ...f, orden: e.target.value }))}
+      {/* Precio Dropdown */}
+      <div className="filters__dropdown">
+        <button 
+          className="filters__dropdown-header"
+          onClick={() => toggleFilter('precio')}
         >
-          <option value="relevancia">Relevancia</option>
-          <option value="precio-asc">Precio: menor a mayor</option>
-          <option value="precio-desc">Precio: mayor a menor</option>
-          <option value="alf-asc">Nombre A→Z</option>
-          <option value="alf-desc">Nombre Z→A</option>
-        </select>
+          <h3>💰 Precio</h3>
+          <span className={`filters__dropdown-icon ${expandedFilters.precio ? 'expanded' : ''}`}>
+            ▼
+          </span>
+        </button>
+        <div className={`filters__dropdown-content ${expandedFilters.precio ? 'expanded' : ''}`}>
+          <div className="filters__price">
+            <input
+              type="number"
+              min="0"
+              placeholder="Mín"
+              value={filters.min}
+              onChange={(e) => clampMin(e.target.value)}
+              className="filters__price-input"
+            />
+            <span className="filters__price-separator">—</span>
+            <input
+              type="number"
+              min="0"
+              placeholder="Máx"
+              value={filters.max}
+              onChange={(e) => clampMax(e.target.value)}
+              className="filters__price-input"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Ordenar Dropdown */}
+      <div className="filters__dropdown">
+        <button 
+          className="filters__dropdown-header"
+          onClick={() => toggleFilter('orden')}
+        >
+          <h3>🔢 Ordenar</h3>
+          <span className={`filters__dropdown-icon ${expandedFilters.orden ? 'expanded' : ''}`}>
+            ▼
+          </span>
+        </button>
+        <div className={`filters__dropdown-content ${expandedFilters.orden ? 'expanded' : ''}`}>
+          <select
+            value={filters.orden}
+            onChange={(e) => setFilters((f) => ({ ...f, orden: e.target.value }))}
+            className="filters__select"
+          >
+            <option value="relevancia">Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+            <option value="alf-asc">Nombre A→Z</option>
+            <option value="alf-desc">Nombre Z→A</option>
+          </select>
+        </div>
       </div>
     </aside>
   );

@@ -1,0 +1,13 @@
+.cs__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.cs__title { margin:0; font-size:20px; }
+.cs__search { width: 260px; max-width: 50%; padding:8px 10px; border:1px solid #e5e7eb; border-radius:10px; background:#f8fafc; }
+.cs__grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.cs__card { border:1px solid #e5e7eb; border-radius:12px; background:#fff; overflow:hidden; display:flex; flex-direction:column; }
+.cs__card.is-active { border-color:#13a4ec; box-shadow:0 0 0 3px rgba(19,164,236,.15); }
+.cs__thumb { height:140px; background:#f3f4f6 center/cover no-repeat; }
+.cs__body { padding:10px; display:flex; flex-direction:column; gap:6px; }
+.cs__name { margin:0; font-size:16px; }
+.cs__meta { color:#6b7280; font-size:12px; }
+.cs__price { font-weight:800; font-size:16px; }
+.cs__btn { background:#13a4ec; color:#fff; border:0; border-radius:10px; padding:8px 10px; font-weight:800; cursor:pointer; }
+.cs__btn:hover { background:#0d8bc7; }

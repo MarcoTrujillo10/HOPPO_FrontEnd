@@ -1,0 +1,10 @@
+.cfg { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; }
+.cfg__title { margin:0 0 8px; font-size:18px; }
+.cfg__list { display:flex; flex-direction:column; gap:8px; }
+.cfg__row { display:flex; justify-content:space-between; gap:8px; }
+.cfg__key { color:#6b7280; }
+.cfg__val em { color:#6b7280; font-style:normal; }
+.cfg__placeholder { color:#9ca3af; }
+.cfg__total { display:flex; justify-content:space-between; border-top:1px solid #e5e7eb; margin-top:10px; padding-top:10px; font-size:18px; }
+.cfg__buy { width:100%; margin-top:10px; background:#13a4ec; color:#fff; border:0; border-radius:10px; padding:10px 12px; font-weight:800; cursor:pointer; }
+.cfg__buy:disabled { background:#cfefff; color:#6b7280; cursor:not-allowed; }
