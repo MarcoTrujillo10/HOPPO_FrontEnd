@@ -33,7 +33,6 @@ a:hover {
   flex-direction: column;
 }
 
-/* Container system */
 .container {
   width: 100%;
   max-width: 1200px;

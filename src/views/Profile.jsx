@@ -4,7 +4,6 @@ import "./Profile.css";
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Datos mock del usuario
   const userData = {
     nombre: "Juan Bautista",
     apellido: "Espino",
@@ -23,7 +22,6 @@ const Profile = () => {
     totalGastado: 2840.50
   };
 
-  // Datos mock de pedidos
   const orders = [
     {
       id: "ORD-001",
@@ -48,7 +46,6 @@ const Profile = () => {
     }
   ];
 
-  // Datos mock de favoritos
   const favorites = [
     {
       id: "fav-1",

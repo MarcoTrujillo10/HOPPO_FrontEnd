@@ -7,7 +7,9 @@ import ProductList from "./views/ProductList";
 import ProductDetail from "./views/ProductDetail";
 import Cart from "./views/Cart";
 import Profile from "./views/Profile";
-import PCBuilder from "./views/PCBuilder";
+import Login from "./views/Login"; 
+import Register from "./views/Register"; 
+import ForgotPassword from "./views/ForgotPassword";
 
 
 const App = () => {
@@ -17,11 +19,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<ProductList />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact" element={<Contact />} /> 
         <Route path="/productos/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/pc-builder" element={<PCBuilder />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </>
   );

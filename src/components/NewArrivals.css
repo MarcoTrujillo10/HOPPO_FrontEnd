@@ -1,8 +1,7 @@
 .new { padding: 40px 0; }
-.new__title { margin: 0 0 16px; font-size: 28px; font-weight: 800; }
+.new__title { margin: 0 0 16px; font-size: 28px; font-weight: 800; text-align: center;  }
 .new__grid {
-  display: grid; gap: 16px; grid-template-columns: repeat(2,1fr);
-}
+  display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 320px)); justify-content: center;}
 @media (min-width: 960px){ .new__grid{ grid-template-columns: repeat(4,1fr); } }
 
 .newcard { 
