@@ -1,4 +1,3 @@
-// Datos compartidos de productos para toda la aplicación
 export const PRODUCTS_DATA = [
   { 
     id: "cpu-i7", 
@@ -184,29 +183,24 @@ export const PRODUCTS_DATA = [
   }
 ];
 
-// Función para obtener productos por categoría del PC Builder
 export const getProductsByPCBuilderCategory = (category) => {
   return PRODUCTS_DATA.filter(product => product.subcategoria === category);
 };
 
-// Función para obtener todas las categorías disponibles
 export const getPCBuilderCategories = () => {
   const categories = [...new Set(PRODUCTS_DATA.map(p => p.subcategoria))];
-  return categories.filter(cat => cat !== 'perifericos'); // Excluir periféricos del PC Builder
+  return categories.filter(cat => cat !== 'perifericos'); 
 };
 
-// Función para obtener productos por categoría general (para ProductList)
 export const getProductsByCategory = (category) => {
   if (category === "Todos") return PRODUCTS_DATA;
   return PRODUCTS_DATA.filter(product => product.categoria === category);
 };
 
-// Función para obtener todas las marcas
 export const getAllBrands = () => {
   return [...new Set(PRODUCTS_DATA.map(p => p.marca))].sort();
 };
 
-// Función para obtener todas las categorías generales
 export const getAllCategories = () => {
   return [...new Set(PRODUCTS_DATA.map(p => p.categoria))];
 };

@@ -10,6 +10,7 @@ import Profile from "./views/Profile";
 import Login from "./views/Login"; 
 import Register from "./views/Register"; 
 import ForgotPassword from "./views/ForgotPassword";
+import PCBuilder from "./views/PCBuilder";
 
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/productos" element={<ProductList />} />
         <Route path="/contact" element={<Contact />} /> 
         <Route path="/productos/:id" element={<ProductDetail />} />
+        <Route path="/armador" element={<PCBuilder />} /> 
         <Route path="/cart" element={<Cart />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
