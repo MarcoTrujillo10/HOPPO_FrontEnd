@@ -5,7 +5,6 @@ import "./Hero.css";
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Productos promocionales para el carrusel
   const promotionalProducts = [
     {
       id: "pc-gamer",
@@ -49,11 +48,10 @@ const Hero = () => {
     }
   ];
 
-  // Auto-advance slides
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % promotionalProducts.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(timer);
   }, [promotionalProducts.length]);
@@ -110,7 +108,6 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Navigation arrows */}
         <button className="hero__nav hero__nav--prev" onClick={goToPrevSlide}>
           ‹
         </button>
@@ -118,7 +115,6 @@ const Hero = () => {
           ›
         </button>
 
-        {/* Dots indicator */}
         <div className="hero__dots">
           {promotionalProducts.map((_, index) => (
             <button

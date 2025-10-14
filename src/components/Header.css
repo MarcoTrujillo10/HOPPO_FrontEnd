@@ -1,116 +1,63 @@
 .hdr {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: #f6f7f8cc;
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid #e5e7eb;
-  width: 100%;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  backdrop-filter: blur(8px);
 }
 
 .hdr__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  padding: 0 20px;
 }
 
-.hdr__left { display: flex; align-items: center; gap: 24px; }
-
-.brand {
+.hdr__brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #111;
+  gap: 10px;
   text-decoration: none;
+  color: #0f172a;
 }
 
-.brand__icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  object-fit: contain;  
-  transition: transform .2s ease, filter .2s ease;
-}
-
-.brand:hover .brand__icon {
-  transform: scale(1.05);
-  filter: saturate(1.05);
-}
-
-.brand__text {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.nav { display: none; gap: 20px; }
-@media (min-width: 768px){ .nav { display: flex; } }
-
-.nav__link {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  text-decoration: none;
-  transition: color .2s ease;
-}
-.nav__link:hover { color: #13a4ec; }
-
-.hdr__right { display: flex; align-items: center; gap: 10px; }
-
-.search { position: relative; max-width: 280px; width: 100%; }
-.search__icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  opacity: .55;
-  color: #6b7280;
-}
-.search__input {
-  width: 100%;
-  padding: 8px 12px 8px 30px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background: #f0f2f5;
-}
-
-.iconbtn {
+.hdr__logo {
   width: 40px;
   height: 40px;
-  border: 0;
-  border-radius: 999px;
-  cursor: pointer;
-  background: #f0f2f5;
+  object-fit: contain;
+}
+
+.hdr__nav {
+  display: flex;
+  gap: 20px;
+}
+
+.hdr__nav a {
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.hdr__nav a:hover {
+  color: #2563eb;
+}
+
+.hdr__right {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  transition: transform .2s ease, background .2s ease, color .2s ease;
+  gap: 12px;
 }
 
-.iconbtn svg { width: 22px; height: 22px; }
-
-.iconbtn:hover {
-  background: #e5e7eb;
-  color: #13a4ec;
-  transform: scale(1.05);
-}
-
-.btn-login {
-  background: #f2f3f5;
-  border-radius: 10px;
-  padding: 8px 16px;
-  margin-right: 12px;
-  color: #111;
+.hdr__login {
+  color: #2563eb;
   font-weight: 600;
   text-decoration: none;
-  border: 1px solid transparent;
-  transition: background .2s ease, border-color .2s ease;
 }
-.btn-login:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
+
+.hdr__login:hover {
+  text-decoration: underline;
 }
