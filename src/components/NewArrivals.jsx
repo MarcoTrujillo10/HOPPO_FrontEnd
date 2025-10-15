@@ -1,45 +1,91 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { productService } from "../services/api";
 import "./NewArrivals.css";
 
-const ITEMS = [
-  {
-    id: "gpu-rtx",
-    title: "Tarjeta Gráfica",
-    desc: "Potencia gráfica sin igual.",
-    img: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=500&h=500&fit=crop&crop=center",
-  },
-  {
-    id: "ram-ddr5",
-    title: "Memoria RAM",
-    desc: "Aumenta la velocidad de tu sistema.",
-    img: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&h=500&fit=crop&crop=center",
-  },
-  {
-    id: "ssd-nvme",
-    title: "SSD NVMe",
-    desc: "Almacenamiento ultrarrápido.",
-    img: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&h=500&fit=crop&crop=center",
-  },
-  {
-    id: "psu-modular",
-    title: "Fuente de Alimentación",
-    desc: "Eficiencia y estabilidad.",
-    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop&crop=center",
-  },
-];
-
 const NewArrivals = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadNewProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await productService.getProducts({ limit: 4, offset: 4 }); // Skip first 4 to get different products
+        setProducts(response.data.content || response.data || []);
+      } catch (error) {
+        console.error('Error loading new products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNewProducts();
+  }, []);
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(price);
+  };
+
+  if (loading) {
+    return (
+      <section className="new">
+        <h2 className="new__title">Nuevas incorporaciones</h2>
+        <div className="new__grid">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="newcard loading">
+              <div className="newcard__img loading-placeholder"></div>
+              <div className="newcard__body">
+                <div className="loading-text"></div>
+                <div className="loading-text short"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <section className="new">
+        <h2 className="new__title">Nuevas incorporaciones</h2>
+        <div className="empty-state">
+          <p>No hay productos nuevos disponibles en este momento.</p>
+          <p>Los vendedores pueden agregar productos desde el panel de administración.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="new">
       <h2 className="new__title">Nuevas incorporaciones</h2>
       <div className="new__grid">
-        {ITEMS.map((it) => (
-          <article key={it.id} className="newcard">
-            <Link to={`/productos/${it.id}`} className="newcard__link">
-              <div className="newcard__img" style={{ backgroundImage: `url("${it.img}")` }} />
+        {products.map((product) => (
+          <article key={product.id} className="newcard">
+            <Link to={`/productos/${product.id}`} className="newcard__link">
+              <div 
+                className="newcard__img" 
+                style={{ 
+                  backgroundImage: `url("${product.images && product.images.length > 0 
+                    ? product.images[0].url 
+                    : 'https://via.placeholder.com/300x300?text=Sin+Imagen'}")` 
+                }} 
+              />
               <div className="newcard__body">
-                <h3 className="newcard__h">{it.title}</h3>
-                <p className="newcard__p">{it.desc}</p>
+                <h3 className="newcard__h">{product.name}</h3>
+                <p className="newcard__p">{product.description}</p>
+                <div className="newcard__price">{formatPrice(product.price)}</div>
+                {product.stock > 0 ? (
+                  <div className="newcard__stock">Stock: {product.stock}</div>
+                ) : (
+                  <div className="newcard__stock out">Sin stock</div>
+                )}
               </div>
             </Link>
           </article>
@@ -48,4 +94,5 @@ const NewArrivals = () => {
     </section>
   );
 };
+
 export default NewArrivals;

@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.jsx";
+import { useCart } from "../hooks/useCart.jsx";
 import "./Header.css";
 
 const Header = () => {
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const { getCartTotals } = useCart();
+  
+  const cartTotals = getCartTotals();
 
   const isActive = (path) =>
     pathname === path ? { color: "#13a4ec" } : undefined;
@@ -15,6 +21,11 @@ const Header = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    closeMobileMenu();
   };
 
   return (
@@ -67,18 +78,56 @@ const Header = () => {
             </svg>
             <input className="search__input" placeholder="Buscar" />
           </div>
-          <Link to="/profile" className="iconbtn" title="Cuenta">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-          </Link>
-          <Link to="/cart" className="iconbtn" title="Carrito">
+          
+          {/* Autenticación */}
+          {isAuthenticated() ? (
+            <div className="user-menu">
+              <span className="user-greeting">Hola, {user?.firstName || user?.name || 'Usuario'}</span>
+              <Link to="/profile" className="iconbtn" title="Perfil">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+              </Link>
+              {user?.role === 'VENDEDOR' && (
+                <Link to="/admin" className="iconbtn" title="Panel de Administración">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2"/>
+                    <rect x="3" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                </Link>
+              )}
+              <button onClick={handleLogout} className="iconbtn logout-btn" title="Cerrar Sesión">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="16,17 21,12 16,7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div className="auth-buttons">
+              <Link to="/login" className="btn btn--ghost btn--small">
+                Iniciar Sesión
+              </Link>
+              <Link to="/register" className="btn btn--primary btn--small">
+                Registrarse
+              </Link>
+            </div>
+          )}
+          
+          {/* Carrito */}
+          <Link to="/cart" className="iconbtn cart-btn" title="Carrito">
             <svg viewBox="0 0 24 24" fill="none">
               <circle cx="9" cy="21" r="1" fill="currentColor"/>
               <circle cx="20" cy="21" r="1" fill="currentColor"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
+            {cartTotals.itemCount > 0 && (
+              <span className="cart-badge">{cartTotals.itemCount}</span>
+            )}
           </Link>
           
           {/* Mobile Menu Button */}
@@ -213,6 +262,48 @@ const Header = () => {
           >
             📞 Contacto
           </Link>
+          
+          {/* Autenticación en móvil */}
+          <div className="mobile-menu__section">
+            {isAuthenticated() ? (
+              <>
+                <div className="mobile-menu__user-info">
+                  <span>Hola, {user?.firstName || user?.name || 'Usuario'}</span>
+                  <small>{user?.role || 'Usuario'}</small>
+                </div>
+                <Link 
+                  className="mobile-menu__link" 
+                  to="/profile" 
+                  onClick={closeMobileMenu}
+                >
+                  👤 Mi Perfil
+                </Link>
+                <button 
+                  className="mobile-menu__link mobile-menu__link--logout" 
+                  onClick={handleLogout}
+                >
+                  🚪 Cerrar Sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  className="mobile-menu__link" 
+                  to="/login" 
+                  onClick={closeMobileMenu}
+                >
+                  🔑 Iniciar Sesión
+                </Link>
+                <Link 
+                  className="mobile-menu__link" 
+                  to="/register" 
+                  onClick={closeMobileMenu}
+                >
+                  📝 Registrarse
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
     </header>

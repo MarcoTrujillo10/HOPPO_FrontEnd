@@ -68,3 +68,66 @@
   color: #666; 
   font-size: 14px; 
 }
+
+.card__price {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #28a745;
+  margin-bottom: 8px;
+}
+
+.card__stock {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.card__stock.out {
+  color: #dc3545;
+}
+
+/* Loading states */
+.loading .card__img {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.loading-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+  height: 200px;
+}
+
+.loading-text {
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.loading-text.short {
+  width: 60%;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.empty-state p {
+  margin: 10px 0;
+}

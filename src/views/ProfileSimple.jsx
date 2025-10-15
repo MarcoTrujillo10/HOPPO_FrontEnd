@@ -1,44 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { useCart } from '../hooks/useCart.jsx';
 import { orderService } from '../services/api';
 import "./Profile.css";
 
-const Profile = () => {
+const ProfileSimple = () => {
   const { user, isAuthenticated } = useAuth();
-  const { getCartTotals } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("profile");
-
-  // Manejar cartTotals de forma segura
-  let cartTotals;
-  try {
-    cartTotals = getCartTotals();
-  } catch (error) {
-    console.error('Error getting cart totals:', error);
-    cartTotals = {
-      subtotal: 0,
-      shipping: 0,
-      tax: 0,
-      total: 0,
-      itemCount: 0
-    };
-  }
 
   useEffect(() => {
     if (isAuthenticated()) {
       loadUserOrders();
     }
-  }, [user, isAuthenticated]);
+  }, [user]);
 
   const loadUserOrders = async () => {
     try {
       setLoading(true);
       const response = await orderService.getMyOrders();
-      // El backend retorna {content: [], pageable: {...}}, necesitamos extraer content
-      const ordersData = response.data?.content || response.data || [];
-      setOrders(ordersData);
+      setOrders(response.data || []);
     } catch (error) {
       console.error('Error loading orders:', error);
       setOrders([]);
@@ -58,13 +39,6 @@ const Profile = () => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
 
-  console.log('Profile component rendering:', {
-    isAuthenticated: isAuthenticated(),
-    user,
-    cartTotals,
-    loading
-  });
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -76,12 +50,16 @@ const Profile = () => {
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
 
+  console.log('ProfileSimple - isAuthenticated():', isAuthenticated());
+  console.log('ProfileSimple - user:', user);
+
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
         <div className="profile__not-authenticated">
           <h1>🔒 Acceso Requerido</h1>
           <p>Debes iniciar sesión para ver tu perfil.</p>
+          <p>Estado actual: {isAuthenticated() ? 'Autenticado' : 'No autenticado'}</p>
         </div>
       </main>
     );
@@ -119,7 +97,7 @@ const Profile = () => {
               <span className="stat__label">Total gastado</span>
             </div>
             <div className="stat">
-              <span className="stat__number">{cartTotals.itemCount}</span>
+              <span className="stat__number">0</span>
               <span className="stat__label">En carrito</span>
             </div>
           </div>
@@ -179,16 +157,7 @@ const Profile = () => {
 
                 <div className="info-section">
                   <h3>🛒 Carrito Actual</h3>
-                  {cartTotals.itemCount > 0 ? (
-                    <div className="cart-summary">
-                      <p><strong>Items:</strong> {cartTotals.itemCount}</p>
-                      <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
-                      <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
-                      <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
-                    </div>
-                  ) : (
-                    <p>Tu carrito está vacío.</p>
-                  )}
+                  <p>Carrito simplificado - sin datos del carrito.</p>
                 </div>
               </div>
             </div>
@@ -250,7 +219,7 @@ const Profile = () => {
                 <div className="stat-card">
                   <div className="stat-icon">🛒</div>
                   <div className="stat-info">
-                    <span className="stat-number">{cartTotals.itemCount}</span>
+                    <span className="stat-number">0</span>
                     <span className="stat-label">Items en Carrito</span>
                   </div>
                 </div>
@@ -272,4 +241,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileSimple;

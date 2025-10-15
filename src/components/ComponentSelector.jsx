@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProductsByPCBuilderCategory } from '../data/productsData';
+import { productService } from '../services/api';
 import './ComponentSelector.css';
 
 const ComponentSelector = ({ category, categoryName, selectedComponent, onSelectComponent }) => {
@@ -12,43 +12,66 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
   const [sortBy, setSortBy] = useState('price');
 
   useEffect(() => {
-    let components = getProductsByPCBuilderCategory(category) || [];
-    
-    // Apply filters
-    if (filters.brand) {
-      components = components.filter(comp => 
-        comp.marca.toLowerCase().includes(filters.brand.toLowerCase())
-      );
-    }
-    
-    if (filters.search) {
-      components = components.filter(comp =>
-        comp.nombre.toLowerCase().includes(filters.search.toLowerCase()) ||
-        comp.marca.toLowerCase().includes(filters.search.toLowerCase()) ||
-        comp.detalle.toLowerCase().includes(filters.search.toLowerCase())
-      );
-    }
-    
-    // Price filter
-    components = components.filter(comp =>
-      comp.precio >= filters.priceRange[0] && comp.precio <= filters.priceRange[1]
-    );
-    
-    // Sort
-    components.sort((a, b) => {
-      switch (sortBy) {
-        case 'price':
-          return a.precio - b.precio;
-        case 'name':
-          return a.nombre.localeCompare(b.nombre);
-        case 'brand':
-          return a.marca.localeCompare(b.marca);
-        default:
-          return 0;
+    const fetchComponents = async () => {
+      try {
+        const response = await productService.getProducts({
+          category: category,
+          limit: 50
+        });
+        
+        let components = (response.data.content || response.data).map(p => ({
+          id: p.id,
+          nombre: p.name,
+          marca: p.brand?.name || 'Sin marca',
+          detalle: p.description || '',
+          precio: p.price || 0,
+          img: p.images && p.images.length > 0 ? p.images[0].url : 'https://via.placeholder.com/300x300?text=Sin+Imagen',
+          stock: p.stock || 0,
+          especificaciones: {} // Por ahora vacío
+        }));
+        
+        // Apply filters
+        if (filters.brand) {
+          components = components.filter(comp => 
+            comp.marca.toLowerCase().includes(filters.brand.toLowerCase())
+          );
+        }
+        
+        if (filters.search) {
+          components = components.filter(comp =>
+            comp.nombre.toLowerCase().includes(filters.search.toLowerCase()) ||
+            comp.marca.toLowerCase().includes(filters.search.toLowerCase()) ||
+            comp.detalle.toLowerCase().includes(filters.search.toLowerCase())
+          );
+        }
+        
+        // Price filter
+        components = components.filter(comp =>
+          comp.precio >= filters.priceRange[0] && comp.precio <= filters.priceRange[1]
+        );
+        
+        // Sort
+        components.sort((a, b) => {
+          switch (sortBy) {
+            case 'price':
+              return a.precio - b.precio;
+            case 'name':
+              return a.nombre.localeCompare(b.nombre);
+            case 'brand':
+              return a.marca.localeCompare(b.marca);
+            default:
+              return 0;
+          }
+        });
+        
+        setFilteredComponents(components);
+      } catch (error) {
+        console.error('Error fetching components:', error);
+        setFilteredComponents([]);
       }
-    });
-    
-    setFilteredComponents(components);
+    };
+
+    fetchComponents();
   }, [category, filters, sortBy]);
 
   const handleFilterChange = (filterType, value) => {
@@ -66,8 +89,7 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
   };
 
   const getBrands = () => {
-    const components = getProductsByPCBuilderCategory(category) || [];
-    return [...new Set(components.map(comp => comp.marca))];
+    return [...new Set(filteredComponents.map(comp => comp.marca))];
   };
 
   return (

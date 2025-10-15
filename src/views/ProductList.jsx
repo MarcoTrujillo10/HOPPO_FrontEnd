@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ProductFilters from "../components/ProductFilters";
 import ProductGrid from "../components/ProductGrid";
-import { PRODUCTS_DATA, getAllCategories, getAllBrands } from "../data/productsData";
+import { productService, categoryService, brandService } from "../services/api";
 import "./ProductList.css";
 
 const uniq = (arr) => [...new Set(arr)];
@@ -18,59 +18,129 @@ const ProductList = () => {
     orden: "relevancia",
   });
 
-  // Opciones dinámicas para selects/checkboxes
-  const categorias = useMemo(
-    () => ["Todos", ...getAllCategories()],
-    []
-  );
-  const marcasOpts = useMemo(() => getAllBrands(), []);
+  // Estados para datos del backend
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState(["Todos"]);
+  const [marcasOpts, setMarcasOpts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Filtrado + orden (memorizado)
-  const productos = useMemo(() => {
-    let out = PRODUCTS_DATA.slice();
-    const { q, categoria, marcas, min, max, orden } = filters;
+  // Cargar categorías y marcas al montar el componente
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        const [categoriesResponse, brandsResponse] = await Promise.all([
+          categoryService.getCategories(),
+          brandService.getBrands()
+        ]);
 
-    // Búsqueda
-    if (q.trim()) {
-      const t = q.trim().toLowerCase();
-      out = out.filter(
-        (p) =>
-          p.nombre.toLowerCase().includes(t) ||
-          p.detalle.toLowerCase().includes(t) ||
-          p.marca.toLowerCase().includes(t)
-      );
-    }
+        console.log('Categories response:', categoriesResponse.data);
+        console.log('Brands response:', brandsResponse.data);
 
-    // Categoría
-    if (categoria !== "Todos") out = out.filter((p) => p.categoria === categoria);
+        // Mapear categorías
+        const categoriesArray = categoriesResponse.data.content || categoriesResponse.data || [];
+        const categoriesData = ["Todos", ...categoriesArray.map(cat => cat.description)];
+        setCategorias(categoriesData);
 
-    // Marcas (multi)
-    if (marcas.length) out = out.filter((p) => marcas.includes(p.marca));
+        // Mapear marcas
+        const brandsArray = brandsResponse.data || [];
+        const brandsData = brandsArray.map(brand => brand.name);
+        setMarcasOpts(brandsData);
+      } catch (err) {
+        console.error('Error cargando datos iniciales:', err);
+        console.error('Error details:', err.response?.data);
+        setError(`Error al cargar datos: ${err.response?.data?.message || err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Precio
-    const nMin = min === "" ? -Infinity : Number(min);
-    const nMax = max === "" ? +Infinity : Number(max);
-    out = out.filter((p) => p.precio >= nMin && p.precio <= nMax);
+    loadInitialData();
+  }, []);
 
-    // Orden
-    switch (orden) {
-      case "precio-asc":
-        out.sort((a, b) => a.precio - b.precio);
-        break;
-      case "precio-desc":
-        out.sort((a, b) => b.precio - a.precio);
-        break;
-      case "alf-asc":
-        out.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        break;
-      case "alf-desc":
-        out.sort((a, b) => b.nombre.localeCompare(a.nombre));
-        break;
-      default:
-        break; // relevancia: orden original
-    }
+  // Cargar productos cuando cambien los filtros
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const { q, categoria, min, max } = filters;
+        
+        // Construir parámetros de búsqueda
+        const searchParams = {
+          page: 0,
+          size: 1000 // Cargar todos los productos por ahora
+        };
 
-    return out;
+        // Agregar filtros si están presentes
+        if (q.trim()) {
+          searchParams.name = q.trim();
+        }
+        if (min !== "") {
+          searchParams.minPrice = Number(min);
+        }
+        if (max !== "") {
+          searchParams.maxPrice = Number(max);
+        }
+
+        let productsData = [];
+        
+        if (categoria !== "Todos") {
+          // Buscar categoría por nombre y obtener productos
+          const categoriesResponse = await categoryService.getCategories();
+          const selectedCategory = categoriesResponse.data.content.find(cat => 
+            cat.description === categoria
+          );
+          
+          if (selectedCategory) {
+            const productsResponse = await categoryService.getProductsByCategory(selectedCategory.id);
+            productsData = productsResponse.data.content;
+          }
+        } else {
+          // Obtener todos los productos
+          const productsResponse = await productService.getProducts(searchParams);
+          productsData = productsResponse.data.content;
+        }
+
+        // Aplicar filtros adicionales en el frontend
+        let filteredProducts = productsData;
+
+        // Filtro por marcas (si se seleccionaron)
+        if (filters.marcas.length > 0) {
+          filteredProducts = filteredProducts.filter(product => 
+            filters.marcas.includes(product.brand?.name)
+          );
+        }
+
+        // Aplicar ordenamiento
+        switch (filters.orden) {
+          case "precio-asc":
+            filteredProducts.sort((a, b) => a.price - b.price);
+            break;
+          case "precio-desc":
+            filteredProducts.sort((a, b) => b.price - a.price);
+            break;
+          case "alf-asc":
+            filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+          case "alf-desc":
+            filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+          default:
+            break; // relevancia: orden original
+        }
+
+        setProductos(filteredProducts);
+      } catch (err) {
+        console.error('Error cargando productos:', err);
+        setError('Error al cargar productos');
+        setProductos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
   }, [filters]);
 
   // Helpers que pasan a los inputs de precio
@@ -78,6 +148,32 @@ const ProductList = () => {
     setFilters((f) => ({ ...f, min: v === "" ? "" : clamp(+v, 0, 100000) }));
   const clampMax = (v) =>
     setFilters((f) => ({ ...f, max: v === "" ? "" : clamp(+v, 0, 100000) }));
+
+  // Mostrar estado de carga
+  if (loading && productos.length === 0) {
+    return (
+      <main className="productList">
+        <div className="loading">
+          <h2>Cargando productos...</h2>
+        </div>
+      </main>
+    );
+  }
+
+  // Mostrar error si hay alguno
+  if (error) {
+    return (
+      <main className="productList">
+        <div className="error">
+          <h2>Error</h2>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>
+            Reintentar
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="productList">
@@ -93,7 +189,10 @@ const ProductList = () => {
       <section className="list">
         <div className="list__head">
           <h2 className="list__title">Productos</h2>
-          <span className="list__count">{productos.length} resultados</span>
+          <span className="list__count">
+            {productos.length} resultados
+            {loading && " (cargando...)"}
+          </span>
         </div>
 
         <ProductGrid productos={productos} />
