@@ -36,6 +36,13 @@
 }
 @media (min-width: 768px){ .nav{ display:flex; } }
 
+/* Ensure hamburger is hidden on desktop */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+}
+
 .nav__link { 
   font-size: 14px; 
   font-weight: 600; 
@@ -415,7 +422,7 @@
 }
 
 /* Show hamburger on mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .hamburger {
     display: flex;
   }

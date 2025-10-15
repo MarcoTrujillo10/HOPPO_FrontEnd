@@ -9,7 +9,7 @@ const Profile = () => {
   const { getCartTotals } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("profile");
+  // Eliminamos activeTab ya que no usaremos pestañas
 
   // Manejar cartTotals de forma segura
   let cartTotals;
@@ -87,11 +87,7 @@ const Profile = () => {
     );
   }
 
-  const tabs = [
-    { id: "profile", label: "Perfil", icon: "👤" },
-    { id: "orders", label: "Pedidos", icon: "📦" },
-    { id: "stats", label: "Estadísticas", icon: "📊" }
-  ];
+  // Eliminamos las tabs ya que no las usaremos
 
   return (
     <main className="profile container">
@@ -127,145 +123,126 @@ const Profile = () => {
       </div>
 
       <div className="profile__content">
-        <nav className="profile__tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`tab ${activeTab === tab.id ? "tab--active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span className="tab__icon">{tab.icon}</span>
-              <span className="tab__label">{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-
         <div className="profile__panel">
-          {activeTab === "profile" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Información Personal</h2>
-              <div className="profile-info-display">
-                <div className="info-section">
-                  <h3>👤 Datos Personales</h3>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <label>Nombre:</label>
-                      <span>{user?.firstName} {user?.lastName}</span>
-                    </div>
-                    <div className="info-item">
-                      <label>Username:</label>
-                      <span>@{user?.username}</span>
-                    </div>
-                    <div className="info-item">
-                      <label>Email:</label>
-                      <span>{user?.email}</span>
-                    </div>
-                    <div className="info-item">
-                      <label>Rol:</label>
-                      <span className="role-badge">{user?.role}</span>
-                    </div>
+          <div className="panel-content">
+            <h2 className="panel-title">Información Personal</h2>
+            <div className="profile-info-display">
+              <div className="info-section">
+                <h3>👤 Datos Personales</h3>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>Nombre:</label>
+                    <span>{user?.firstName} {user?.lastName}</span>
                   </div>
-                </div>
-
-                {user?.role === 'VENDEDOR' && (
-                  <div className="info-section">
-                    <h3>🛠️ Acceso de Vendedor</h3>
-                    <p>Como vendedor, tienes acceso a funciones administrativas especiales.</p>
-                    <a href="/admin" className="btn btn--primary">
-                      Ir al Panel de Admin
-                    </a>
+                  <div className="info-item">
+                    <label>Username:</label>
+                    <span>@{user?.username}</span>
                   </div>
-                )}
-
-                <div className="info-section">
-                  <h3>🛒 Carrito Actual</h3>
-                  {cartTotals.itemCount > 0 ? (
-                    <div className="cart-summary">
-                      <p><strong>Items:</strong> {cartTotals.itemCount}</p>
-                      <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
-                      <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
-                      <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
-                    </div>
-                  ) : (
-                    <p>Tu carrito está vacío.</p>
-                  )}
+                  <div className="info-item">
+                    <label>Email:</label>
+                    <span>{user?.email}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Rol:</label>
+                    <span className="role-badge">{user?.role}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {activeTab === "orders" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Mis Pedidos</h2>
-              {loading ? (
-                <p>Cargando órdenes...</p>
-              ) : orders.length > 0 ? (
-                <div className="orders-list">
-                  {orders.map(order => (
-                    <div key={order.id} className="order-card">
-                      <div className="order-header">
-                        <div className="order-info">
-                          <h3 className="order-id">Pedido #{order.id}</h3>
-                          <p className="order-date">
-                            {formatDate(order.createdAt)}
-                          </p>
-                        </div>
-                        <div className="order-status">
-                          {getStatusBadge(order.status)}
-                          <span className="order-total">{formatPrice(order.total)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <p>No tienes órdenes registradas.</p>
-                  <a href="/productos" className="btn btn--primary">Ver Productos</a>
+              {user?.role === 'VENDEDOR' && (
+                <div className="info-section">
+                  <h3>🛠️ Acceso de Vendedor</h3>
+                  <p>Como vendedor, tienes acceso a funciones administrativas especiales.</p>
+                  <a href="/admin" className="btn btn--primary">
+                    Ir al Panel de Admin
+                  </a>
                 </div>
               )}
-            </div>
-          )}
 
-          {activeTab === "stats" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Mis Estadísticas</h2>
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-icon">📦</div>
-                  <div className="stat-info">
-                    <span className="stat-number">{orders.length}</span>
-                    <span className="stat-label">Órdenes Realizadas</span>
+              <div className="info-section">
+                <h3>🛒 Carrito Actual</h3>
+                {cartTotals.itemCount > 0 ? (
+                  <div className="cart-summary">
+                    <p><strong>Items:</strong> {cartTotals.itemCount}</p>
+                    <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
+                    <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
+                    <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
                   </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">💰</div>
-                  <div className="stat-info">
-                    <span className="stat-number">
-                      {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
-                    </span>
-                    <span className="stat-label">Total Gastado</span>
+                ) : (
+                  <p>Tu carrito está vacío.</p>
+                )}
+              </div>
+
+              <div className="info-section">
+                <h3>📦 Mis Pedidos</h3>
+                {loading ? (
+                  <p>Cargando órdenes...</p>
+                ) : orders.length > 0 ? (
+                  <div className="orders-list">
+                    {orders.map(order => (
+                      <div key={order.id} className="order-card">
+                        <div className="order-header">
+                          <div className="order-info">
+                            <h3 className="order-id">Pedido #{order.id}</h3>
+                            <p className="order-date">
+                              {formatDate(order.orderDate || order.createdAt)}
+                            </p>
+                          </div>
+                          <div className="order-status">
+                            {getStatusBadge(order.status)}
+                            <span className="order-total">{formatPrice(order.total)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">🛒</div>
-                  <div className="stat-info">
-                    <span className="stat-number">{cartTotals.itemCount}</span>
-                    <span className="stat-label">Items en Carrito</span>
+                ) : (
+                  <div className="empty-state">
+                    <p>No tienes órdenes registradas.</p>
+                    <a href="/productos" className="btn btn--primary">Ver Productos</a>
                   </div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-icon">📅</div>
-                  <div className="stat-info">
-                    <span className="stat-number">
-                      {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
-                    </span>
-                    <span className="stat-label">Usuario desde</span>
+                )}
+              </div>
+
+              <div className="info-section">
+                <h3>📊 Mis Estadísticas</h3>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-icon">📦</div>
+                    <div className="stat-info">
+                      <span className="stat-number">{orders.length}</span>
+                      <span className="stat-label">Órdenes Realizadas</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">💰</div>
+                    <div className="stat-info">
+                      <span className="stat-number">
+                        {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
+                      </span>
+                      <span className="stat-label">Total Gastado</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">🛒</div>
+                    <div className="stat-info">
+                      <span className="stat-number">{cartTotals.itemCount}</span>
+                      <span className="stat-label">Items en Carrito</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">📅</div>
+                    <div className="stat-info">
+                      <span className="stat-number">
+                        {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
+                      </span>
+                      <span className="stat-label">Usuario desde</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </main>
