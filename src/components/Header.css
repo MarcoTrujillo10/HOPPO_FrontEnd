@@ -39,7 +39,11 @@
 /* Ensure hamburger is hidden on desktop */
 @media (min-width: 768px) {
   .hamburger {
-    display: none;
+    display: none !important;
+  }
+  
+  .nav {
+    display: flex !important;
   }
 }
 
@@ -278,9 +282,9 @@
   }
 }
 
-/* Hamburger Menu */
+/* Hamburger Menu - Hidden by default */
 .hamburger {
-  display: none;
+  display: none !important;
   flex-direction: column;
   justify-content: space-around;
   width: 2rem;
@@ -424,11 +428,11 @@
 /* Show hamburger on mobile */
 @media (max-width: 767px) {
   .hamburger {
-    display: flex;
+    display: flex !important;
   }
   
   .nav {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -549,5 +553,30 @@
   
   .auth-buttons {
     display: none;
+  }
+}
+
+/* FORCE: Hamburger visibility rules - Maximum specificity */
+@media screen and (min-width: 768px) {
+  .hdr .hamburger {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  .hdr .nav {
+    display: flex !important;
+    visibility: visible !important;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .hdr .hamburger {
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .hdr .nav {
+    display: none !important;
+    visibility: hidden !important;
   }
 }

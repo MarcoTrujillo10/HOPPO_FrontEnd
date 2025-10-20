@@ -9,19 +9,40 @@ const ProductCard = ({ p }) => {
     categoria: p.category?.description || 'Sin categoría',
     marca: p.brand?.name || 'Sin marca',
     precio: p.price || 0,
-    img: p.images && p.images.length > 0 
-      ? p.images[0].url 
-      : 'https://via.placeholder.com/300x300?text=Sin+Imagen',
-    stock: p.stock || 0
+    descuento: p.discount || 0,
+    stock: p.stock || 0,
+    images: p.images || []
   };
+
+  // Calcular precio con descuento
+  const precioFinal = productData.descuento > 0 
+    ? productData.precio * (1 - productData.descuento / 100)
+    : productData.precio;
+
+  // Obtener imagen principal
+  const imagenPrincipal = productData.images.length > 0 
+    ? productData.images[0].imageUrl 
+    : 'https://via.placeholder.com/300x300?text=Sin+Imagen';
 
   return (
     <article className="product">
       <Link to={`/productos/${productData.id}`} className="product__link">
-        <div
-          className="product__img"
-          style={{ backgroundImage: `url("${productData.img}")` }}
-        />
+        <div className="product__image-container">
+          <div
+            className="product__img"
+            style={{ backgroundImage: `url("${imagenPrincipal}")` }}
+          />
+          {productData.images.length > 1 && (
+            <div className="product__image-count">
+              +{productData.images.length - 1}
+            </div>
+          )}
+          {productData.descuento > 0 && (
+            <div className="product__discount-badge">
+              -{productData.descuento}%
+            </div>
+          )}
+        </div>
 
         <div className="product__body">
           <div>
@@ -40,7 +61,14 @@ const ProductCard = ({ p }) => {
             )}
           </div>
 
-          <p className="product__price">${productData.precio.toFixed(2)}</p>
+          <div className="product__pricing">
+            {productData.descuento > 0 && (
+              <span className="product__price-original">
+                ${productData.precio.toFixed(2)}
+              </span>
+            )}
+            <p className="product__price">${precioFinal.toFixed(2)}</p>
+          </div>
         </div>
       </Link>
     </article>

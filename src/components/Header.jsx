@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { useCart } from "../hooks/useCart.jsx";
@@ -7,10 +7,24 @@ import "./Header.css";
 const Header = () => {
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { user, isAuthenticated, logout } = useAuth();
   const { getCartTotals } = useCart();
   
   const cartTotals = getCartTotals();
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isActive = (path) =>
     pathname === path ? { color: "#13a4ec" } : undefined;
@@ -130,26 +144,29 @@ const Header = () => {
             )}
           </Link>
           
-          {/* Mobile Menu Button */}
-          <button 
-            className={`hamburger ${isMobileMenuOpen ? 'hamburger--active' : ''}`}
-            onClick={toggleMobileMenu}
-            aria-label="Toggle mobile menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          {/* Mobile Menu Button - Only show on mobile */}
+          {isMobile && (
+            <button 
+              className={`hamburger ${isMobileMenuOpen ? 'hamburger--active' : ''}`}
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
+      {isMobile && isMobileMenuOpen && (
         <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>
       )}
 
       {/* Mobile Menu */}
-      <nav className={`mobile-menu ${isMobileMenuOpen ? 'mobile-menu--open' : ''}`}>
+      {isMobile && (
+        <nav className={`mobile-menu ${isMobileMenuOpen ? 'mobile-menu--open' : ''}`}>
         <div className="mobile-menu__content">
           <Link 
             className="mobile-menu__link" 
@@ -305,7 +322,8 @@ const Header = () => {
             )}
           </div>
         </div>
-      </nav>
+        </nav>
+      )}
     </header>
   );
 };
