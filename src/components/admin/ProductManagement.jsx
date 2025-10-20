@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productService, categoryService, brandService } from '../../services/api';
-import ImageUpload from './ImageUpload';
+import ImageUploadTest from './ImageUploadTest';
 import './AdminComponents.css';
 
 const ProductManagement = () => {
@@ -20,6 +20,8 @@ const ProductManagement = () => {
     discount: 0
   });
   const [productImages, setProductImages] = useState([]);
+
+  console.log('ProductManagement render - productImages:', productImages);
 
   useEffect(() => {
     loadData();
@@ -256,10 +258,9 @@ const ProductManagement = () => {
               </div>
 
               {/* Componente para subir imágenes */}
-              <ImageUpload
+              <ImageUploadTest
                 images={productImages}
                 onImagesChange={setProductImages}
-                maxImages={5}
               />
 
               <div className="form-actions">
