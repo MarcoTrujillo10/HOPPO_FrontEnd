@@ -79,7 +79,7 @@ const ProductDetail = () => {
 
   // Generar imágenes para la galería
   const images = productData.images.length > 0 
-    ? productData.images.map(img => img.url)
+    ? productData.images.map(img => img.imageUrl)
     : ['https://via.placeholder.com/500x500?text=Sin+Imagen'];
   
   // Si solo hay una imagen, duplicarla para la galería

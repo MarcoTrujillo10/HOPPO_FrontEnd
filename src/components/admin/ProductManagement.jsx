@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { productService, categoryService, brandService } from '../../services/api';
+import { productService, categoryService, brandService, uploadService } from '../../services/api';
 import ImageUploadTest from './ImageUploadTest';
 import './AdminComponents.css';
 
@@ -47,42 +47,57 @@ const ProductManagement = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Convertir imágenes a URLs (por ahora usamos URLs de placeholder)
-      // En una implementación real, aquí subirías las imágenes a un servidor
-      const imageUrls = productImages.map(img => {
-        if (img.isNew) {
-          // Para nuevas imágenes, usar placeholder por ahora
-          return `https://via.placeholder.com/500x500?text=${encodeURIComponent(formData.name)}`;
-        }
-        return img.url || img.imageUrl;
-      });
+  e.preventDefault();
+  try {
+    // 1) dividir imágenes nuevas vs existentes
+    const imgs = Array.isArray(productImages) ? productImages : [];
 
-      const productData = {
-        ...formData,
-        price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
-        categoryId: parseInt(formData.categoryId),
-        brandId: parseInt(formData.brandId),
-        discount: parseInt(formData.discount) || 0,
-        imageUrls: imageUrls
-      };
+    const newFiles = imgs
+      .filter(img => img?.isNew && img?.file instanceof File)
+      .map(img => img.file);
 
-      if (editingProduct) {
-        await productService.updateProduct(editingProduct.id, productData);
-      } else {
-        await productService.createProduct(productData);
-      }
+    const existingUrls = imgs
+      .filter(img => !img?.isNew)
+      .map(img => img.url || img.imageUrl)
+      .filter(Boolean);
 
-      await loadData();
-      resetForm();
-      alert(editingProduct ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
-    } catch (error) {
-      console.error('Error saving product:', error);
-      alert('Error al guardar el producto');
+    // 2) subir nuevas (si las hay) y obtener sus URLs
+    let uploadedUrls = [];
+    if (newFiles.length > 0) {
+      uploadedUrls = await uploadService.uploadImages(newFiles);
     }
-  };
+
+    // 3) unificar URLs
+    const imageUrls = [...existingUrls, ...uploadedUrls];
+
+    // 4) armar payload del producto
+    const productData = {
+      ...formData,
+      price: Number(formData.price) || 0,
+      stock: parseInt(formData.stock, 10) || 0,
+      categoryId: parseInt(formData.categoryId, 10),
+      brandId: parseInt(formData.brandId, 10),
+      discount: parseInt(formData.discount, 10) || 0,
+      imageUrls
+    };
+
+    // 5) crear o actualizar
+    if (editingProduct?.id) {
+      await productService.updateProduct(editingProduct.id, productData);
+    } else {
+      await productService.createProduct(productData);
+    }
+
+    // 6) refrescar y limpiar
+    await loadData();
+    resetForm();
+    alert(editingProduct ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
+  } catch (error) {
+    console.error('Error saving product:', error);
+    alert('Error al guardar el producto');
+  }
+};
+
 
   const handleEdit = (product) => {
     setEditingProduct(product);

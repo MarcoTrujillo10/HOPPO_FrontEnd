@@ -73,7 +73,7 @@ const NewArrivals = () => {
                 className="newcard__img" 
                 style={{ 
                   backgroundImage: `url("${product.images && product.images.length > 0 
-                    ? product.images[0].url 
+                    ? product.images[0].imageUrl 
                     : 'https://via.placeholder.com/300x300?text=Sin+Imagen'}")` 
                 }} 
               />
