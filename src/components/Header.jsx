@@ -2,16 +2,37 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { useCart } from "../hooks/useCart.jsx";
+import { categoryService } from "../services/api";
 import "./Header.css";
 
 const Header = () => {
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user, isAuthenticated, logout } = useAuth();
   const { getCartTotals } = useCart();
   
   const cartTotals = getCartTotals();
+
+  // Load categories from backend
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await categoryService.getCategories();
+        setCategories(response.data.content || response.data || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   // Handle window resize
   useEffect(() => {
@@ -58,25 +79,51 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="nav">
             <Link className="nav__link" style={isActive("/")} to="/">Inicio</Link>
+            
+            {/* Componentes Dropdown */}
             <div className="nav__dropdown">
               <span className="nav__dropdown-trigger">Componentes</span>
               <div className="nav__dropdown-menu">
-                <Link className="nav__dropdown-link" to="/productos?categoria=procesadores">Procesadores</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=graficas">Tarjetas Gráficas</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=memoria">Memoria RAM</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=almacenamiento">Almacenamiento</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=fuentes">Fuentes de Poder</Link>
+                {loading ? (
+                  <div className="nav__dropdown-link">Cargando...</div>
+                ) : categories.filter(cat => cat.type === 'COMPONENTE').length > 0 ? (
+                  categories.filter(cat => cat.type === 'COMPONENTE').map((category) => (
+                    <Link 
+                      key={category.id}
+                      className="nav__dropdown-link" 
+                      to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
+                    >
+                      {category.description}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="nav__dropdown-link">No hay componentes</div>
+                )}
               </div>
             </div>
+
+            {/* Periféricos Dropdown */}
             <div className="nav__dropdown">
               <span className="nav__dropdown-trigger">Periféricos</span>
               <div className="nav__dropdown-menu">
-                <Link className="nav__dropdown-link" to="/productos?categoria=teclados">Teclados</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=mouses">Mouses</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=monitores">Monitores</Link>
-                <Link className="nav__dropdown-link" to="/productos?categoria=auriculares">Auriculares</Link>
+                {loading ? (
+                  <div className="nav__dropdown-link">Cargando...</div>
+                ) : categories.filter(cat => cat.type === 'PERIFERICO').length > 0 ? (
+                  categories.filter(cat => cat.type === 'PERIFERICO').map((category) => (
+                    <Link 
+                      key={category.id}
+                      className="nav__dropdown-link" 
+                      to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
+                    >
+                      {category.description}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="nav__dropdown-link">No hay periféricos</div>
+                )}
               </div>
             </div>
+
             <Link className="nav__link" style={isActive("/productos")} to="/productos">Todos los Productos</Link>
             <Link className="nav__link" style={isActive("/pc-builder")} to="/pc-builder">🛠️ Armador de PC</Link>
             <Link className="nav__link nav__link--sale" to="/productos?oferta=true">Ofertas</Link>
@@ -179,73 +226,42 @@ const Header = () => {
           
           <div className="mobile-menu__section">
             <h3 className="mobile-menu__section-title">💻 Componentes</h3>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=procesadores" 
-              onClick={closeMobileMenu}
-            >
-              Procesadores
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=graficas" 
-              onClick={closeMobileMenu}
-            >
-              Tarjetas Gráficas
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=memoria" 
-              onClick={closeMobileMenu}
-            >
-              Memoria RAM
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=almacenamiento" 
-              onClick={closeMobileMenu}
-            >
-              Almacenamiento
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=fuentes" 
-              onClick={closeMobileMenu}
-            >
-              Fuentes de Poder
-            </Link>
+            {loading ? (
+              <div className="mobile-menu__sublink">Cargando...</div>
+            ) : categories.filter(cat => cat.type === 'COMPONENTE').length > 0 ? (
+              categories.filter(cat => cat.type === 'COMPONENTE').map((category) => (
+                <Link 
+                  key={category.id}
+                  className="mobile-menu__sublink" 
+                  to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
+                  onClick={closeMobileMenu}
+                >
+                  {category.description}
+                </Link>
+              ))
+            ) : (
+              <div className="mobile-menu__sublink">No hay componentes</div>
+            )}
           </div>
 
           <div className="mobile-menu__section">
             <h3 className="mobile-menu__section-title">⌨️ Periféricos</h3>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=teclados" 
-              onClick={closeMobileMenu}
-            >
-              Teclados
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=mouses" 
-              onClick={closeMobileMenu}
-            >
-              Mouses
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=monitores" 
-              onClick={closeMobileMenu}
-            >
-              Monitores
-            </Link>
-            <Link 
-              className="mobile-menu__sublink" 
-              to="/productos?categoria=auriculares" 
-              onClick={closeMobileMenu}
-            >
-              Auriculares
-            </Link>
+            {loading ? (
+              <div className="mobile-menu__sublink">Cargando...</div>
+            ) : categories.filter(cat => cat.type === 'PERIFERICO').length > 0 ? (
+              categories.filter(cat => cat.type === 'PERIFERICO').map((category) => (
+                <Link 
+                  key={category.id}
+                  className="mobile-menu__sublink" 
+                  to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
+                  onClick={closeMobileMenu}
+                >
+                  {category.description}
+                </Link>
+              ))
+            ) : (
+              <div className="mobile-menu__sublink">No hay periféricos</div>
+            )}
           </div>
 
           <Link 
