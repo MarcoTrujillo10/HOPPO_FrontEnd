@@ -71,6 +71,9 @@ const ProductDetail = () => {
     categoria: product.category?.description || 'Sin categoría',
     marca: product.brand?.name || 'Sin marca',
     precio: product.price || 0,
+    precioConDescuento: product.discountedPrice || product.price || 0,
+    descuento: product.discount || 0,
+    tieneDescuento: product.hasDiscount || false,
     descripcion: product.description || '',
     especificaciones: product.specifications || [],
     stock: product.stock || 0,
@@ -148,7 +151,15 @@ const ProductDetail = () => {
             <p className="pd__model">{productData.detalle}</p>
           </header>
 
-          <div className="pd__price">${productData.precio.toFixed(2)}</div>
+          <div className="pd__pricing">
+            {productData.tieneDescuento && (
+              <div className="pd__discount-info">
+                <span className="pd__price-original">${productData.precio.toFixed(2)}</span>
+                <span className="pd__discount-badge">-{productData.descuento}%</span>
+              </div>
+            )}
+            <div className="pd__price">${productData.precioConDescuento.toFixed(2)}</div>
+          </div>
           
           {productData.stock > 0 && (
             <div className="pd__stock">

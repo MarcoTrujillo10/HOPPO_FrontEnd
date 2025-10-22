@@ -8,6 +8,7 @@ import Contact from "./views/Contact";
 import ProductList from "./views/ProductList";
 import ProductDetail from "./views/ProductDetail";
 import Cart from "./views/Cart";
+import Checkout from "./views/Checkout";
 import Profile from "./views/Profile";
 import PCBuilder from "./views/PCBuilder";
 import Login from "./views/Login";
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/productos/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/pc-builder" element={<PCBuilder />} />
           <Route path="/login" element={<Login />} />

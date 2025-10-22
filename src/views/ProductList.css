@@ -178,7 +178,9 @@
 .product__link:hover .product__title { color: #13a4ec; }
 .product__desc { font-size: 13px; color: #666; margin: 4px 0 0; }
 .product__meta { display: block; color: #888; font-size: 12px; }
+.product__pricing { display: flex; flex-direction: column; gap: 2px; }
 .product__price { font-weight: 800; color: #13a4ec; font-size: 14px; }
+.product__price-original { font-size: 12px; color: #9ca3af; text-decoration: line-through; }
 
 /* ===== Badges / Overlays de la card (siempre debajo del sidebar) ===== */
 .product__image-container {

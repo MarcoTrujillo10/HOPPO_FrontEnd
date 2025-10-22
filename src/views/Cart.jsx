@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import "./Cart.css";
@@ -16,6 +16,7 @@ const Cart = () => {
   } = useCart();
   
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Calcular totales del carrito
   const totals = getCartTotals();
@@ -46,6 +47,22 @@ const Cart = () => {
     } else {
       alert(result.error);
     }
+  };
+
+  // Función para proceder al checkout
+  const handleCheckout = () => {
+    if (!isAuthenticated()) {
+      alert('Debes iniciar sesión para proceder al checkout');
+      navigate('/login');
+      return;
+    }
+
+    if (isCartEmpty()) {
+      alert('Tu carrito está vacío');
+      return;
+    }
+
+    navigate('/checkout');
   };
 
   // Si el usuario no está autenticado
@@ -244,7 +261,10 @@ const Cart = () => {
               <p className="benefit">📦 {totals.itemCount} producto(s) en el carrito</p>
             </div>
 
-            <button className="checkout-btn">
+            <button 
+              className="checkout-btn"
+              onClick={handleCheckout}
+            >
               Proceder al pago
             </button>
 

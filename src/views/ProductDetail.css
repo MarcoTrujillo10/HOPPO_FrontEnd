@@ -41,7 +41,11 @@
 .pd__title { margin: 0; font-size: 30px; font-weight: 800; color: #0f172a; }
 .pd__model { margin: 4px 0 0; color: #6b7280; }
 
-.pd__price { font-size: 36px; font-weight: 800; color: #13a4ec; margin: 8px 0 12px; }
+.pd__pricing { margin: 8px 0 12px; }
+.pd__price { font-size: 36px; font-weight: 800; color: #13a4ec; }
+.pd__discount-info { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.pd__price-original { font-size: 20px; color: #9ca3af; text-decoration: line-through; }
+.pd__discount-badge { background: #ef4444; color: white; padding: 4px 8px; border-radius: 6px; font-size: 14px; font-weight: 600; }
 
 .pd__block { margin-top: 14px; }
 .pd__h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #0f172a; }
