@@ -220,4 +220,18 @@ export const authService = {
   },
 };
 
+export const uploadService = {
+  uploadImages: async (files) => {
+    const fd = new FormData();
+    files.forEach(f => fd.append('files', f));
+    const res = await api.post('/uploads', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    const urls = (res.data?.urls || []).map(u => `${API_BASE_URL}${u}`);
+    return urls;
+  }
+};
+
+
+
 export default api;
