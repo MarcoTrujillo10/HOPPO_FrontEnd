@@ -1,10 +1,7 @@
 import { useState, useRef } from 'react';
-
 const ImageUploadTest = ({ images = [], onImagesChange }) => {
   const fileInputRef = useRef(null);
-
   console.log('ImageUploadTest render - images:', images);
-
   const handleFileSelect = (files) => {
     console.log('Files selected:', files);
     const fileArray = Array.from(files);
@@ -14,23 +11,19 @@ const ImageUploadTest = ({ images = [], onImagesChange }) => {
       alert('Solo archivos de imagen');
       return;
     }
-
     const newImages = imageFiles.map(file => ({
       file: file,
       url: URL.createObjectURL(file),
       name: file.name,
       isNew: true
     }));
-
     console.log('New images:', newImages);
     onImagesChange([...images, ...newImages]);
   };
-
   const removeImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
   };
-
   return (
     <div style={{ border: '2px solid #ccc', padding: '20px', margin: '20px 0' }}>
       <h3>Test Image Upload</h3>
@@ -62,5 +55,4 @@ const ImageUploadTest = ({ images = [], onImagesChange }) => {
     </div>
   );
 };
-
 export default ImageUploadTest;

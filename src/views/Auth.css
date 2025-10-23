@@ -1,4 +1,4 @@
-/* Estilos para páginas de autenticación */
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -112,7 +112,7 @@
   text-decoration: underline;
 }
 
-/* Responsive */
+
 @media (max-width: 480px) {
   .auth-page {
     padding: 10px;

@@ -1,4 +1,4 @@
-/* Estilos generales para componentes de administración */
+
 
 .loading {
   text-align: center;
@@ -22,7 +22,7 @@
   font-size: 1.8rem;
 }
 
-/* Botones */
+
 .btn {
   padding: 10px 20px;
   border: none;
@@ -102,7 +102,7 @@
   font-size: 0.8rem;
 }
 
-/* Modal de formulario */
+
 .form-modal {
   position: fixed;
   top: 0;
@@ -154,7 +154,7 @@
   color: #dc3545;
 }
 
-/* Formularios */
+
 .product-form,
 .category-form,
 .brand-form {
@@ -206,7 +206,7 @@
   border-top: 2px solid #e9ecef;
 }
 
-/* Grids de productos, categorías y marcas */
+
 .products-grid,
 .categories-grid,
 .brands-grid {
@@ -267,7 +267,7 @@
   line-height: 1.5;
 }
 
-/* Tipo de categoría */
+
 .category-type {
   display: inline-block;
   padding: 4px 8px;
@@ -299,7 +299,7 @@
   margin-top: 15px;
 }
 
-/* Tabla de órdenes */
+
 .orders-table-container {
   overflow-x: auto;
   margin-top: 20px;
@@ -342,7 +342,7 @@
   color: #6c757d;
 }
 
-/* Estados de órdenes */
+
 .status-badge {
   padding: 6px 12px;
   border-radius: 20px;
@@ -377,7 +377,7 @@
   flex-wrap: wrap;
 }
 
-/* Estado vacío */
+
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -385,7 +385,7 @@
   font-size: 1.1rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -422,7 +422,7 @@
   }
 }
 
-/* ===== IMAGE UPLOAD STYLES ===== */
+
 .image-upload-container {
   margin: 20px 0;
 }
@@ -607,7 +607,7 @@
   margin-bottom: 5px;
 }
 
-/* Responsive para image upload */
+
 @media (max-width: 768px) {
   .image-preview-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -623,7 +623,7 @@
   }
 }
 
-/* ===== PRODUCT CARD IMAGE STYLES ===== */
+
 .product-image {
   position: relative;
   width: 100%;
@@ -676,7 +676,7 @@
   margin: 5px 0;
 }
 
-/* Mejorar el layout de las tarjetas de productos */
+
 .product-card {
   display: flex;
   flex-direction: column;

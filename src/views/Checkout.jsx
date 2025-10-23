@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart.jsx';
 import PaymentForm from '../components/PaymentForm.jsx';
 import './Checkout.css';
-
 const Checkout = () => {
   const { cart, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
   const [showPaymentForm, setShowPaymentForm] = useState(true);
-
   const handlePaymentSuccess = (paymentResult) => {
     console.log('Pago exitoso:', paymentResult);
     
-    // Limpiar el carrito
-    clearCart();
+    // El carrito ya se limpia automáticamente en el backend
+    // Solo necesitamos recargar el carrito para reflejar los cambios
+    window.location.reload();
     
     // Mostrar mensaje de éxito
     alert(`¡Pago procesado exitosamente!
@@ -21,17 +20,14 @@ const Checkout = () => {
 ID de Transacción: ${paymentResult.transactionId}
 ID de Orden: ${paymentResult.orderId}
 Monto: $${paymentResult.amount.toFixed(2)}
-
 Gracias por tu compra!`);
     
     // Redirigir a la página principal
     navigate('/');
   };
-
   const handlePaymentCancel = () => {
     navigate('/cart');
   };
-
   if (!cart || cart.items.length === 0) {
     return (
       <main className="checkout">
@@ -48,7 +44,6 @@ Gracias por tu compra!`);
       </main>
     );
   }
-
   return (
     <main className="checkout">
       <div className="checkout__container">
@@ -116,7 +111,6 @@ Gracias por tu compra!`);
               </div>
             </div>
           </div>
-
           {/* Formulario de pago */}
           <div className="checkout__payment">
             <PaymentForm
@@ -129,5 +123,4 @@ Gracias por tu compra!`);
     </main>
   );
 };
-
 export default Checkout;

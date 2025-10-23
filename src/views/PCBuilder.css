@@ -33,7 +33,7 @@
   margin-bottom: 2rem;
 }
 
-/* Progress Steps */
+
 .pc-builder__steps {
   display: flex;
   justify-content: space-between;
@@ -84,7 +84,7 @@
   text-align: center;
 }
 
-/* Main Content */
+
 .pc-builder__main {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -104,7 +104,7 @@
   padding: 1.5rem;
 }
 
-/* Navigation */
+
 .pc-builder__navigation {
   display: flex;
   justify-content: space-between;
@@ -156,7 +156,7 @@
   font-size: 1.1rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .pc-builder__title {
     font-size: 2rem;

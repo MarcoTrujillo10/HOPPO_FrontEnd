@@ -1,11 +1,9 @@
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useCart } from '../hooks/useCart.jsx';
-
 const TestPage = () => {
   const { user, isAuthenticated } = useAuth();
   const { cartProducts, getCartTotals } = useCart();
   const cartTotals = getCartTotals();
-
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>🧪 Página de Prueba - HOPPO</h1>
@@ -21,7 +19,6 @@ const TestPage = () => {
           </div>
         )}
       </div>
-
       <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
         <h2>Estado del Carrito:</h2>
         <p><strong>Productos en carrito:</strong> {cartProducts.length}</p>
@@ -29,7 +26,6 @@ const TestPage = () => {
         <p><strong>Subtotal:</strong> ${cartTotals.subtotal}</p>
         <p><strong>Total:</strong> ${cartTotals.total}</p>
       </div>
-
       <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px' }}>
         <h2>Enlaces de Prueba:</h2>
         <ul>
@@ -40,7 +36,6 @@ const TestPage = () => {
           <li><a href="/register">📝 Registro</a></li>
         </ul>
       </div>
-
       <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
         <h2>🔧 Información Técnica:</h2>
         <p><strong>Frontend:</strong> React + Vite (Puerto 5174)</p>
@@ -51,6 +46,4 @@ const TestPage = () => {
     </div>
   );
 };
-
 export default TestPage;
-

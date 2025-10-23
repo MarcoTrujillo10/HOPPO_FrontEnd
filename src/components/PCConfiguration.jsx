@@ -1,5 +1,4 @@
 import './PCConfiguration.css';
-
 const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-US', {
@@ -7,7 +6,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
       currency: 'USD'
     }).format(price);
   };
-
   const getComponentIcon = (category) => {
     const icons = {
       cpu: '🧠',
@@ -21,7 +19,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
     };
     return icons[category] || '🔧';
   };
-
   const getComponentName = (category) => {
     const names = {
       cpu: 'Procesador',
@@ -35,7 +32,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
     };
     return names[category] || category;
   };
-
   const calculateCompatibility = () => {
     const warnings = [];
     
@@ -75,9 +71,7 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
     
     return warnings;
   };
-
   const compatibilityWarnings = calculateCompatibility();
-
   return (
     <div className="pc-configuration">
       <div className="pc-configuration__header">
@@ -90,7 +84,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
           )}
         </div>
       </div>
-
       <div className="pc-configuration__components">
         {Object.entries(selectedComponents).map(([category, component]) => (
           <div key={category} className="pc-configuration__component">
@@ -132,7 +125,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
           </div>
         ))}
       </div>
-
       {/* Compatibility Warnings */}
       {compatibilityWarnings.length > 0 && (
         <div className="pc-configuration__warnings">
@@ -144,7 +136,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
           ))}
         </div>
       )}
-
       {/* Total Price */}
       <div className="pc-configuration__total">
         <div className="pc-configuration__total-label">Total estimado:</div>
@@ -152,7 +143,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
           {formatPrice(totalPrice)}
         </div>
       </div>
-
       {/* Action Buttons */}
       <div className="pc-configuration__actions">
         <button 
@@ -168,7 +158,6 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
           🛒 Agregar al Carrito
         </button>
       </div>
-
       {/* Build Summary */}
       {isComplete && (
         <div className="pc-configuration__summary">
@@ -198,5 +187,4 @@ const PCConfiguration = ({ selectedComponents, totalPrice, isComplete }) => {
     </div>
   );
 };
-
 export default PCConfiguration;

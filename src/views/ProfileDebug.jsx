@@ -1,15 +1,12 @@
 import { useAuth } from '../hooks/useAuth.jsx';
-
 const ProfileDebug = () => {
   const { user, token, isAuthenticated, loading } = useAuth();
-
   console.log('ProfileDebug - Estado:', {
     user,
     token: token ? 'Presente' : 'No presente',
     isAuthenticated: isAuthenticated(),
     loading
   });
-
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>Profile Debug</h1>
@@ -21,14 +18,12 @@ const ProfileDebug = () => {
         <p><strong>Token:</strong> {token ? 'Presente' : 'No presente'}</p>
         <p><strong>Usuario:</strong> {user ? 'Presente' : 'No presente'}</p>
       </div>
-
       <div style={{ marginBottom: '20px' }}>
         <h2>Datos del Usuario:</h2>
         <pre style={{ background: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
           {JSON.stringify(user, null, 2)}
         </pre>
       </div>
-
       <div style={{ marginBottom: '20px' }}>
         <h2>Resultado de isAuthenticated():</h2>
         <div style={{ 
@@ -40,7 +35,6 @@ const ProfileDebug = () => {
           {isAuthenticated() ? '✅ Usuario autenticado' : '❌ Usuario NO autenticado'}
         </div>
       </div>
-
       <div style={{ marginBottom: '20px' }}>
         <h2>Renderizado del Perfil:</h2>
         {!isAuthenticated() ? (
@@ -70,5 +64,4 @@ const ProfileDebug = () => {
     </div>
   );
 };
-
 export default ProfileDebug;

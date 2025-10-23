@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import { orderService } from '../../services/api';
 import './AdminComponents.css';
-
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     loadOrders();
   }, []);
-
   const loadOrders = async () => {
     try {
       setLoading(true);
+      console.log('🛒 OrderManagement: Cargando órdenes...');
       const response = await orderService.getOrders();
-      setOrders(response.data || []);
+      console.log('🛒 OrderManagement: Respuesta del backend:', response);
+      // El backend devuelve una respuesta paginada con content
+      const orders = response.data?.content || response.data || [];
+      console.log('🛒 OrderManagement: Órdenes extraídas:', orders);
+      setOrders(orders);
     } catch (error) {
       console.error('Error loading orders:', error);
       setOrders([]);
@@ -22,7 +24,6 @@ const OrderManagement = () => {
       setLoading(false);
     }
   };
-
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
       await orderService.updateOrder(orderId, { status: newStatus });
@@ -33,18 +34,15 @@ const OrderManagement = () => {
       alert('Error al actualizar la orden');
     }
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -55,11 +53,9 @@ const OrderManagement = () => {
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
-
   if (loading) {
     return <div className="loading">Cargando órdenes...</div>;
   }
-
   return (
     <div className="order-management">
       <div className="section-header">
@@ -71,7 +67,6 @@ const OrderManagement = () => {
           🔄 Actualizar
         </button>
       </div>
-
       <div className="orders-table-container">
         <table className="orders-table">
           <thead>
@@ -122,7 +117,6 @@ const OrderManagement = () => {
           </tbody>
         </table>
       </div>
-
       {orders.length === 0 && (
         <div className="empty-state">
           <p>No hay órdenes registradas.</p>
@@ -131,5 +125,4 @@ const OrderManagement = () => {
     </div>
   );
 };
-
 export default OrderManagement;

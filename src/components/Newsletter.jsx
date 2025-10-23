@@ -1,5 +1,4 @@
 import "./Newsletter.css";
-
 const Newsletter = () => {
   return (
     <section className="news">

@@ -4,8 +4,6 @@ import { productService } from "../services/api";
 import { useCart } from "../hooks/useCart.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import "./ProductDetail.css";
-
-
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -16,7 +14,6 @@ const ProductDetail = () => {
   
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
-
   // Cargar producto del backend
   useEffect(() => {
     const loadProduct = async () => {
@@ -31,12 +28,10 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
-
     if (id) {
       loadProduct();
     }
   }, [id]);
-
   // Mostrar estado de carga
   if (loading) {
     return (
@@ -47,7 +42,6 @@ const ProductDetail = () => {
       </main>
     );
   }
-
   // Si no se encuentra el producto, mostrar error
   if (error || !product) {
     return (
@@ -62,7 +56,6 @@ const ProductDetail = () => {
       </main>
     );
   }
-
   // Mapear datos del backend
   const productData = {
     id: product.id,
@@ -79,7 +72,6 @@ const ProductDetail = () => {
     stock: product.stock || 0,
     images: product.images || []
   };
-
   // Generar imágenes para la galería
   const images = productData.images.length > 0 
     ? productData.images.map(img => img.imageUrl)
@@ -89,14 +81,12 @@ const ProductDetail = () => {
   while (images.length < 4) {
     images.push(images[0]);
   }
-
   // Función para agregar al carrito
   const handleAddToCart = async () => {
     if (!isAuthenticated()) {
       alert('Debes iniciar sesión para agregar productos al carrito');
       return;
     }
-
     try {
       setAddingToCart(true);
       const result = await addToCart(productData.id, quantity);
@@ -113,7 +103,6 @@ const ProductDetail = () => {
       setAddingToCart(false);
     }
   };
-
   return (
     <main className="pd container">
       {/* migas */}
@@ -122,7 +111,6 @@ const ProductDetail = () => {
         <span>/</span>
         <span>{productData.categoria}</span>
       </div>
-
       <div className="pd__grid">
         {/* Galería */}
         <section className="pd__gallery">
@@ -143,14 +131,12 @@ const ProductDetail = () => {
             style={{ backgroundImage: `url("${images[3]}")` }}
           />
         </section>
-
         {/* Info */}
         <section className="pd__info">
           <header className="pd__header">
             <h1 className="pd__title">{productData.nombre}</h1>
             <p className="pd__model">{productData.detalle}</p>
           </header>
-
           <div className="pd__pricing">
             {productData.tieneDescuento && (
               <div className="pd__discount-info">
@@ -166,14 +152,12 @@ const ProductDetail = () => {
               Stock disponible: {productData.stock} unidades
             </div>
           )}
-
           <div className="pd__block">
             <h2 className="pd__h2">Descripción del Producto</h2>
             <p className="pd__text">
               {productData.descripcion || 'No hay descripción disponible.'}
             </p>
           </div>
-
           <div className="pd__block">
             <h2 className="pd__h2">Especificaciones Técnicas</h2>
             <div className="pd__specs">
@@ -189,7 +173,6 @@ const ProductDetail = () => {
               )}
             </div>
           </div>
-
           <div className="pd__actions">
             {productData.stock > 0 && (
               <div className="pd__quantity">
@@ -233,5 +216,4 @@ const ProductDetail = () => {
     </main>
   );
 };
-
 export default ProductDetail;

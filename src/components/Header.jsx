@@ -16,7 +16,7 @@ const Header = () => {
   
   const cartTotals = getCartTotals();
 
-  // Load categories from backend
+ 
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -34,7 +34,7 @@ const Header = () => {
     loadCategories();
   }, []);
 
-  // Handle window resize
+ 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -125,8 +125,6 @@ const Header = () => {
             </div>
 
             <Link className="nav__link" style={isActive("/productos")} to="/productos">Todos los Productos</Link>
-            <Link className="nav__link" style={isActive("/pc-builder")} to="/pc-builder">🛠️ Armador de PC</Link>
-            <Link className="nav__link nav__link--sale" to="/productos?oferta=true">Ofertas</Link>
           </nav>
         </div>
 
@@ -270,21 +268,6 @@ const Header = () => {
             onClick={closeMobileMenu}
           >
             📦 Todos los Productos
-          </Link>
-          <Link 
-            className="mobile-menu__link" 
-            style={isActive("/pc-builder")} 
-            to="/pc-builder" 
-            onClick={closeMobileMenu}
-          >
-            🛠️ Armador de PC
-          </Link>
-          <Link 
-            className="mobile-menu__link mobile-menu__link--sale" 
-            to="/productos?oferta=true" 
-            onClick={closeMobileMenu}
-          >
-            🔥 Ofertas
           </Link>
           
           {/* Autenticación en móvil */}

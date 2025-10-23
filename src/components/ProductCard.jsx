@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 const ProductCard = ({ p }) => {
   // Mapear datos del backend a la estructura esperada
   const productData = {
@@ -15,12 +14,10 @@ const ProductCard = ({ p }) => {
     stock: p.stock || 0,
     images: p.images || []
   };
-
   // Obtener imagen principal
   const imagenPrincipal = productData.images.length > 0 
     ? productData.images[0].imageUrl 
     : 'https://via.placeholder.com/300x300?text=Sin+Imagen';
-
   return (
     <article className="product">
       <Link to={`/productos/${productData.id}`} className="product__link">
@@ -40,13 +37,11 @@ const ProductCard = ({ p }) => {
             </div>
           )}
         </div>
-
         <div className="product__body">
           <div>
             <h3 className="product__title">
               {productData.nombre}
             </h3>
-
             <p className="product__desc">{productData.detalle}</p>
             <small className="product__meta">
               {productData.categoria} · {productData.marca}
@@ -57,7 +52,6 @@ const ProductCard = ({ p }) => {
               </small>
             )}
           </div>
-
           <div className="product__pricing">
             {productData.tieneDescuento && (
               <span className="product__price-original">
@@ -71,5 +65,4 @@ const ProductCard = ({ p }) => {
     </article>
   );
 };
-
 export default ProductCard;

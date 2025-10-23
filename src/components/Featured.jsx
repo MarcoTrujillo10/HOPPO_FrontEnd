@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productService } from "../services/api";
 import "./Featured.css";
-
 const Featured = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadFeaturedProducts = async () => {
       try {
@@ -20,17 +18,14 @@ const Featured = () => {
         setLoading(false);
       }
     };
-
     loadFeaturedProducts();
   }, []);
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   if (loading) {
     return (
       <section className="feat">
@@ -49,7 +44,6 @@ const Featured = () => {
       </section>
     );
   }
-
   if (products.length === 0) {
     return (
       <section className="feat">
@@ -61,7 +55,6 @@ const Featured = () => {
       </section>
     );
   }
-
   return (
     <section className="feat">
       <h2 className="feat__title">Productos destacados</h2>
@@ -94,5 +87,4 @@ const Featured = () => {
     </section>
   );
 };
-
 export default Featured;

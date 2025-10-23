@@ -1,5 +1,4 @@
 import ProductCard from "./ProductCard";
-
 const ProductGrid = ({ productos }) => {
   return (
     <div className="grid">
@@ -9,5 +8,4 @@ const ProductGrid = ({ productos }) => {
     </div>
   );
 };
-
 export default ProductGrid;

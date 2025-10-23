@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { productService, categoryService, brandService, uploadService } from '../../services/api';
 import ImageUploadTest from './ImageUploadTest';
 import './AdminComponents.css';
-
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,13 +19,10 @@ const ProductManagement = () => {
     discount: 0
   });
   const [productImages, setProductImages] = useState([]);
-
   console.log('ProductManagement render - productImages:', productImages);
-
   useEffect(() => {
     loadData();
   }, []);
-
   const loadData = async () => {
     try {
       setLoading(true);
@@ -35,7 +31,6 @@ const ProductManagement = () => {
         categoryService.getCategories(),
         brandService.getBrands()
       ]);
-
       setProducts(productsRes.data.content || productsRes.data || []);
       setCategories(categoriesRes.data.content || categoriesRes.data || []);
       setBrands(brandsRes.data || []);
@@ -45,31 +40,25 @@ const ProductManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     // 1) dividir imágenes nuevas vs existentes
     const imgs = Array.isArray(productImages) ? productImages : [];
-
     const newFiles = imgs
       .filter(img => img?.isNew && img?.file instanceof File)
       .map(img => img.file);
-
     const existingUrls = imgs
       .filter(img => !img?.isNew)
       .map(img => img.url || img.imageUrl)
       .filter(Boolean);
-
     // 2) subir nuevas (si las hay) y obtener sus URLs
     let uploadedUrls = [];
     if (newFiles.length > 0) {
       uploadedUrls = await uploadService.uploadImages(newFiles);
     }
-
     // 3) unificar URLs
     const imageUrls = [...existingUrls, ...uploadedUrls];
-
     // 4) armar payload del producto
     const productData = {
       ...formData,
@@ -80,14 +69,12 @@ const ProductManagement = () => {
       discount: parseInt(formData.discount, 10) || 0,
       imageUrls
     };
-
     // 5) crear o actualizar
     if (editingProduct?.id) {
       await productService.updateProduct(editingProduct.id, productData);
     } else {
       await productService.createProduct(productData);
     }
-
     // 6) refrescar y limpiar
     await loadData();
     resetForm();
@@ -97,8 +84,6 @@ const ProductManagement = () => {
     alert('Error al guardar el producto');
   }
 };
-
-
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
@@ -125,7 +110,6 @@ const ProductManagement = () => {
     
     setShowForm(true);
   };
-
   const handleDelete = async (productId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       try {
@@ -138,7 +122,6 @@ const ProductManagement = () => {
       }
     }
   };
-
   const resetForm = () => {
     setFormData({
       name: '',
@@ -153,18 +136,15 @@ const ProductManagement = () => {
     setEditingProduct(null);
     setShowForm(false);
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   if (loading) {
     return <div className="loading">Cargando productos...</div>;
   }
-
   return (
     <div className="product-management">
       <div className="section-header">
@@ -176,7 +156,6 @@ const ProductManagement = () => {
           ➕ Agregar Producto
         </button>
       </div>
-
       {showForm && (
         <div className="form-modal">
           <div className="form-content">
@@ -184,7 +163,6 @@ const ProductManagement = () => {
               <h3>{editingProduct ? '✏️ Editar Producto' : '➕ Nuevo Producto'}</h3>
               <button className="close-btn" onClick={resetForm}>✕</button>
             </div>
-
             <form onSubmit={handleSubmit} className="product-form">
               <div className="form-row">
                 <div className="form-group">
@@ -196,7 +174,6 @@ const ProductManagement = () => {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label>Precio</label>
                   <input
@@ -208,7 +185,6 @@ const ProductManagement = () => {
                   />
                 </div>
               </div>
-
               <div className="form-row">
                 <div className="form-group">
                   <label>Stock</label>
@@ -219,7 +195,6 @@ const ProductManagement = () => {
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label>Descuento (%)</label>
                   <input
@@ -231,7 +206,6 @@ const ProductManagement = () => {
                   />
                 </div>
               </div>
-
               <div className="form-row">
                 <div className="form-group">
                   <label>Categoría</label>
@@ -246,7 +220,6 @@ const ProductManagement = () => {
                     ))}
                   </select>
                 </div>
-
                 <div className="form-group">
                   <label>Marca</label>
                   <select
@@ -261,7 +234,6 @@ const ProductManagement = () => {
                   </select>
                 </div>
               </div>
-
               <div className="form-group">
                 <label>Descripción</label>
                 <textarea
@@ -271,13 +243,11 @@ const ProductManagement = () => {
                   required
                 />
               </div>
-
               {/* Componente para subir imágenes */}
               <ImageUploadTest
                 images={productImages}
                 onImagesChange={setProductImages}
               />
-
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -290,7 +260,6 @@ const ProductManagement = () => {
           </div>
         </div>
       )}
-
       <div className="products-grid">
         {products.map(product => (
           <div key={product.id} className="product-card">
@@ -347,7 +316,6 @@ const ProductManagement = () => {
           </div>
         ))}
       </div>
-
       {products.length === 0 && (
         <div className="empty-state">
           <p>No hay productos registrados.</p>
@@ -356,5 +324,4 @@ const ProductManagement = () => {
     </div>
   );
 };
-
 export default ProductManagement;

@@ -6,7 +6,6 @@ import Offers from "../components/Offers";
 import Categories from "../components/Categories";
 import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
-
 const Home = () => {
   return (
     <main className="home">
@@ -22,5 +21,4 @@ const Home = () => {
     </main>
   );
 };
-
 export default Home;

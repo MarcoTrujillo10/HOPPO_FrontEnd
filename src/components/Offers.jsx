@@ -1,5 +1,4 @@
 import "./Offers.css";
-
 const Offers = () => {
   const IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuAPq0In9Wd2HuJsWfsAQzmWLViv6CrJqKOjiiwpmF73o3DJrziLIuEDQzKwVplxoGwY-ffAS7OHQkBm8KtRV0BU6vFcne7kr_xqvJnzkn48PiJovGa9_Uqv2z19DjU8b3jplZbGySpVUlAnbBUIGzir_vDxeyIz20avtq2UsX-sF9diHgJ15fFADHqeExzpzVIU7ul_-y9yIcKob3bbs_fTRUJYXjTZQr4-WFLBN8VZnwWS-UGZDxigfg-lIgMKRaZD_l1_xen9dYE";
   return (
@@ -19,5 +18,4 @@ const Offers = () => {
     </section>
   );
 };
-
 export default Offers;

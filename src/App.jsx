@@ -19,8 +19,6 @@ import ProfileDebug from "./views/ProfileDebug";
 import ProfileSimple from "./views/ProfileSimple";
 import ProfileMinimal from "./views/ProfileMinimal";
 import AdminPanel from "./views/AdminPanel";
-
-
 const App = () => {
   return (
     <AuthProvider>
@@ -48,5 +46,4 @@ const App = () => {
     </AuthProvider>
   );
 };
-
 export default App;

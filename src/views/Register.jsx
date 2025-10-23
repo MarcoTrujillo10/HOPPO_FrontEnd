@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import './Auth.css';
-
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -13,10 +12,8 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const { register } = useAuth();
   const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,19 +21,16 @@ const Register = () => {
     });
     setError(''); // Limpiar error al escribir
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     // Validar que las contraseñas coincidan
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       setLoading(false);
       return;
     }
-
     try {
       const result = await register({
         firstname: formData.firstName,
@@ -58,7 +52,6 @@ const Register = () => {
       setLoading(false);
     }
   };
-
   return (
     <main className="auth-page">
       <div className="auth-container">
@@ -70,7 +63,6 @@ const Register = () => {
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-row">
               <div className="form-group">
@@ -85,7 +77,6 @@ const Register = () => {
                   disabled={loading}
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="lastName">Apellido</label>
                 <input
@@ -99,7 +90,6 @@ const Register = () => {
                 />
               </div>
             </div>
-
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -112,7 +102,6 @@ const Register = () => {
                 disabled={loading}
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
               <input
@@ -126,7 +115,6 @@ const Register = () => {
                 minLength="6"
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirmar Contraseña</label>
               <input
@@ -140,7 +128,6 @@ const Register = () => {
                 minLength="6"
               />
             </div>
-
             <button 
               type="submit" 
               className="btn btn--primary auth-submit"
@@ -149,7 +136,6 @@ const Register = () => {
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </button>
           </form>
-
           <div className="auth-links">
             <p>¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
           </div>
@@ -158,5 +144,4 @@ const Register = () => {
     </main>
   );
 };
-
 export default Register;

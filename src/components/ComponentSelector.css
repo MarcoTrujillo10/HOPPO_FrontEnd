@@ -27,7 +27,7 @@
   color: #155724;
 }
 
-/* Filters */
+
 .component-selector__filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -82,7 +82,7 @@
   background: #f8f9fa;
 }
 
-/* Components Grid */
+
 .component-selector__grid {
   flex: 1;
   display: grid;
@@ -265,7 +265,7 @@
   font-size: 1.1rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .component-selector__filters {
     grid-template-columns: 1fr;

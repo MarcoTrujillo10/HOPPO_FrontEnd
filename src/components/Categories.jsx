@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { categoryService } from "../services/api";
 import "./Categories.css";
-
-// Función para obtener icono basado en el tipo de categoría
 const getCategoryIcon = (category) => {
   const componentIcons = {
     "Procesadores": "🧠",
@@ -21,7 +19,6 @@ const getCategoryIcon = (category) => {
     "GPU": "🎮",
     "PSU": "⚡"
   };
-
   const peripheralIcons = {
     "Monitores": "🖥️",
     "Teclados": "⌨️",
@@ -34,15 +31,12 @@ const getCategoryIcon = (category) => {
     "Teclado": "⌨️",
     "Monitor": "🖥️"
   };
-
   const iconMap = category.type === 'COMPONENTE' ? componentIcons : peripheralIcons;
   return iconMap[category.description] || (category.type === 'COMPONENTE' ? "🔧" : "🖱️");
 };
-
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -56,10 +50,8 @@ const Categories = () => {
         setLoading(false);
       }
     };
-
     loadCategories();
   }, []);
-
   if (loading) {
     return (
       <section className="cats">
@@ -75,7 +67,6 @@ const Categories = () => {
       </section>
     );
   }
-
   if (categories.length === 0) {
     return (
       <section className="cats">
@@ -87,7 +78,6 @@ const Categories = () => {
       </section>
     );
   }
-
   return (
     <section className="cats">
       <h2 className="cats__title">Categorías principales</h2>
@@ -111,5 +101,4 @@ const Categories = () => {
     </section>
   );
 };
-
 export default Categories;

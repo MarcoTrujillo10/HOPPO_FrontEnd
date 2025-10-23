@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productService } from '../services/api';
 import './ComponentSelector.css';
-
 const ComponentSelector = ({ category, categoryName, selectedComponent, onSelectComponent }) => {
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [filters, setFilters] = useState({
@@ -10,7 +9,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
     search: ''
   });
   const [sortBy, setSortBy] = useState('price');
-
   useEffect(() => {
     const fetchComponents = async () => {
       try {
@@ -70,28 +68,23 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
         setFilteredComponents([]);
       }
     };
-
     fetchComponents();
   }, [category, filters, sortBy]);
-
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
       ...prev,
       [filterType]: value
     }));
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   const getBrands = () => {
     return [...new Set(filteredComponents.map(comp => comp.marca))];
   };
-
   return (
     <div className="component-selector">
       <div className="component-selector__header">
@@ -105,7 +98,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
           </div>
         )}
       </div>
-
       {/* Filters */}
       <div className="component-selector__filters">
         <div className="component-selector__filter">
@@ -118,7 +110,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
             className="component-selector__search"
           />
         </div>
-
         <div className="component-selector__filter">
           <label>Marca:</label>
           <select
@@ -132,7 +123,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
             ))}
           </select>
         </div>
-
         <div className="component-selector__filter">
           <label>Precio máximo:</label>
           <input
@@ -142,7 +132,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
             className="component-selector__price-input"
           />
         </div>
-
         <div className="component-selector__filter">
           <label>Ordenar por:</label>
           <select
@@ -156,7 +145,6 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
           </select>
         </div>
       </div>
-
       {/* Components Grid */}
       <div className="component-selector__grid">
         {filteredComponents.length === 0 ? (
@@ -218,5 +206,4 @@ const ComponentSelector = ({ category, categoryName, selectedComponent, onSelect
     </div>
   );
 };
-
 export default ComponentSelector;

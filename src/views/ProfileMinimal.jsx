@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { orderService } from '../services/api';
 import "./Profile.css";
-
 const ProfileMinimal = () => {
   const { user, isAuthenticated } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (isAuthenticated()) {
       loadUserOrders();
     }
   }, [user, isAuthenticated]);
-
   const loadUserOrders = async () => {
     try {
       setLoading(true);
@@ -28,25 +25,21 @@ const ProfileMinimal = () => {
       setLoading(false);
     }
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
-
   console.log('ProfileMinimal rendering:', {
     isAuthenticated: isAuthenticated(),
     user,
     loading,
     ordersCount: orders.length
   });
-
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
@@ -58,7 +51,6 @@ const ProfileMinimal = () => {
       </main>
     );
   }
-
   return (
     <main className="profile container">
       <div className="profile__header">
@@ -91,7 +83,6 @@ const ProfileMinimal = () => {
           </div>
         </div>
       </div>
-
       <div className="profile__content">
         <div className="profile__panel">
           <div className="panel-content">
@@ -118,7 +109,6 @@ const ProfileMinimal = () => {
                   </div>
                 </div>
               </div>
-
               {user?.role === 'VENDEDOR' && (
                 <div className="info-section">
                   <h3>🛠️ Acceso de Vendedor</h3>
@@ -128,7 +118,6 @@ const ProfileMinimal = () => {
                   </a>
                 </div>
               )}
-
               <div className="info-section">
                 <h3>📦 Mis Pedidos</h3>
                 {loading ? (
@@ -165,5 +154,4 @@ const ProfileMinimal = () => {
     </main>
   );
 };
-
 export default ProfileMinimal;

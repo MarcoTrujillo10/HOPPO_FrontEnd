@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { categoryService } from '../../services/api';
 import './AdminComponents.css';
-
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,11 +10,9 @@ const CategoryManagement = () => {
     description: '',
     type: 'COMPONENTE'
   });
-
   useEffect(() => {
     loadCategories();
   }, []);
-
   const loadCategories = async () => {
     try {
       setLoading(true);
@@ -27,7 +24,6 @@ const CategoryManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -36,7 +32,6 @@ const CategoryManagement = () => {
       } else {
         await categoryService.createCategory(formData);
       }
-
       await loadCategories();
       resetForm();
       alert(editingCategory ? 'Categoría actualizada exitosamente' : 'Categoría creada exitosamente');
@@ -45,7 +40,6 @@ const CategoryManagement = () => {
       alert('Error al guardar la categoría');
     }
   };
-
   const handleEdit = (category) => {
     setEditingCategory(category);
     setFormData({
@@ -54,7 +48,6 @@ const CategoryManagement = () => {
     });
     setShowForm(true);
   };
-
   const handleDelete = async (categoryId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
       try {
@@ -67,17 +60,14 @@ const CategoryManagement = () => {
       }
     }
   };
-
   const resetForm = () => {
     setFormData({ description: '', type: 'COMPONENTE' });
     setEditingCategory(null);
     setShowForm(false);
   };
-
   if (loading) {
     return <div className="loading">Cargando categorías...</div>;
   }
-
   return (
     <div className="category-management">
       <div className="section-header">
@@ -89,7 +79,6 @@ const CategoryManagement = () => {
           ➕ Agregar Categoría
         </button>
       </div>
-
       {showForm && (
         <div className="form-modal">
           <div className="form-content">
@@ -97,7 +86,6 @@ const CategoryManagement = () => {
               <h3>{editingCategory ? '✏️ Editar Categoría' : '➕ Nueva Categoría'}</h3>
               <button className="close-btn" onClick={resetForm}>✕</button>
             </div>
-
             <form onSubmit={handleSubmit} className="category-form">
               <div className="form-group">
                 <label>Nombre de la Categoría</label>
@@ -109,7 +97,6 @@ const CategoryManagement = () => {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label>Tipo de Categoría</label>
                 <select
@@ -121,7 +108,6 @@ const CategoryManagement = () => {
                   <option value="PERIFERICO">🖱️ Periférico</option>
                 </select>
               </div>
-
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -134,7 +120,6 @@ const CategoryManagement = () => {
           </div>
         </div>
       )}
-
       <div className="categories-grid">
         {categories.map(category => (
           <div key={category.id} className="category-card">
@@ -163,7 +148,6 @@ const CategoryManagement = () => {
           </div>
         ))}
       </div>
-
       {categories.length === 0 && (
         <div className="empty-state">
           <p>No hay categorías registradas.</p>
@@ -172,5 +156,4 @@ const CategoryManagement = () => {
     </div>
   );
 };
-
 export default CategoryManagement;

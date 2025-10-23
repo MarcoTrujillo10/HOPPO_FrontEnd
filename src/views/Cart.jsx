@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 import "./Cart.css";
-
 const Cart = () => {
   const { 
     cartProducts, 
@@ -12,15 +11,14 @@ const Cart = () => {
     removeFromCart,
     getCartTotals,
     isCartEmpty,
-    extendCartExpiration 
+    extendCartExpiration,
+    refreshCart 
   } = useCart();
   
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
   // Calcular totales del carrito
   const totals = getCartTotals();
-
   // Función para actualizar cantidad
   const handleUpdateQuantity = async (cartProductId, newQuantity) => {
     const result = await updateCartProduct(cartProductId, newQuantity);
@@ -28,7 +26,6 @@ const Cart = () => {
       alert(result.error);
     }
   };
-
   // Función para eliminar producto
   const handleRemoveProduct = async (cartProductId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
@@ -38,7 +35,6 @@ const Cart = () => {
       }
     }
   };
-
   // Función para extender expiración
   const handleExtendExpiration = async () => {
     const result = await extendCartExpiration();
@@ -48,7 +44,6 @@ const Cart = () => {
       alert(result.error);
     }
   };
-
   // Función para proceder al checkout
   const handleCheckout = () => {
     if (!isAuthenticated()) {
@@ -56,15 +51,12 @@ const Cart = () => {
       navigate('/login');
       return;
     }
-
     if (isCartEmpty()) {
       alert('Tu carrito está vacío');
       return;
     }
-
     navigate('/checkout');
   };
-
   // Si el usuario no está autenticado
   if (!isAuthenticated()) {
     return (
@@ -79,9 +71,8 @@ const Cart = () => {
       </main>
     );
   }
-
   // Mostrar estado de carga
-  if (loading && isCartEmpty) {
+  if (loading && isCartEmpty()) {
     return (
       <main className="cart container">
         <div className="cart__loading">
@@ -90,7 +81,6 @@ const Cart = () => {
       </main>
     );
   }
-
   // Mostrar error si hay alguno
   if (error) {
     return (
@@ -105,9 +95,8 @@ const Cart = () => {
       </main>
     );
   }
-
   // Carrito vacío
-  if (isCartEmpty) {
+  if (isCartEmpty()) {
     return (
       <main className="cart container">
         <div className="cart__empty">
@@ -120,7 +109,6 @@ const Cart = () => {
       </main>
     );
   }
-
   return (
     <main className="cart container">
       <div className="cart__header">
@@ -129,12 +117,19 @@ const Cart = () => {
           ← Continuar comprando
         </Link>
       </div>
-
       <div className="cart__content">
         {/* Lista de productos */}
         <section className="cart__items">
-          <div className="cart__items-header">
-            <h2>Productos ({cartProducts.length})</h2>
+        <div className="cart__items-header">
+          <h2>Productos ({cartProducts.length})</h2>
+          <div className="cart__header-actions">
+            <button 
+              className="refresh-btn"
+              onClick={refreshCart}
+              title="Refrescar carrito"
+            >
+              🔄 Refrescar
+            </button>
             <button 
               className="extend-btn"
               onClick={handleExtendExpiration}
@@ -143,6 +138,7 @@ const Cart = () => {
               ⏰ Extender carrito
             </button>
           </div>
+        </div>
           
           <div className="cart__items-list">
             {cartProducts.map((cartProduct) => (
@@ -164,7 +160,6 @@ const Cart = () => {
                     Stock: {cartProduct.product.stock} unidades
                   </p>
                 </div>
-
                 <div className="cart-item__quantity">
                   <button 
                     className="quantity-btn" 
@@ -182,13 +177,11 @@ const Cart = () => {
                     +
                   </button>
                 </div>
-
                 <div className="cart-item__total">
                   <p className="cart-item__total-price">
                     ${(cartProduct.product.price * cartProduct.quantity).toFixed(2)}
                   </p>
                 </div>
-
                 <div className="cart-item__actions">
                   <button 
                     className="remove-btn" 
@@ -204,7 +197,6 @@ const Cart = () => {
               </article>
             ))}
           </div>
-
           {/* Cupón de descuento */}
           <div className="cart__coupon">
             <h3>Aplicar cupón de descuento</h3>
@@ -218,7 +210,6 @@ const Cart = () => {
             </div>
           </div>
         </section>
-
         {/* Resumen del pedido */}
         <aside className="cart__summary">
           <div className="summary-card">
@@ -249,7 +240,6 @@ const Cart = () => {
               <span>Total</span>
               <span>${totals.total.toFixed(2)}</span>
             </div>
-
             <div className="summary__benefits">
               {totals.subtotal < 500 && (
                 <p className="benefit">
@@ -260,14 +250,12 @@ const Cart = () => {
               <p className="benefit">🔄 Devolución gratuita</p>
               <p className="benefit">📦 {totals.itemCount} producto(s) en el carrito</p>
             </div>
-
             <button 
               className="checkout-btn"
               onClick={handleCheckout}
             >
               Proceder al pago
             </button>
-
             <div className="payment-methods">
               <p className="payment__title">Métodos de pago aceptados:</p>
               <div className="payment__icons">
@@ -280,7 +268,6 @@ const Cart = () => {
           </div>
         </aside>
       </div>
-
       {/* Productos relacionados */}
       <section className="cart__related">
         <h3>Productos que te pueden interesar</h3>
@@ -299,5 +286,4 @@ const Cart = () => {
     </main>
   );
 };
-
 export default Cart;

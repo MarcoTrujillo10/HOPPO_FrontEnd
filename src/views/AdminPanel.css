@@ -92,7 +92,7 @@
   font-size: 1.1rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .admin-panel {
     padding: 10px;

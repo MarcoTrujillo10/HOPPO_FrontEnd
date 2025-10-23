@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-
 const defaultOpen = {
   search: true,
   categoria: true,
@@ -7,10 +6,7 @@ const defaultOpen = {
   precio: true,
   orden: false,
 };
-
-// util de clamp local
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
-
 export default function ProductFilters({
   filters,
   setFilters,
@@ -18,13 +14,11 @@ export default function ProductFilters({
   marcasOpts = [],
 }) {
   const [open, setOpen] = useState(defaultOpen);
-
   // === DRAFT LOCAL PARA PRECIO ===
   const [priceDraft, setPriceDraft] = useState({
     min: filters.min ?? "",
     max: filters.max ?? "",
   });
-
   // si desde afuera cambian los filtros (limpiar, etc.), sincronizo el draft
   useEffect(() => {
     setPriceDraft({
@@ -32,24 +26,19 @@ export default function ProductFilters({
       max: filters.max ?? "",
     });
   }, [filters.min, filters.max]);
-
   // handlers de filtro
   const onChangeSearch = (e) =>
     setFilters((f) => ({ ...f, q: e.target.value }));
-
   const onChangeCategoria = (e) =>
     setFilters((f) => ({ ...f, categoria: e.target.value }));
-
   const toggleMarca = (name) =>
     setFilters((f) => {
       const current = new Set(f.marcas || []);
       current.has(name) ? current.delete(name) : current.add(name);
       return { ...f, marcas: Array.from(current) };
     });
-
   const onChangeOrden = (e) =>
     setFilters((f) => ({ ...f, orden: e.target.value }));
-
   const clearAll = () =>
     setFilters({
       q: "",
@@ -59,41 +48,34 @@ export default function ProductFilters({
       max: "",
       orden: "relevancia",
     });
-
   // ordenar marcas para UX
   const marcasOrdenadas = useMemo(
     () => [...marcasOpts].sort((a, b) => a.localeCompare(b)),
     [marcasOpts]
   );
-
   // evita que Enter envíe un form implícito y recargue la página
   const preventEnter = (e) => {
     if (e.key === "Enter") e.preventDefault();
   };
-
   // aplicar precio: pasa de draft -> filters (dispara fetch 1 sola vez)
   const applyPrice = () => {
     const rawMin = priceDraft.min;
     const rawMax = priceDraft.max;
-
     const nextMin =
       rawMin === "" ? "" : clamp(Number(rawMin) || 0, 0, 100000);
     const nextMax =
       rawMax === "" ? "" : clamp(Number(rawMax) || 0, 0, 100000);
-
     // validación simple: si ambos existen y min > max, no aplicar
     if (nextMin !== "" && nextMax !== "" && Number(nextMin) > Number(nextMax)) {
       // opcional: mostrar toast/alert
       return;
     }
-
     setFilters((f) => ({
       ...f,
       min: nextMin,
       max: nextMax,
     }));
   };
-
   // aplicar con Enter dentro de los inputs de precio
   const onPriceKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -101,7 +83,6 @@ export default function ProductFilters({
       applyPrice();
     }
   };
-
   return (
     <aside className="filters">
       <div className="filters__head">
@@ -110,7 +91,6 @@ export default function ProductFilters({
           Limpiar
         </button>
       </div>
-
       {/* === BUSCADOR === */}
       <div className="filters__block">
         <input
@@ -124,7 +104,6 @@ export default function ProductFilters({
           onClick={(e) => e.stopPropagation()}
         />
       </div>
-
       {/* === CATEGORÍA === */}
       <div className="filters__dropdown">
         <button
@@ -141,7 +120,6 @@ export default function ProductFilters({
             ▾
           </span>
         </button>
-
         <div
           className={`filters__dropdown-content ${
             open.categoria ? "expanded" : ""
@@ -163,7 +141,6 @@ export default function ProductFilters({
           </select>
         </div>
       </div>
-
       {/* === MARCA === */}
       <div className="filters__dropdown">
         <button
@@ -180,7 +157,6 @@ export default function ProductFilters({
             ▾
           </span>
         </button>
-
         <div
           className={`filters__dropdown-content ${
             open.marca ? "expanded" : ""
@@ -206,7 +182,6 @@ export default function ProductFilters({
           </div>
         </div>
       </div>
-
       {/* === PRECIO === */}
       <div className="filters__dropdown">
         <button
@@ -223,7 +198,6 @@ export default function ProductFilters({
             ▾
           </span>
         </button>
-
         <div
           className={`filters__dropdown-content ${
             open.precio ? "expanded" : ""
@@ -268,7 +242,6 @@ export default function ProductFilters({
               step="1"
             />
           </div>
-
           <button
             type="button"
             className="filters__apply"
@@ -281,7 +254,6 @@ export default function ProductFilters({
           </button>
         </div>
       </div>
-
       {/* === ORDEN === */}
       <div className="filters__dropdown">
         <button
@@ -298,7 +270,6 @@ export default function ProductFilters({
             ▾
           </span>
         </button>
-
         <div
           className={`filters__dropdown-content ${
             open.orden ? "expanded" : ""

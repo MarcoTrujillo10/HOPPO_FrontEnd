@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productService } from "../services/api";
 import "./NewArrivals.css";
-
 const NewArrivals = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadNewProducts = async () => {
       try {
@@ -20,17 +18,14 @@ const NewArrivals = () => {
         setLoading(false);
       }
     };
-
     loadNewProducts();
   }, []);
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   if (loading) {
     return (
       <section className="new">
@@ -49,7 +44,6 @@ const NewArrivals = () => {
       </section>
     );
   }
-
   if (products.length === 0) {
     return (
       <section className="new">
@@ -61,7 +55,6 @@ const NewArrivals = () => {
       </section>
     );
   }
-
   return (
     <section className="new">
       <h2 className="new__title">Nuevas incorporaciones</h2>
@@ -94,5 +87,4 @@ const NewArrivals = () => {
     </section>
   );
 };
-
 export default NewArrivals;

@@ -2,19 +2,16 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { orderService } from '../services/api';
 import "./Profile.css";
-
 const ProfileSimple = () => {
   const { user, isAuthenticated } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("profile");
-
   useEffect(() => {
     if (isAuthenticated()) {
       loadUserOrders();
     }
   }, [user]);
-
   const loadUserOrders = async () => {
     try {
       setLoading(true);
@@ -27,18 +24,15 @@ const ProfileSimple = () => {
       setLoading(false);
     }
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -49,10 +43,8 @@ const ProfileSimple = () => {
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
-
   console.log('ProfileSimple - isAuthenticated():', isAuthenticated());
   console.log('ProfileSimple - user:', user);
-
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
@@ -64,13 +56,11 @@ const ProfileSimple = () => {
       </main>
     );
   }
-
   const tabs = [
     { id: "profile", label: "Perfil", icon: "👤" },
     { id: "orders", label: "Pedidos", icon: "📦" },
     { id: "stats", label: "Estadísticas", icon: "📊" }
   ];
-
   return (
     <main className="profile container">
       <div className="profile__header">
@@ -103,7 +93,6 @@ const ProfileSimple = () => {
           </div>
         </div>
       </div>
-
       <div className="profile__content">
         <nav className="profile__tabs">
           {tabs.map((tab) => (
@@ -117,7 +106,6 @@ const ProfileSimple = () => {
             </button>
           ))}
         </nav>
-
         <div className="profile__panel">
           {activeTab === "profile" && (
             <div className="panel-content">
@@ -144,7 +132,6 @@ const ProfileSimple = () => {
                     </div>
                   </div>
                 </div>
-
                 {user?.role === 'VENDEDOR' && (
                   <div className="info-section">
                     <h3>🛠️ Acceso de Vendedor</h3>
@@ -154,7 +141,6 @@ const ProfileSimple = () => {
                     </a>
                   </div>
                 )}
-
                 <div className="info-section">
                   <h3>🛒 Carrito Actual</h3>
                   <p>Carrito simplificado - sin datos del carrito.</p>
@@ -162,7 +148,6 @@ const ProfileSimple = () => {
               </div>
             </div>
           )}
-
           {activeTab === "orders" && (
             <div className="panel-content">
               <h2 className="panel-title">Mis Pedidos</h2>
@@ -195,7 +180,6 @@ const ProfileSimple = () => {
               )}
             </div>
           )}
-
           {activeTab === "stats" && (
             <div className="panel-content">
               <h2 className="panel-title">Mis Estadísticas</h2>
@@ -240,5 +224,4 @@ const ProfileSimple = () => {
     </main>
   );
 };
-
 export default ProfileSimple;

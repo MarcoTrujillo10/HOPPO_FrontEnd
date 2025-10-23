@@ -39,7 +39,7 @@
   border: 1px solid #f5c6cb;
 }
 
-/* Components List */
+
 .pc-configuration__components {
   flex: 1;
   overflow-y: auto;
@@ -156,7 +156,7 @@
   border: 2px dashed #dee2e6;
 }
 
-/* Warnings */
+
 .pc-configuration__warnings {
   background: #fff3cd;
   border: 1px solid #ffeaa7;
@@ -185,7 +185,7 @@
   margin-bottom: 0;
 }
 
-/* Total Price */
+
 .pc-configuration__total {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
@@ -208,7 +208,7 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Action Buttons */
+
 .pc-configuration__actions {
   display: flex;
   gap: 1rem;
@@ -253,7 +253,7 @@
   transform: none !important;
 }
 
-/* Build Summary */
+
 .pc-configuration__summary {
   background: #f8f9fa;
   border-radius: 10px;
@@ -298,7 +298,7 @@
   color: #2c3e50;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .pc-configuration__header {
     flex-direction: column;

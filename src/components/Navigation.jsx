@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { categoryService } from "../services/api";
-
 const Navigation = () => {
   const { pathname } = useLocation();
   const { user, isAuthenticated } = useAuth();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCategories, setShowCategories] = useState(false);
-
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -23,16 +21,13 @@ const Navigation = () => {
         setLoading(false);
       }
     };
-
     loadCategories();
   }, []);
-
   const isActive = (path) => pathname === path;
   const isActiveCategory = (categoryId) => {
     return pathname.includes(`/productos`) && 
            new URLSearchParams(window.location.search).get('categoria') === categoryId;
   };
-
   return (
     <nav style={styles.nav} className="navigation-container">
       <style>{mobileStyles}</style>
@@ -50,7 +45,6 @@ const Navigation = () => {
               🏠 Inicio
             </Link>
           </li>
-
           {/* Productos */}
           <li>
             <Link
@@ -63,7 +57,6 @@ const Navigation = () => {
               🛍️ Productos
             </Link>
           </li>
-
           {/* Categorías Dropdown */}
           <li style={styles.dropdownContainer}>
             <button
@@ -130,7 +123,6 @@ const Navigation = () => {
               </div>
             )}
           </li>
-
           {/* PC Builder */}
           <li>
             <Link
@@ -143,7 +135,6 @@ const Navigation = () => {
               🔧 PC Builder
             </Link>
           </li>
-
           {/* Panel de Admin (solo para vendedores) */}
           {isAuthenticated() && user?.role === 'VENDEDOR' && (
             <li>
@@ -159,7 +150,6 @@ const Navigation = () => {
               </Link>
             </li>
           )}
-
           {/* Contacto */}
           <li>
             <Link
@@ -177,9 +167,7 @@ const Navigation = () => {
     </nav>
   );
 };
-
 export default Navigation;
-
 const styles = {
   nav: {
     borderBottom: "1px solid #e3e3e3",
@@ -268,8 +256,6 @@ const styles = {
     border: "1px solid #ffeaa7",
   },
 };
-
-// Estilos responsivos para móviles
 const mobileStyles = `
   @media (max-width: 768px) {
     .navigation-container ul {

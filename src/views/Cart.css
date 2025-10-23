@@ -38,7 +38,7 @@
   margin-bottom: 3rem;
 }
 
-/* Lista de productos */
+
 .cart__items {
   background: white;
   border-radius: 12px;
@@ -50,6 +50,35 @@
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart__header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.extend-btn, .refresh-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-btn {
+  background: #3b82f6;
+}
+
+.extend-btn:hover, .refresh-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .cart__items-header h2 {
@@ -206,7 +235,7 @@
   color: white;
 }
 
-/* Cupón de descuento */
+
 .cart__coupon {
   padding: 1.5rem;
   border-top: 1px solid #e5e7eb;
@@ -254,7 +283,7 @@
   background: #0d8bc7;
 }
 
-/* Resumen del pedido */
+
 .cart__summary {
   position: sticky;
   top: 2rem;
@@ -360,7 +389,7 @@
   font-size: 1.25rem;
 }
 
-/* Productos relacionados */
+
 .cart__related {
   margin-top: 3rem;
   padding-top: 2rem;
@@ -423,7 +452,7 @@
   font-size: 1rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .cart__content {
     grid-template-columns: 1fr;

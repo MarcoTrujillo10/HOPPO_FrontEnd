@@ -1,11 +1,8 @@
 import { useState, useRef } from 'react';
 import './AdminComponents.css';
-
 const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
   const fileInputRef = useRef(null);
-
   console.log('ImageUpload render - images:', images, 'onImagesChange:', typeof onImagesChange);
-
   const handleFileSelect = (files) => {
     console.log('handleFileSelect called with files:', files);
     const fileArray = Array.from(files);
@@ -17,12 +14,10 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       alert('Por favor selecciona solo archivos de imagen');
       return;
     }
-
     if (images.length + imageFiles.length > maxImages) {
       alert(`Máximo ${maxImages} imágenes permitidas`);
       return;
     }
-
     // Convertir archivos a URLs para preview
     const newImageUrls = imageFiles.map(file => ({
       file: file,
@@ -30,25 +25,20 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       name: file.name,
       isNew: true
     }));
-
     console.log('New image URLs:', newImageUrls);
     console.log('Current images:', images);
     console.log('Combined images:', [...images, ...newImageUrls]);
-
     onImagesChange([...images, ...newImageUrls]);
   };
-
   const removeImage = (index) => {
     console.log('Removing image at index:', index);
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
   };
-
   const openFileDialog = () => {
     console.log('Opening file dialog');
     fileInputRef.current?.click();
   };
-
   const handleFileInputChange = (e) => {
     console.log('File input changed:', e.target.files);
     const files = e.target.files;
@@ -58,7 +48,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
     // Limpiar el input para permitir seleccionar el mismo archivo otra vez
     e.target.value = '';
   };
-
   return (
     <div className="image-upload-container">
       <label className="form-label">Imágenes del Producto</label>
@@ -78,7 +67,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
             <small>JPG, PNG, GIF hasta 5MB cada una</small>
           </div>
         </div>
-
         {/* Input oculto */}
         <input
           ref={fileInputRef}
@@ -88,7 +76,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           onChange={handleFileInputChange}
           style={{ display: 'none' }}
         />
-
         {/* Preview de imágenes */}
         {images.length > 0 && (
           <div className="image-preview-grid">
@@ -125,7 +112,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           </div>
         )}
       </div>
-
       {/* Debug info */}
       <div style={{ marginTop: '10px', padding: '10px', background: '#f0f0f0', fontSize: '12px' }}>
         <strong>Debug:</strong> {images.length} imágenes cargadas
@@ -140,5 +126,4 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
     </div>
   );
 };
-
 export default ImageUpload;

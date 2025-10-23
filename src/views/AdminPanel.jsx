@@ -4,12 +4,11 @@ import ProductManagement from '../components/admin/ProductManagement';
 import CategoryManagement from '../components/admin/CategoryManagement';
 import BrandManagement from '../components/admin/BrandManagement';
 import OrderManagement from '../components/admin/OrderManagement';
+import BannerManagement from '../components/admin/BannerManagement';
 import './AdminPanel.css';
-
 const AdminPanel = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
-
   // Verificar que el usuario sea vendedor
   if (user?.role !== 'VENDEDOR') {
     return (
@@ -21,14 +20,13 @@ const AdminPanel = () => {
       </div>
     );
   }
-
   const tabs = [
     { id: 'products', label: 'Productos', icon: '📦' },
     { id: 'categories', label: 'Categorías', icon: '📂' },
     { id: 'brands', label: 'Marcas', icon: '🏷️' },
+    { id: 'banners', label: 'Banners', icon: '🎯' },
     { id: 'orders', label: 'Órdenes', icon: '📋' },
   ];
-
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'products':
@@ -37,20 +35,20 @@ const AdminPanel = () => {
         return <CategoryManagement />;
       case 'brands':
         return <BrandManagement />;
+      case 'banners':
+        return <BannerManagement />;
       case 'orders':
         return <OrderManagement />;
       default:
         return <ProductManagement />;
     }
   };
-
   return (
     <div className="admin-panel">
       <div className="admin-header">
         <h1>🛠️ Panel de Administración</h1>
         <p>Bienvenido, {user?.firstName} {user?.lastName}</p>
       </div>
-
       <div className="admin-tabs">
         {tabs.map((tab) => (
           <button
@@ -63,13 +61,10 @@ const AdminPanel = () => {
           </button>
         ))}
       </div>
-
       <div className="admin-content">
         {renderActiveTab()}
       </div>
     </div>
   );
 };
-
 export default AdminPanel;
-

@@ -3,14 +3,12 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import { useCart } from '../hooks/useCart.jsx';
 import { orderService } from '../services/api';
 import "./Profile.css";
-
 const Profile = () => {
   const { user, isAuthenticated } = useAuth();
   const { getCartTotals } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   // Eliminamos activeTab ya que no usaremos pestañas
-
   // Manejar cartTotals de forma segura
   let cartTotals;
   try {
@@ -25,13 +23,11 @@ const Profile = () => {
       itemCount: 0
     };
   }
-
   useEffect(() => {
     if (isAuthenticated()) {
       loadUserOrders();
     }
   }, [user, isAuthenticated]);
-
   const loadUserOrders = async () => {
     try {
       setLoading(true);
@@ -46,25 +42,21 @@ const Profile = () => {
       setLoading(false);
     }
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
-
   console.log('Profile component rendering:', {
     isAuthenticated: isAuthenticated(),
     user,
     cartTotals,
     loading
   });
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -75,7 +67,6 @@ const Profile = () => {
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
-
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
@@ -86,9 +77,7 @@ const Profile = () => {
       </main>
     );
   }
-
   // Eliminamos las tabs ya que no las usaremos
-
   return (
     <main className="profile container">
       <div className="profile__header">
@@ -121,7 +110,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
       <div className="profile__content">
         <div className="profile__panel">
           <div className="panel-content">
@@ -148,7 +136,6 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
-
               {user?.role === 'VENDEDOR' && (
                 <div className="info-section">
                   <h3>🛠️ Acceso de Vendedor</h3>
@@ -158,7 +145,6 @@ const Profile = () => {
                   </a>
                 </div>
               )}
-
               <div className="info-section">
                 <h3>🛒 Carrito Actual</h3>
                 {cartTotals.itemCount > 0 ? (
@@ -172,7 +158,6 @@ const Profile = () => {
                   <p>Tu carrito está vacío.</p>
                 )}
               </div>
-
               <div className="info-section">
                 <h3>📦 Mis Pedidos</h3>
                 {loading ? (
@@ -203,7 +188,6 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-
               <div className="info-section">
                 <h3>📊 Mis Estadísticas</h3>
                 <div className="stats-grid">
@@ -248,5 +232,4 @@ const Profile = () => {
     </main>
   );
 };
-
 export default Profile;

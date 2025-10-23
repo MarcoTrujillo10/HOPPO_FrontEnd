@@ -4,7 +4,7 @@
   padding: 2rem 0;
 }
 
-/* Header del perfil */
+
 .profile__header {
   display: flex;
   gap: 2rem;
@@ -93,7 +93,7 @@
   font-weight: 500;
 }
 
-/* Contenido principal */
+
 .profile__content {
   display: grid;
   grid-template-columns: 250px 1fr;
@@ -101,12 +101,12 @@
   align-items: start;
 }
 
-/* ✅ FIX: si hay un solo hijo, que ocupe todo el ancho */
+
 .profile__content > *:only-child {
   grid-column: 1 / -1;
 }
 
-/* Navegación por tabs */
+
 .profile__tabs {
   display: flex;
   flex-direction: column;
@@ -149,7 +149,7 @@
   font-weight: 600;
 }
 
-/* Panel de contenido */
+
 .profile__panel {
   background: white;
   border-radius: 16px;
@@ -170,7 +170,7 @@
   color: #1f2937;
 }
 
-/* Formulario de perfil */
+
 .profile-form {
   max-width: 600px;
 }
@@ -233,7 +233,7 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* Lista de pedidos */
+
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -348,7 +348,7 @@
   flex-wrap: wrap;
 }
 
-/* Grid de favoritos */
+
 .favorites-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -426,7 +426,7 @@
   padding: 0 1rem 1rem 1rem;
 }
 
-/* Configuración */
+
 .settings-sections {
   display: flex;
   flex-direction: column;
@@ -471,7 +471,7 @@
   color: #6b7280;
 }
 
-/* Toggle switch */
+
 .toggle {
   position: relative;
   display: inline-block;
@@ -523,7 +523,7 @@
   flex-wrap: wrap;
 }
 
-/* Botones */
+
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -575,7 +575,7 @@
   background: #dc2626;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .profile__header {
     flex-direction: column;
@@ -630,7 +630,7 @@
   }
 }
 
-/* New styles for dynamic profile */
+
 .profile__not-authenticated {
   text-align: center;
   padding: 60px 20px;

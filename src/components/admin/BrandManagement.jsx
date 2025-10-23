@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { brandService } from '../../services/api';
 import './AdminComponents.css';
-
 const BrandManagement = () => {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,11 +9,9 @@ const BrandManagement = () => {
   const [formData, setFormData] = useState({
     name: ''
   });
-
   useEffect(() => {
     loadBrands();
   }, []);
-
   const loadBrands = async () => {
     try {
       setLoading(true);
@@ -26,7 +23,6 @@ const BrandManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -35,7 +31,6 @@ const BrandManagement = () => {
       } else {
         await brandService.createBrand(formData);
       }
-
       await loadBrands();
       resetForm();
       alert(editingBrand ? 'Marca actualizada exitosamente' : 'Marca creada exitosamente');
@@ -44,7 +39,6 @@ const BrandManagement = () => {
       alert('Error al guardar la marca');
     }
   };
-
   const handleEdit = (brand) => {
     setEditingBrand(brand);
     setFormData({
@@ -52,7 +46,6 @@ const BrandManagement = () => {
     });
     setShowForm(true);
   };
-
   const handleDelete = async (brandId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta marca?')) {
       try {
@@ -65,17 +58,14 @@ const BrandManagement = () => {
       }
     }
   };
-
   const resetForm = () => {
     setFormData({ name: '' });
     setEditingBrand(null);
     setShowForm(false);
   };
-
   if (loading) {
     return <div className="loading">Cargando marcas...</div>;
   }
-
   return (
     <div className="brand-management">
       <div className="section-header">
@@ -87,7 +77,6 @@ const BrandManagement = () => {
           ➕ Agregar Marca
         </button>
       </div>
-
       {showForm && (
         <div className="form-modal">
           <div className="form-content">
@@ -95,7 +84,6 @@ const BrandManagement = () => {
               <h3>{editingBrand ? '✏️ Editar Marca' : '➕ Nueva Marca'}</h3>
               <button className="close-btn" onClick={resetForm}>✕</button>
             </div>
-
             <form onSubmit={handleSubmit} className="brand-form">
               <div className="form-group">
                 <label>Nombre de la Marca</label>
@@ -107,7 +95,6 @@ const BrandManagement = () => {
                   required
                 />
               </div>
-
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -120,7 +107,6 @@ const BrandManagement = () => {
           </div>
         </div>
       )}
-
       <div className="brands-grid">
         {brands.map(brand => (
           <div key={brand.id} className="brand-card">
@@ -146,7 +132,6 @@ const BrandManagement = () => {
           </div>
         ))}
       </div>
-
       {brands.length === 0 && (
         <div className="empty-state">
           <p>No hay marcas registradas.</p>
@@ -155,5 +140,4 @@ const BrandManagement = () => {
     </div>
   );
 };
-
 export default BrandManagement;

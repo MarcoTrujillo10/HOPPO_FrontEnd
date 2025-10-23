@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import './Auth.css';
-
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -10,10 +9,8 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const { login } = useAuth();
   const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -21,12 +18,10 @@ const Login = () => {
     });
     setError(''); // Limpiar error al escribir
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const result = await login({
         email: formData.email,
@@ -44,7 +39,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
   return (
     <main className="auth-page">
       <div className="auth-container">
@@ -56,7 +50,6 @@ const Login = () => {
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="email">Email</label>
@@ -70,7 +63,6 @@ const Login = () => {
                 disabled={loading}
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
               <input
@@ -83,7 +75,6 @@ const Login = () => {
                 disabled={loading}
               />
             </div>
-
             <button 
               type="submit" 
               className="btn btn--primary auth-submit"
@@ -92,7 +83,6 @@ const Login = () => {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
-
           <div className="auth-links">
             <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
           </div>
@@ -101,5 +91,4 @@ const Login = () => {
     </main>
   );
 };
-
 export default Login;

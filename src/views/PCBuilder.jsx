@@ -2,7 +2,6 @@ import { useState } from 'react';
 import ComponentSelector from '../components/ComponentSelector';
 import PCConfiguration from '../components/PCConfiguration';
 import './PCBuilder.css';
-
 const PCBuilder = () => {
   const [selectedComponents, setSelectedComponents] = useState({
     cpu: null,
@@ -14,9 +13,7 @@ const PCBuilder = () => {
     case: null,
     cooling: null
   });
-
   const [currentStep, setCurrentStep] = useState(0);
-
   const componentCategories = [
     { key: 'cpu', name: 'Procesador', icon: '🧠', required: true },
     { key: 'motherboard', name: 'Placa Madre', icon: '🔧', required: true },
@@ -27,47 +24,39 @@ const PCBuilder = () => {
     { key: 'case', name: 'Gabinete', icon: '📦', required: true },
     { key: 'cooling', name: 'Refrigeración', icon: '❄️', required: false }
   ];
-
   const updateComponent = (category, component) => {
     setSelectedComponents(prev => ({
       ...prev,
       [category]: component
     }));
   };
-
   const nextStep = () => {
     if (currentStep < componentCategories.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
-
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
-
   const goToStep = (step) => {
     setCurrentStep(step);
   };
-
   const calculateTotal = () => {
     return Object.values(selectedComponents)
       .filter(component => component !== null)
       .reduce((total, component) => total + component.precio, 0);
   };
-
   const isStepComplete = (step) => {
     const category = componentCategories[step];
     return category.required ? selectedComponents[category.key] !== null : true;
   };
-
   const isBuildComplete = () => {
     return componentCategories
       .filter(category => category.required)
       .every(category => selectedComponents[category.key] !== null);
   };
-
   return (
     <div className="pc-builder">
       <div className="container">
@@ -79,7 +68,6 @@ const PCBuilder = () => {
             Construye tu PC ideal paso a paso. Selecciona cada componente y ve el precio total actualizarse en tiempo real.
           </p>
         </div>
-
         <div className="pc-builder__content">
           {/* Progress Steps */}
           <div className="pc-builder__steps">
@@ -100,7 +88,6 @@ const PCBuilder = () => {
               </div>
             ))}
           </div>
-
           <div className="pc-builder__main">
             {/* Component Selection */}
             <div className="pc-builder__selector">
@@ -113,7 +100,6 @@ const PCBuilder = () => {
                 }
               />
             </div>
-
             {/* PC Configuration Summary */}
             <div className="pc-builder__config">
               <PCConfiguration
@@ -123,7 +109,6 @@ const PCBuilder = () => {
               />
             </div>
           </div>
-
           {/* Navigation */}
           <div className="pc-builder__navigation">
             <button
@@ -137,7 +122,6 @@ const PCBuilder = () => {
             <div className="pc-builder__step-info">
               Paso {currentStep + 1} de {componentCategories.length}
             </div>
-
             <button
               className="pc-builder__nav-btn pc-builder__nav-btn--next"
               onClick={nextStep}
@@ -151,5 +135,4 @@ const PCBuilder = () => {
     </div>
   );
 };
-
 export default PCBuilder;
