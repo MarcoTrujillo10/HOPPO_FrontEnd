@@ -1,6 +1,9 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { cartService, cartProductService } from '../services/api';
+import { useAuth } from '../hooks/useAuth.jsx';
+ 
 const CartContext = createContext();
+ 
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
@@ -8,23 +11,21 @@ export const useCart = () => {
   }
   return context;
 };
+ 
 export const CartProvider = ({ children }) => {
+  const { token } = useAuth();
   const [cart, setCart] = useState(null);
   const [cartProducts, setCartProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // Cargar carrito activo del usuario
+ 
   const loadCart = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Intentar obtener el carrito activo
       const cartResponse = await cartService.getMyCart();
-      
       if (cartResponse.data) {
         setCart(cartResponse.data);
-        // Extraer los productos del carrito
         const items = cartResponse.data.items || [];
         setCartProducts(items);
       } else {
@@ -33,7 +34,6 @@ export const CartProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Error cargando carrito:', err);
-      // Si no hay carrito activo, no es un error
       if (err.response?.status !== 404) {
         setError('Error al cargar el carrito');
       }
@@ -43,10 +43,9 @@ export const CartProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Cargar productos del carrito
+ 
   const loadCartProducts = async () => {
     try {
-      // Recargar el carrito completo para obtener los datos actualizados
       await loadCart();
     } catch (err) {
       console.error('Error cargando productos del carrito:', err);
@@ -54,7 +53,7 @@ export const CartProvider = ({ children }) => {
       setCartProducts([]);
     }
   };
-  // Crear nuevo carrito si no existe
+ 
   const createCart = async () => {
     try {
       const response = await cartService.createCart({});
@@ -66,28 +65,21 @@ export const CartProvider = ({ children }) => {
       throw err;
     }
   };
-  // Agregar producto al carrito
+ 
   const addToCart = async (productId, quantity = 1) => {
     try {
       setLoading(true);
       setError(null);
-      // Verificar si el producto ya está en el carrito
       const existingProduct = cartProducts.find(cp => cp.product.id === productId);
-      
       if (existingProduct) {
-        // Actualizar cantidad del producto existente
         return await updateCartProduct(existingProduct.id, existingProduct.quantity + quantity);
       } else {
-        // Agregar nuevo producto al carrito (el backend creará el carrito si no existe)
         const cartProductData = {
-          productId: productId,
-          quantity: quantity
+          productId,
+          quantity
         };
         const response = await cartProductService.addToCart(cartProductData);
-        
-        // Recargar carrito y productos
         await loadCart();
-        
         return {
           success: true,
           message: `Se agregaron ${quantity} unidad(es) al carrito`,
@@ -105,23 +97,17 @@ export const CartProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Actualizar cantidad de producto en el carrito
+ 
   const updateCartProduct = async (cartProductId, newQuantity) => {
     try {
       setLoading(true);
       setError(null);
       if (newQuantity <= 0) {
-        // Si la cantidad es 0 o menor, eliminar el producto
         return await removeFromCart(cartProductId);
       }
-      const cartProductData = {
-        quantity: newQuantity
-      };
+      const cartProductData = { quantity: newQuantity };
       await cartProductService.updateCartProduct(cartProductId, cartProductData);
-      
-      // Recargar productos del carrito
       await loadCartProducts();
-      
       return {
         success: true,
         message: 'Cantidad actualizada',
@@ -138,16 +124,13 @@ export const CartProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Eliminar producto del carrito
+ 
   const removeFromCart = async (cartProductId) => {
     try {
       setLoading(true);
       setError(null);
       await cartProductService.removeFromCart(cartProductId);
-      
-      // Recargar productos del carrito
       await loadCartProducts();
-      
       return {
         success: true,
         message: 'Producto eliminado del carrito'
@@ -163,11 +146,11 @@ export const CartProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Extender expiración del carrito
+ 
   const extendCartExpiration = async () => {
     try {
       await cartService.extendCartExpiration();
-      await loadCart(); // Recargar carrito con nueva expiración
+      await loadCart();
       return {
         success: true,
         message: 'Expiración del carrito extendida por 24 horas'
@@ -180,21 +163,15 @@ export const CartProvider = ({ children }) => {
       };
     }
   };
-  // Limpiar carrito (eliminar todos los productos)
+ 
   const clearCart = async () => {
     try {
       setLoading(true);
-      
-      // Eliminar todos los productos del carrito
-      const deletePromises = cartProducts.map(cp => 
+      const deletePromises = cartProducts.map(cp =>
         cartProductService.removeFromCart(cp.id)
       );
-      
       await Promise.all(deletePromises);
-      
-      // Recargar productos del carrito
       await loadCartProducts();
-      
       return {
         success: true,
         message: 'Carrito limpiado'
@@ -209,61 +186,36 @@ export const CartProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  // Calcular totales del carrito
+ 
   const getCartTotals = () => {
     const subtotal = cartProducts.reduce((sum, cp) => {
-      // Usar el precio con descuento si está disponible, sino el precio original
       const price = cp.product.discountedPrice || cp.product.price;
-      return sum + (price * cp.quantity);
+      return sum + price * cp.quantity;
     }, 0);
     const shipping = subtotal > 500 ? 0 : 25;
-    const tax = subtotal * 0.21; // 21% IVA
+    const tax = subtotal * 0.21;
     const total = subtotal + shipping + tax;
     const itemCount = cartProducts.reduce((sum, cp) => sum + cp.quantity, 0);
-    return {
-      subtotal,
-      shipping,
-      tax,
-      total,
-      itemCount
-    };
+    return { subtotal, shipping, tax, total, itemCount };
   };
-  // Obtener total del carrito desde el backend (más preciso)
+ 
   const getCartTotal = () => {
     if (cart && cart.totalPrice !== undefined) {
       return cart.totalPrice;
     }
-    
-    // Fallback al cálculo local si no hay datos del backend
     const totals = getCartTotals();
     return totals.total;
   };
-  // Cargar carrito al montar el componente
+ 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (token) {
       loadCart();
     } else {
-      // Si no hay token, limpiar el carrito
       setCart(null);
       setCartProducts([]);
     }
-  }, []);
-  // Recargar carrito cuando cambie el token (cuando el usuario se autentique/desautentique)
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'token') {
-        if (e.newValue) {
-          loadCart();
-        } else {
-          setCart(null);
-          setCartProducts([]);
-        }
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [token]);
+ 
   const value = {
     cart,
     cartProducts,
@@ -277,12 +229,11 @@ export const CartProvider = ({ children }) => {
     clearCart,
     getCartTotals,
     getCartTotal,
-    // Utilidades
     isCartEmpty: () => cartProducts.length === 0,
     hasItems: cartProducts.length > 0,
-    // Forzar recarga del carrito
     refreshCart: loadCart
   };
+ 
   return (
     <CartContext.Provider value={value}>
       {children}

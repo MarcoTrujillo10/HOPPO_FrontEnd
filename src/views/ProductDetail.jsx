@@ -209,7 +209,6 @@ const ProductDetail = () => {
               {addingToCart ? 'Agregando...' : 
                productData.stock > 0 ? 'Añadir al Carrito' : 'Sin Stock'}
             </button>
-            <button className="btn btn--ghost" title="Favoritos">♡</button>
           </div>
         </section>
       </div>

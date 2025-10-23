@@ -193,40 +193,6 @@
   gap: 20px;
 }
 
-.filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #495057;
-}
-
-.filter-toggle input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #13a4ec;
-}
-
-.filter-toggle span {
-  font-weight: 500;
-}
-
-.products-stats {
-  background-color: #f8f9fa;
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  border-left: 4px solid #13a4ec;
-}
-
-.products-stats p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #495057;
-  font-weight: 500;
-}
-
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.8rem;

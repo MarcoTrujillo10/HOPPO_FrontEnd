@@ -4,12 +4,11 @@ import ProductManagement from '../components/admin/ProductManagement';
 import CategoryManagement from '../components/admin/CategoryManagement';
 import BrandManagement from '../components/admin/BrandManagement';
 import OrderManagement from '../components/admin/OrderManagement';
-import ProductDebug from '../components/admin/ProductDebug';
 import './AdminPanel.css';
 const AdminPanel = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
-  // Verificar que el usuario sea vendedor
+
   if (user?.role !== 'VENDEDOR') {
     return (
       <div className="admin-panel">
@@ -24,7 +23,6 @@ const AdminPanel = () => {
     { id: 'products', label: 'Productos', icon: '📦' },
     { id: 'categories', label: 'Categorías', icon: '📂' },
     { id: 'brands', label: 'Marcas', icon: '🏷️' },
-    { id: 'debug', label: 'Debug', icon: '🔧' },
     { id: 'orders', label: 'Órdenes', icon: '📋' },
   ];
   const renderActiveTab = () => {
@@ -35,8 +33,6 @@ const AdminPanel = () => {
         return <CategoryManagement />;
       case 'brands':
         return <BrandManagement />;
-      case 'debug':
-        return <ProductDebug />;
       case 'orders':
         return <OrderManagement />;
       default:

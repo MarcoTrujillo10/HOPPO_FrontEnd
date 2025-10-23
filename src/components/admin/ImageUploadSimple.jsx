@@ -2,13 +2,10 @@ import { useState, useRef } from 'react';
 import './AdminComponents.css';
 const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
   const fileInputRef = useRef(null);
-  console.log('ImageUpload render - images:', images, 'onImagesChange:', typeof onImagesChange);
+
   const handleFileSelect = (files) => {
-    console.log('handleFileSelect called with files:', files);
     const fileArray = Array.from(files);
     const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
-    
-    console.log('Filtered image files:', imageFiles);
     
     if (imageFiles.length === 0) {
       alert('Por favor selecciona solo archivos de imagen');
@@ -25,22 +22,16 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       name: file.name,
       isNew: true
     }));
-    console.log('New image URLs:', newImageUrls);
-    console.log('Current images:', images);
-    console.log('Combined images:', [...images, ...newImageUrls]);
     onImagesChange([...images, ...newImageUrls]);
   };
   const removeImage = (index) => {
-    console.log('Removing image at index:', index);
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
   };
   const openFileDialog = () => {
-    console.log('Opening file dialog');
     fileInputRef.current?.click();
   };
   const handleFileInputChange = (e) => {
-    console.log('File input changed:', e.target.files);
     const files = e.target.files;
     if (files) {
       handleFileSelect(files);
@@ -108,17 +99,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-      {/* Debug info */}
-      <div style={{ marginTop: '10px', padding: '10px', background: '#f0f0f0', fontSize: '12px' }}>
-        <strong>Debug:</strong> {images.length} imágenes cargadas
-        {images.length > 0 && (
-          <div>
-            {images.map((img, i) => (
-              <div key={i}>- {img.name || 'Sin nombre'}</div>
             ))}
           </div>
         )}

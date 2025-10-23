@@ -4,18 +4,15 @@ import { useAuth } from "../hooks/useAuth.jsx";
 import { useCart } from "../hooks/useCart.jsx";
 import { categoryService } from "../services/api";
 import "./Header.css";
-
+ 
 const Header = () => {
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, isAuthenticated, logout } = useAuth();
   const { getCartTotals } = useCart();
-  
   const cartTotals = getCartTotals();
-
  
   useEffect(() => {
     const loadCategories = async () => {
@@ -30,39 +27,25 @@ const Header = () => {
         setLoading(false);
       }
     };
-
     loadCategories();
   }, []);
-
  
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const isActive = (path) =>
     pathname === path ? { color: "#13a4ec" } : undefined;
-
+ 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
+ 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
-
+ 
   const handleLogout = () => {
     logout();
     closeMobileMenu();
   };
-
+ 
   return (
     <header className="hdr">
       <div className="container hdr__inner">
@@ -75,12 +58,10 @@ const Header = () => {
             </svg>
             <h2 className="brand__text">HOPPO</h2>
           </Link>
-
-          {/* Desktop Navigation */}
+ 
           <nav className="nav">
             <Link className="nav__link" style={isActive("/")} to="/">Inicio</Link>
-            
-            {/* Componentes Dropdown */}
+ 
             <div className="nav__dropdown">
               <span className="nav__dropdown-trigger">Componentes</span>
               <div className="nav__dropdown-menu">
@@ -88,9 +69,9 @@ const Header = () => {
                   <div className="nav__dropdown-link">Cargando...</div>
                 ) : categories.filter(cat => cat.type === 'COMPONENTE').length > 0 ? (
                   categories.filter(cat => cat.type === 'COMPONENTE').map((category) => (
-                    <Link 
+                    <Link
                       key={category.id}
-                      className="nav__dropdown-link" 
+                      className="nav__dropdown-link"
                       to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
                     >
                       {category.description}
@@ -101,8 +82,7 @@ const Header = () => {
                 )}
               </div>
             </div>
-
-            {/* Periféricos Dropdown */}
+ 
             <div className="nav__dropdown">
               <span className="nav__dropdown-trigger">Periféricos</span>
               <div className="nav__dropdown-menu">
@@ -110,9 +90,9 @@ const Header = () => {
                   <div className="nav__dropdown-link">Cargando...</div>
                 ) : categories.filter(cat => cat.type === 'PERIFERICO').length > 0 ? (
                   categories.filter(cat => cat.type === 'PERIFERICO').map((category) => (
-                    <Link 
+                    <Link
                       key={category.id}
-                      className="nav__dropdown-link" 
+                      className="nav__dropdown-link"
                       to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
                     >
                       {category.description}
@@ -123,11 +103,11 @@ const Header = () => {
                 )}
               </div>
             </div>
-
+ 
             <Link className="nav__link" style={isActive("/productos")} to="/productos">Todos los Productos</Link>
           </nav>
         </div>
-
+ 
         <div className="hdr__right">
           <div className="search">
             <svg className="search__icon" viewBox="0 0 24 24" fill="none">
@@ -136,8 +116,7 @@ const Header = () => {
             </svg>
             <input className="search__input" placeholder="Buscar" />
           </div>
-          
-          {/* Autenticación */}
+ 
           {isAuthenticated() ? (
             <div className="user-menu">
               <span className="user-greeting">Hola, {user?.firstName || user?.name || 'Usuario'}</span>
@@ -175,8 +154,7 @@ const Header = () => {
               </Link>
             </div>
           )}
-          
-          {/* Carrito */}
+ 
           <Link to="/cart" className="iconbtn cart-btn" title="Carrito">
             <svg viewBox="0 0 24 24" fill="none">
               <circle cx="9" cy="21" r="1" fill="currentColor"/>
@@ -187,49 +165,43 @@ const Header = () => {
               <span className="cart-badge">{cartTotals.itemCount}</span>
             )}
           </Link>
-          
-          {/* Mobile Menu Button - Only show on mobile */}
-          {isMobile && (
-            <button 
-              className={`hamburger ${isMobileMenuOpen ? 'hamburger--active' : ''}`}
-              onClick={toggleMobileMenu}
-              aria-label="Toggle mobile menu"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          )}
+ 
+          <button
+            className={`hamburger ${isMobileMenuOpen ? 'hamburger--active' : ''}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMobile && isMobileMenuOpen && (
+ 
+      {isMobileMenuOpen && (
         <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>
       )}
-
-      {/* Mobile Menu */}
-      {isMobile && (
-        <nav className={`mobile-menu ${isMobileMenuOpen ? 'mobile-menu--open' : ''}`}>
+ 
+      <nav className={`mobile-menu ${isMobileMenuOpen ? 'mobile-menu--open' : ''}`}>
         <div className="mobile-menu__content">
-          <Link 
-            className="mobile-menu__link" 
-            style={isActive("/")} 
-            to="/" 
+          <Link
+            className="mobile-menu__link"
+            style={isActive("/")}
+            to="/"
             onClick={closeMobileMenu}
           >
             🏠 Inicio
           </Link>
-          
+ 
           <div className="mobile-menu__section">
             <h3 className="mobile-menu__section-title">💻 Componentes</h3>
             {loading ? (
               <div className="mobile-menu__sublink">Cargando...</div>
             ) : categories.filter(cat => cat.type === 'COMPONENTE').length > 0 ? (
               categories.filter(cat => cat.type === 'COMPONENTE').map((category) => (
-                <Link 
+                <Link
                   key={category.id}
-                  className="mobile-menu__sublink" 
+                  className="mobile-menu__sublink"
                   to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
                   onClick={closeMobileMenu}
                 >
@@ -240,16 +212,16 @@ const Header = () => {
               <div className="mobile-menu__sublink">No hay componentes</div>
             )}
           </div>
-
+ 
           <div className="mobile-menu__section">
             <h3 className="mobile-menu__section-title">⌨️ Periféricos</h3>
             {loading ? (
               <div className="mobile-menu__sublink">Cargando...</div>
             ) : categories.filter(cat => cat.type === 'PERIFERICO').length > 0 ? (
               categories.filter(cat => cat.type === 'PERIFERICO').map((category) => (
-                <Link 
+                <Link
                   key={category.id}
-                  className="mobile-menu__sublink" 
+                  className="mobile-menu__sublink"
                   to={`/productos?categoria=${encodeURIComponent(category.description)}&tipo=${category.type}`}
                   onClick={closeMobileMenu}
                 >
@@ -260,17 +232,16 @@ const Header = () => {
               <div className="mobile-menu__sublink">No hay periféricos</div>
             )}
           </div>
-
-          <Link 
-            className="mobile-menu__link" 
-            style={isActive("/productos")} 
-            to="/productos" 
+ 
+          <Link
+            className="mobile-menu__link"
+            style={isActive("/productos")}
+            to="/productos"
             onClick={closeMobileMenu}
           >
             📦 Todos los Productos
           </Link>
-          
-          {/* Autenticación en móvil */}
+ 
           <div className="mobile-menu__section">
             {isAuthenticated() ? (
               <>
@@ -278,15 +249,15 @@ const Header = () => {
                   <span>Hola, {user?.firstName || user?.name || 'Usuario'}</span>
                   <small>{user?.role || 'Usuario'}</small>
                 </div>
-                <Link 
-                  className="mobile-menu__link" 
-                  to="/profile" 
+                <Link
+                  className="mobile-menu__link"
+                  to="/profile"
                   onClick={closeMobileMenu}
                 >
                   👤 Mi Perfil
                 </Link>
-                <button 
-                  className="mobile-menu__link mobile-menu__link--logout" 
+                <button
+                  className="mobile-menu__link mobile-menu__link--logout"
                   onClick={handleLogout}
                 >
                   🚪 Cerrar Sesión
@@ -294,16 +265,16 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link 
-                  className="mobile-menu__link" 
-                  to="/login" 
+                <Link
+                  className="mobile-menu__link"
+                  to="/login"
                   onClick={closeMobileMenu}
                 >
                   🔑 Iniciar Sesión
                 </Link>
-                <Link 
-                  className="mobile-menu__link" 
-                  to="/register" 
+                <Link
+                  className="mobile-menu__link"
+                  to="/register"
                   onClick={closeMobileMenu}
                 >
                   📝 Registrarse
@@ -312,10 +283,9 @@ const Header = () => {
             )}
           </div>
         </div>
-        </nav>
-      )}
+      </nav>
     </header>
   );
 };
-
+ 
 export default Header;

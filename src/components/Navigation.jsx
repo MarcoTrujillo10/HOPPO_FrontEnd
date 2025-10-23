@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { categoryService } from "../services/api";
+ 
 const Navigation = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const { user, isAuthenticated } = useAuth();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCategories, setShowCategories] = useState(false);
+ 
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -23,17 +25,19 @@ const Navigation = () => {
     };
     loadCategories();
   }, []);
+ 
   const isActive = (path) => pathname === path;
+ 
   const isActiveCategory = (categoryId) => {
-    return pathname.includes(`/productos`) && 
-           new URLSearchParams(window.location.search).get('categoria') === categoryId;
+    return pathname.includes(`/productos`) &&
+           new URLSearchParams(search).get('categoria') === categoryId;
   };
+ 
   return (
     <nav style={styles.nav} className="navigation-container">
       <style>{mobileStyles}</style>
       <div className="container">
         <ul style={styles.ul}>
-          {/* Navegación Principal */}
           <li>
             <Link
               to="/"
@@ -45,7 +49,7 @@ const Navigation = () => {
               🏠 Inicio
             </Link>
           </li>
-          {/* Productos */}
+ 
           <li>
             <Link
               to="/productos"
@@ -57,7 +61,7 @@ const Navigation = () => {
               🛍️ Productos
             </Link>
           </li>
-          {/* Categorías Dropdown */}
+ 
           <li style={styles.dropdownContainer}>
             <button
               style={{
@@ -71,7 +75,7 @@ const Navigation = () => {
               📂 Categorías ▼
             </button>
             {showCategories && (
-              <div 
+              <div
                 style={styles.dropdown}
                 className="dropdown"
                 onMouseEnter={() => setShowCategories(true)}
@@ -81,7 +85,6 @@ const Navigation = () => {
                   <div style={styles.dropdownItem} className="dropdown-item">Cargando...</div>
                 ) : categories.length > 0 ? (
                   <>
-                    {/* Componentes */}
                     <div style={styles.dropdownSection}>
                       <div style={styles.dropdownSectionTitle}>🔧 Componentes</div>
                       {categories.filter(cat => cat.type === 'COMPONENTE').map((category) => (
@@ -98,8 +101,7 @@ const Navigation = () => {
                         </Link>
                       ))}
                     </div>
-                    
-                    {/* Periféricos */}
+ 
                     <div style={styles.dropdownSection}>
                       <div style={styles.dropdownSectionTitle}>🖱️ Periféricos</div>
                       {categories.filter(cat => cat.type === 'PERIFERICO').map((category) => (
@@ -123,7 +125,7 @@ const Navigation = () => {
               </div>
             )}
           </li>
-          {/* PC Builder */}
+ 
           <li>
             <Link
               to="/pc-builder"
@@ -135,7 +137,7 @@ const Navigation = () => {
               🔧 PC Builder
             </Link>
           </li>
-          {/* Panel de Admin (solo para vendedores) */}
+ 
           {isAuthenticated() && user?.role === 'VENDEDOR' && (
             <li>
               <Link
@@ -150,7 +152,7 @@ const Navigation = () => {
               </Link>
             </li>
           )}
-          {/* Contacto */}
+ 
           <li>
             <Link
               to="/contact"
@@ -167,7 +169,9 @@ const Navigation = () => {
     </nav>
   );
 };
+ 
 export default Navigation;
+ 
 const styles = {
   nav: {
     borderBottom: "1px solid #e3e3e3",
@@ -256,6 +260,7 @@ const styles = {
     border: "1px solid #ffeaa7",
   },
 };
+ 
 const mobileStyles = `
   @media (max-width: 768px) {
     .navigation-container ul {

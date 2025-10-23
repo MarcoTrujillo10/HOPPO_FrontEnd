@@ -15,18 +15,36 @@ const Hero = () => {
   const loadCarouselProducts = async () => {
     try {
       setLoading(true);
-      // Temporalmente usar productos con descuento hasta que el backend soporte showInCarousel
-      const response = await productService.getProducts({ discount: { gt: 0 } });
-      const productsWithDiscount = response.data.content || response.data || [];
       
-      // Si no hay productos con descuento, usar los primeros productos disponibles
-      if (productsWithDiscount.length === 0) {
-        const allProductsResponse = await productService.getProducts();
-        const allProducts = allProductsResponse.data.content || allProductsResponse.data || [];
-        setProducts(allProducts.slice(0, 3)); // Tomar los primeros 3 productos
-      } else {
-        setProducts(productsWithDiscount.slice(0, 5)); // Máximo 5 productos
+      // Intentar obtener productos específicamente marcados para el carrusel
+      let carouselProducts = [];
+      
+      try {
+        // Estrategia 1: Usar el endpoint específico para productos del carrusel
+        const response = await productService.getCarouselProducts();
+        carouselProducts = response.data.content || response.data || [];
+      } catch (error) {
+        try {
+          // Estrategia 2: Buscar productos con showInCarousel = true
+          const response = await productService.getProducts({ showInCarousel: true });
+          carouselProducts = response.data.content || response.data || [];
+        } catch (error2) {
+          try {
+            // Estrategia 3: Usar productos con descuento como fallback
+            const response = await productService.getProducts({ discount: { gt: 0 } });
+            carouselProducts = response.data.content || response.data || [];
+          } catch (error3) {
+            carouselProducts = getDefaultProducts();
+          }
+        }
       }
+      
+      // Si no hay productos del carrusel, usar productos por defecto
+      if (carouselProducts.length === 0) {
+        carouselProducts = getDefaultProducts();
+      }
+      
+      setProducts(carouselProducts.slice(0, 5)); // Máximo 5 productos
     } catch (error) {
       console.error('Error loading carousel products:', error);
       setProducts(getDefaultProducts());
@@ -138,7 +156,6 @@ const Hero = () => {
             
             <h1 className="hero__title">{currentProduct.name}</h1>
             <p className="hero__subtitle">{currentProduct.category?.description || 'Producto destacado'}</p>
-            <p className="hero__description">{currentProduct.description}</p>
             
             <div className="hero__price-section">
               <span className="hero__price">{formatPrice(discountedPrice)}</span>

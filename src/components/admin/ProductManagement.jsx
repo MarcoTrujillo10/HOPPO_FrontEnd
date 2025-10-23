@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { productService, categoryService, brandService, uploadService } from '../../services/api';
-import ImageUploadTest from './ImageUploadTest';
+import ImageUploadSimple from './ImageUploadSimple';
 import './AdminComponents.css';
+ 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -9,7 +10,10 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [showOutOfStock, setShowOutOfStock] = useState(true);
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+ 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -17,19 +21,19 @@ const ProductManagement = () => {
     stock: '',
     categoryId: '',
     brandId: '',
-    discount: 0,
-    showInCarousel: false
+    discount: 0
   });
   const [productImages, setProductImages] = useState([]);
-  console.log('ProductManagement render - productImages:', productImages);
+ 
   useEffect(() => {
     loadData();
   }, []);
+ 
   const loadData = async () => {
     try {
       setLoading(true);
       const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        productService.getProducts({ includeOutOfStock: true }), // Incluir productos sin stock
+        productService.getProducts(),
         categoryService.getCategories(),
         brandService.getBrands()
       ]);
@@ -38,90 +42,88 @@ const ProductManagement = () => {
       setBrands(brandsRes.data || []);
     } catch (error) {
       console.error('Error loading data:', error);
+      setStatus({ type: 'error', message: 'Error al cargar datos' });
     } finally {
       setLoading(false);
     }
   };
+ 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  // Validaciones básicas
-  if (!formData.name.trim()) {
-    alert('El nombre del producto es requerido');
-    return;
-  }
-  
-  if (!formData.price || Number(formData.price) <= 0) {
-    alert('El precio debe ser mayor a 0');
-    return;
-  }
-  
-  if (!formData.categoryId) {
-    alert('Debe seleccionar una categoría');
-    return;
-  }
-  
-  if (!formData.brandId) {
-    alert('Debe seleccionar una marca');
-    return;
-  }
-  
-  try {
-    // 1) dividir imágenes nuevas vs existentes
-    const imgs = Array.isArray(productImages) ? productImages : [];
-    const newFiles = imgs
-      .filter(img => img?.isNew && img?.file instanceof File)
-      .map(img => img.file);
-    const existingUrls = imgs
-      .filter(img => !img?.isNew)
-      .map(img => img.url || img.imageUrl)
-      .filter(Boolean);
-    // 2) subir nuevas (si las hay) y obtener sus URLs
-    let uploadedUrls = [];
-    if (newFiles.length > 0) {
-      uploadedUrls = await uploadService.uploadImages(newFiles);
-    }
-    // 3) unificar URLs
-    const imageUrls = [...existingUrls, ...uploadedUrls];
-    // 4) armar payload del producto
-    const productData = {
-      name: formData.name,
-      description: formData.description,
-      price: Number(formData.price) || 0,
-      stock: parseInt(formData.stock, 10) || 0,
-      categoryId: parseInt(formData.categoryId, 10),
-      brandId: parseInt(formData.brandId, 10),
-      discount: parseInt(formData.discount, 10) || 0,
-      imageUrls
-    };
+    e.preventDefault();
     
-    // Solo agregar showInCarousel si el backend lo soporta
-    if (formData.showInCarousel !== undefined) {
-      productData.showInCarousel = Boolean(formData.showInCarousel);
+    // Validaciones básicas
+    if (!formData.name.trim()) {
+      setStatus({ type: 'error', message: 'El nombre del producto es requerido' });
+      return;
     }
-    // 5) crear o actualizar
-    if (editingProduct?.id) {
-      await productService.updateProduct(editingProduct.id, productData);
-    } else {
-      await productService.createProduct(productData);
+    if (!formData.price || formData.price <= 0) {
+      setStatus({ type: 'error', message: 'El precio debe ser mayor a 0' });
+      return;
     }
-    // 6) refrescar y limpiar
-    await loadData();
-    resetForm();
-    alert(editingProduct ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
-  } catch (error) {
-    console.error('Error saving product:', error);
-    console.error('Error details:', error.response?.data);
-    console.error('Product data being sent:', productData);
+    if (!formData.categoryId) {
+      setStatus({ type: 'error', message: 'Debe seleccionar una categoría' });
+      return;
+    }
+    if (!formData.brandId) {
+      setStatus({ type: 'error', message: 'Debe seleccionar una marca' });
+      return;
+    }
     
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        error.message || 
-                        'Error al guardar el producto';
-    
-    alert(`Error al guardar el producto: ${errorMessage}`);
-  }
-};
+    try {
+      const imgs = Array.isArray(productImages) ? productImages : [];
+      const newFiles = imgs
+        .filter(img => img?.isNew && img?.file instanceof File)
+        .map(img => img.file);
+      const existingUrls = imgs
+        .filter(img => !img?.isNew)
+        .map(img => img.url || img.imageUrl)
+        .filter(Boolean);
+ 
+      let uploadedUrls = [];
+      if (newFiles.length > 0) {
+        uploadedUrls = await uploadService.uploadImages(newFiles);
+      }
+ 
+      const imageUrls = [...existingUrls, ...uploadedUrls];
+ 
+      const productData = {
+        ...formData,
+        price: Number(formData.price) || 0,
+        stock: parseInt(formData.stock, 10) || 0,
+        categoryId: parseInt(formData.categoryId, 10),
+        brandId: parseInt(formData.brandId, 10),
+        discount: parseInt(formData.discount, 10) || 0,
+        imageUrls
+      };
+ 
+      if (editingProduct?.id) {
+        await productService.updateProduct(editingProduct.id, productData);
+        setStatus({ type: 'success', message: 'Producto actualizado exitosamente' });
+      } else {
+        await productService.createProduct(productData);
+        setStatus({ type: 'success', message: 'Producto creado exitosamente' });
+      }
+ 
+      await loadData();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving product:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Product data being sent:', productData);
+      
+      let errorMessage = 'Error al guardar el producto';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.errors) {
+        errorMessage = error.response.data.errors.join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setStatus({ type: 'error', message: errorMessage });
+    }
+  };
+ 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData({
@@ -131,79 +133,48 @@ const ProductManagement = () => {
       stock: product.stock,
       categoryId: product.category?.id || '',
       brandId: product.brand?.id || '',
-      discount: product.discount || 0,
-      showInCarousel: product.showInCarousel || false
+      discount: product.discount || 0
     });
-    
-    // Cargar imágenes existentes
+ 
     if (product.images && product.images.length > 0) {
       const existingImages = product.images.map(img => ({
         url: img.imageUrl,
-        name: `Imagen existente`,
+        name: 'Imagen existente',
         isNew: false
       }));
       setProductImages(existingImages);
     } else {
       setProductImages([]);
     }
-    
+ 
     setShowForm(true);
   };
-  const handleDelete = async (productId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      try {
-        await productService.deleteProduct(productId);
-        await loadData();
-        alert('Producto eliminado exitosamente');
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        alert('Error al eliminar el producto');
-      }
-    }
+ 
+  const requestDelete = (productId) => {
+    setPendingDeleteId(productId);
+    setConfirmOpen(true);
   };
-
-  const handleToggleCarousel = async (product) => {
+ 
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
-      const newCarouselStatus = !product.showInCarousel;
-      
-      console.log(`Updating product ${product.id} carousel status to:`, newCarouselStatus);
-      
-      // Intentar usar el endpoint específico primero
-      try {
-        await productService.updateProductCarouselStatus(product.id, newCarouselStatus);
-      } catch (carouselError) {
-        console.log('Carousel-specific endpoint failed, trying full update:', carouselError);
-        
-        // Si falla, usar el endpoint completo con datos limpios
-        const updatedProduct = {
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          stock: product.stock,
-          categoryId: product.category?.id || product.categoryId,
-          brandId: product.brand?.id || product.brandId,
-          discount: product.discount || 0,
-          showInCarousel: newCarouselStatus,
-          imageUrls: product.images ? product.images.map(img => img.imageUrl) : []
-        };
-        
-        await productService.updateProduct(product.id, updatedProduct);
-      }
-      
+      await productService.deleteProduct(pendingDeleteId);
       await loadData();
-      alert(`Producto ${newCarouselStatus ? 'agregado al' : 'quitado del'} carrusel`);
+      setStatus({ type: 'success', message: 'Producto eliminado exitosamente' });
     } catch (error) {
-      console.error('Error updating carousel status:', error);
-      console.error('Error details:', error.response?.data);
-      
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          'Error al actualizar el estado del carrusel';
-      
-      alert(`Error al actualizar el estado del carrusel: ${errorMessage}`);
+      console.error('Error deleting product:', error);
+      setStatus({ type: 'error', message: 'Error al eliminar el producto' });
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
+ 
+  const cancelDelete = () => {
+    setConfirmOpen(false);
+    setPendingDeleteId(null);
+  };
+ 
   const resetForm = () => {
     setFormData({
       name: '',
@@ -212,51 +183,42 @@ const ProductManagement = () => {
       stock: '',
       categoryId: '',
       brandId: '',
-      discount: 0,
-      showInCarousel: false
+      discount: 0
     });
     setProductImages([]);
     setEditingProduct(null);
     setShowForm(false);
   };
+ 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
+ 
   if (loading) {
     return <div className="loading">Cargando productos...</div>;
   }
+ 
   return (
     <div className="product-management">
       <div className="section-header">
         <h2>📦 Gestión de Productos</h2>
-        <div className="header-actions">
-          <label className="filter-toggle">
-            <input
-              type="checkbox"
-              checked={showOutOfStock}
-              onChange={(e) => setShowOutOfStock(e.target.checked)}
-            />
-            <span>Mostrar productos sin stock</span>
-          </label>
-          <button 
-            className="btn btn-primary"
-            onClick={() => setShowForm(true)}
-          >
-            ➕ Agregar Producto
-          </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowForm(true)}
+        >
+          ➕ Agregar Producto
+        </button>
+      </div>
+ 
+      {status.message && (
+        <div className={`status-banner ${status.type}`}>
+          {status.message}
         </div>
-      </div>
-      
-      <div className="products-stats">
-        <p>
-          Total: {products.length} productos | 
-          Sin stock: {products.filter(p => p.stock === 0).length} | 
-          Con stock: {products.filter(p => p.stock > 0).length}
-        </p>
-      </div>
+      )}
+ 
       {showForm && (
         <div className="form-modal">
           <div className="form-content">
@@ -271,7 +233,7 @@ const ProductManagement = () => {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
                 </div>
@@ -281,18 +243,19 @@ const ProductManagement = () => {
                     type="number"
                     step="0.01"
                     value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                   />
                 </div>
               </div>
+ 
               <div className="form-row">
                 <div className="form-group">
                   <label>Stock</label>
                   <input
                     type="number"
                     value={formData.stock}
-                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                     required
                   />
                 </div>
@@ -303,16 +266,17 @@ const ProductManagement = () => {
                     min="0"
                     max="100"
                     value={formData.discount}
-                    onChange={(e) => setFormData({...formData, discount: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                   />
                 </div>
               </div>
+ 
               <div className="form-row">
                 <div className="form-group">
                   <label>Categoría</label>
                   <select
                     value={formData.categoryId}
-                    onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                     required
                   >
                     <option value="">Seleccionar categoría</option>
@@ -325,7 +289,7 @@ const ProductManagement = () => {
                   <label>Marca</label>
                   <select
                     value={formData.brandId}
-                    onChange={(e) => setFormData({...formData, brandId: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
                     required
                   >
                     <option value="">Seleccionar marca</option>
@@ -335,35 +299,22 @@ const ProductManagement = () => {
                   </select>
                 </div>
               </div>
+ 
               <div className="form-group">
                 <label>Descripción</label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows="3"
                   required
                 />
               </div>
-              
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.showInCarousel}
-                    onChange={(e) => setFormData({...formData, showInCarousel: e.target.checked})}
-                    disabled={true}
-                  />
-                  <span className="checkbox-text">🎯 Mostrar en carrusel principal</span>
-                </label>
-                <small className="form-help">
-                  ⚠️ Funcionalidad temporalmente deshabilitada hasta que el backend soporte el campo showInCarousel
-                </small>
-              </div>
-              {/* Componente para subir imágenes */}
-              <ImageUploadTest
+ 
+              <ImageUploadSimple
                 images={productImages}
                 onImagesChange={setProductImages}
               />
+ 
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -376,16 +327,14 @@ const ProductManagement = () => {
           </div>
         </div>
       )}
+ 
       <div className="products-grid">
-        {products
-          .filter(product => showOutOfStock || product.stock > 0)
-          .map(product => (
-          <div key={product.id} className={`product-card ${product.stock === 0 ? 'product-card--out-of-stock' : ''}`}>
-            {/* Imagen del producto */}
+        {products.map(product => (
+          <div key={product.id} className="product-card">
             <div className="product-image">
               {product.images && product.images.length > 0 ? (
-                <img 
-                  src={product.images[0].imageUrl} 
+                <img
+                  src={product.images[0].imageUrl}
                   alt={product.name}
                   className="product-img"
                 />
@@ -400,54 +349,29 @@ const ProductManagement = () => {
                 </div>
               )}
             </div>
-            
+ 
             <div className="product-info">
               <h3>{product.name}</h3>
-              {product.showInCarousel && (
-                <div className="carousel-badge">
-                  🎯 En carrusel
-                </div>
-              )}
-              {product.stock === 0 && (
-                <div className="out-of-stock-badge">
-                  ⚠️ Sin stock
-                </div>
-              )}
               <p className="product-price">{formatPrice(product.price)}</p>
               {product.discount > 0 && (
                 <p className="product-discount">Descuento: {product.discount}%</p>
               )}
-              <p className={`product-stock ${product.stock === 0 ? 'product-stock--zero' : ''}`}>
-                Stock: {product.stock}
-              </p>
-              <p className="product-category">
-                📂 {product.category?.description || 'Sin categoría'}
-              </p>
-              <p className="product-brand">
-                🏷️ {product.brand?.name || 'Sin marca'}
-              </p>
+              <p className="product-stock">Stock: {product.stock}</p>
+              <p className="product-category">📂 {product.category?.description || 'Sin categoría'}</p>
+              <p className="product-brand">🏷️ {product.brand?.name || 'Sin marca'}</p>
               <p className="product-description">{product.description}</p>
             </div>
-            
+ 
             <div className="product-actions">
-              <button 
-                className={`btn ${product.showInCarousel ? 'btn-carousel-active' : 'btn-carousel'}`}
-                onClick={() => handleToggleCarousel(product)}
-                title="Funcionalidad temporalmente deshabilitada"
-                disabled={true}
-                style={{ opacity: 0.5, cursor: 'not-allowed' }}
-              >
-                {product.showInCarousel ? '🎯 En carrusel' : '🎯 Agregar'}
-              </button>
-              <button 
+              <button
                 className="btn btn-edit"
                 onClick={() => handleEdit(product)}
               >
                 ✏️ Editar
               </button>
-              <button 
+              <button
                 className="btn btn-delete"
-                onClick={() => handleDelete(product.id)}
+                onClick={() => requestDelete(product.id)}
               >
                 🗑️ Eliminar
               </button>
@@ -455,12 +379,26 @@ const ProductManagement = () => {
           </div>
         ))}
       </div>
+ 
       {products.length === 0 && (
         <div className="empty-state">
           <p>No hay productos registrados.</p>
         </div>
       )}
+ 
+      {confirmOpen && (
+        <div className="confirm-backdrop" role="dialog" aria-modal="true">
+          <div className="confirm-box">
+            <p>¿Estás seguro de que quieres eliminar este producto?</p>
+            <div className="confirm-actions">
+              <button className="btn btn-danger btn-small" onClick={confirmDelete}>Eliminar</button>
+              <button className="btn btn-secondary btn-small" onClick={cancelDelete}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+ 
 export default ProductManagement;
