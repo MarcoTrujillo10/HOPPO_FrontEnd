@@ -1,64 +1,71 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { bannerService } from "../services/api";
+import { productService } from "../services/api";
 import "./Hero.css";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [banners, setBanners] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadBanners();
+    loadCarouselProducts();
   }, []);
 
-  const loadBanners = async () => {
+  const loadCarouselProducts = async () => {
     try {
       setLoading(true);
-      const response = await bannerService.getActiveBanners();
-      const activeBanners = response.data
-        .filter(banner => banner.isActive)
-        .sort((a, b) => a.order - b.order);
-      setBanners(activeBanners);
+      // Temporalmente usar productos con descuento hasta que el backend soporte showInCarousel
+      const response = await productService.getProducts({ discount: { gt: 0 } });
+      const productsWithDiscount = response.data.content || response.data || [];
+      
+      // Si no hay productos con descuento, usar los primeros productos disponibles
+      if (productsWithDiscount.length === 0) {
+        const allProductsResponse = await productService.getProducts();
+        const allProducts = allProductsResponse.data.content || allProductsResponse.data || [];
+        setProducts(allProducts.slice(0, 3)); // Tomar los primeros 3 productos
+      } else {
+        setProducts(productsWithDiscount.slice(0, 5)); // Máximo 5 productos
+      }
     } catch (error) {
-      console.error('Error loading banners:', error);
-      setBanners(getDefaultBanners());
+      console.error('Error loading carousel products:', error);
+      setProducts(getDefaultProducts());
     } finally {
       setLoading(false);
     }
   };
 
-  const getDefaultBanners = () => [
+  const getDefaultProducts = () => [
     {
       id: "pc-gamer",
-      title: "PC Gamer de Alto Rendimiento",
-      subtitle: "Experimenta el máximo rendimiento",
+      name: "PC Gamer de Alto Rendimiento",
       description: "Sistema completo con RTX 4080, Intel i7 y 32GB RAM DDR5",
-      price: "$1,599",
-      discount: "20% OFF",
-      imageUrl: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=1200&h=600&fit=crop&crop=center",
-      link: "/productos/pc-gamer"
+      price: 1599,
+      discount: 20,
+      images: [{
+        imageUrl: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=1200&h=600&fit=crop&crop=center"
+      }]
     },
     {
       id: "gpu-rtx",
-      title: "NVIDIA RTX 4080",
-      subtitle: "Potencia gráfica de nueva generación",
+      name: "NVIDIA RTX 4080",
       description: "16GB GDDR6X, ray tracing avanzado y DLSS 3.0",
-      price: "$1,499",
-      discount: "15% OFF",
-      imageUrl: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=1200&h=600&fit=crop&crop=center",
-      link: "/productos/gpu-rtx"
+      price: 1499,
+      discount: 15,
+      images: [{
+        imageUrl: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=1200&h=600&fit=crop&crop=center"
+      }]
     }
   ];
 
   useEffect(() => {
-    if (banners.length > 0) {
+    if (products.length > 0) {
       const timer = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % banners.length);
+        setCurrentSlide((prev) => (prev + 1) % products.length);
       }, 5000);
       return () => clearInterval(timer);
     }
-  }, [banners.length]);
+  }, [products.length]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -66,12 +73,23 @@ const Hero = () => {
 
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => 
-      prev === 0 ? banners.length - 1 : prev - 1
+      prev === 0 ? products.length - 1 : prev - 1
     );
   };
 
   const goToNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % banners.length);
+    setCurrentSlide((prev) => (prev + 1) % products.length);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price);
+  };
+
+  const calculateDiscountedPrice = (price, discount) => {
+    return price * (1 - discount / 100);
   };
 
   if (loading) {
@@ -79,17 +97,18 @@ const Hero = () => {
       <section className="hero">
         <div className="hero__loading">
           <div className="hero__loading-spinner"></div>
-          <p>Cargando promociones...</p>
+          <p>Cargando productos destacados...</p>
         </div>
       </section>
     );
   }
 
-  if (banners.length === 0) {
+  if (products.length === 0) {
     return (
       <section className="hero">
         <div className="hero__empty">
-          <h2>No hay promociones disponibles</h2>
+          <h2>No hay productos destacados</h2>
+          <p>Los vendedores pueden agregar productos al carrusel desde el panel de administración.</p>
           <Link to="/productos" className="btn btn--primary">
             Ver todos los productos
           </Link>
@@ -98,7 +117,8 @@ const Hero = () => {
     );
   }
 
-  const currentBanner = banners[currentSlide];
+  const currentProduct = products[currentSlide];
+  const discountedPrice = calculateDiscountedPrice(currentProduct.price, currentProduct.discount || 0);
   
   return (
     <section className="hero">
@@ -106,27 +126,31 @@ const Hero = () => {
         <div 
           className="hero__slide active"
           style={{ 
-            backgroundImage: `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.5)), url("${currentBanner.imageUrl}")`
+            backgroundImage: `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.5)), url("${currentProduct.images?.[0]?.imageUrl || '/placeholder-product.jpg'}")`
           }}
         >
           <div className="hero__content">
-            <div className="hero__badge">
-              <span className="hero__discount">{currentBanner.discount}</span>
-            </div>
+            {currentProduct.discount > 0 && (
+              <div className="hero__badge">
+                <span className="hero__discount">{currentProduct.discount}% OFF</span>
+              </div>
+            )}
             
-            <h1 className="hero__title">{currentBanner.title}</h1>
-            <p className="hero__subtitle">{currentBanner.subtitle}</p>
-            <p className="hero__description">{currentBanner.description}</p>
+            <h1 className="hero__title">{currentProduct.name}</h1>
+            <p className="hero__subtitle">{currentProduct.category?.description || 'Producto destacado'}</p>
+            <p className="hero__description">{currentProduct.description}</p>
             
             <div className="hero__price-section">
-              <span className="hero__price">{currentBanner.price}</span>
-              <span className="hero__old-price">
-                ${Math.round(parseFloat(currentBanner.price.replace('$', '').replace(',', '')) * 1.25).toLocaleString()}
-              </span>
+              <span className="hero__price">{formatPrice(discountedPrice)}</span>
+              {currentProduct.discount > 0 && (
+                <span className="hero__old-price">
+                  {formatPrice(currentProduct.price)}
+                </span>
+              )}
             </div>
             
             <div className="hero__actions">
-              <Link to={currentBanner.link} className="hero__btn hero__btn--primary">
+              <Link to={`/productos/${currentProduct.id}`} className="hero__btn hero__btn--primary">
                 Ver producto
               </Link>
               <Link to="/productos" className="hero__btn hero__btn--secondary">
@@ -136,7 +160,7 @@ const Hero = () => {
           </div>
         </div>
         
-        {banners.length > 1 && (
+        {products.length > 1 && (
           <>
             <button className="hero__nav hero__nav--prev" onClick={goToPrevSlide}>
               ‹
@@ -146,7 +170,7 @@ const Hero = () => {
             </button>
             
             <div className="hero__dots">
-              {banners.map((_, index) => (
+              {products.map((_, index) => (
                 <button
                   key={index}
                   className={`hero__dot ${index === currentSlide ? 'active' : ''}`}

@@ -45,6 +45,18 @@ export const productService = {
   deleteProduct: (id) => {
     return api.delete(`/products/${id}`);
   },
+
+  getFeaturedProducts: () => {
+    return api.get('/products', { params: { featured: true } });
+  },
+
+  getCarouselProducts: () => {
+    return api.get('/products', { params: { showInCarousel: true } });
+  },
+
+  updateProductCarouselStatus: (id, showInCarousel) => {
+    return api.patch(`/products/${id}/carousel`, { showInCarousel });
+  },
 };
 export const categoryService = {
   // Obtener todas las categorías

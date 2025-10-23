@@ -9,6 +9,7 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [showOutOfStock, setShowOutOfStock] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -16,7 +17,8 @@ const ProductManagement = () => {
     stock: '',
     categoryId: '',
     brandId: '',
-    discount: 0
+    discount: 0,
+    showInCarousel: false
   });
   const [productImages, setProductImages] = useState([]);
   console.log('ProductManagement render - productImages:', productImages);
@@ -27,7 +29,7 @@ const ProductManagement = () => {
     try {
       setLoading(true);
       const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        productService.getProducts(),
+        productService.getProducts({ includeOutOfStock: true }), // Incluir productos sin stock
         categoryService.getCategories(),
         brandService.getBrands()
       ]);
@@ -42,6 +44,28 @@ const ProductManagement = () => {
   };
   const handleSubmit = async (e) => {
   e.preventDefault();
+  
+  // Validaciones básicas
+  if (!formData.name.trim()) {
+    alert('El nombre del producto es requerido');
+    return;
+  }
+  
+  if (!formData.price || Number(formData.price) <= 0) {
+    alert('El precio debe ser mayor a 0');
+    return;
+  }
+  
+  if (!formData.categoryId) {
+    alert('Debe seleccionar una categoría');
+    return;
+  }
+  
+  if (!formData.brandId) {
+    alert('Debe seleccionar una marca');
+    return;
+  }
+  
   try {
     // 1) dividir imágenes nuevas vs existentes
     const imgs = Array.isArray(productImages) ? productImages : [];
@@ -61,7 +85,8 @@ const ProductManagement = () => {
     const imageUrls = [...existingUrls, ...uploadedUrls];
     // 4) armar payload del producto
     const productData = {
-      ...formData,
+      name: formData.name,
+      description: formData.description,
       price: Number(formData.price) || 0,
       stock: parseInt(formData.stock, 10) || 0,
       categoryId: parseInt(formData.categoryId, 10),
@@ -69,6 +94,11 @@ const ProductManagement = () => {
       discount: parseInt(formData.discount, 10) || 0,
       imageUrls
     };
+    
+    // Solo agregar showInCarousel si el backend lo soporta
+    if (formData.showInCarousel !== undefined) {
+      productData.showInCarousel = Boolean(formData.showInCarousel);
+    }
     // 5) crear o actualizar
     if (editingProduct?.id) {
       await productService.updateProduct(editingProduct.id, productData);
@@ -81,7 +111,15 @@ const ProductManagement = () => {
     alert(editingProduct ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
   } catch (error) {
     console.error('Error saving product:', error);
-    alert('Error al guardar el producto');
+    console.error('Error details:', error.response?.data);
+    console.error('Product data being sent:', productData);
+    
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        'Error al guardar el producto';
+    
+    alert(`Error al guardar el producto: ${errorMessage}`);
   }
 };
   const handleEdit = (product) => {
@@ -93,7 +131,8 @@ const ProductManagement = () => {
       stock: product.stock,
       categoryId: product.category?.id || '',
       brandId: product.brand?.id || '',
-      discount: product.discount || 0
+      discount: product.discount || 0,
+      showInCarousel: product.showInCarousel || false
     });
     
     // Cargar imágenes existentes
@@ -122,6 +161,49 @@ const ProductManagement = () => {
       }
     }
   };
+
+  const handleToggleCarousel = async (product) => {
+    try {
+      const newCarouselStatus = !product.showInCarousel;
+      
+      console.log(`Updating product ${product.id} carousel status to:`, newCarouselStatus);
+      
+      // Intentar usar el endpoint específico primero
+      try {
+        await productService.updateProductCarouselStatus(product.id, newCarouselStatus);
+      } catch (carouselError) {
+        console.log('Carousel-specific endpoint failed, trying full update:', carouselError);
+        
+        // Si falla, usar el endpoint completo con datos limpios
+        const updatedProduct = {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          stock: product.stock,
+          categoryId: product.category?.id || product.categoryId,
+          brandId: product.brand?.id || product.brandId,
+          discount: product.discount || 0,
+          showInCarousel: newCarouselStatus,
+          imageUrls: product.images ? product.images.map(img => img.imageUrl) : []
+        };
+        
+        await productService.updateProduct(product.id, updatedProduct);
+      }
+      
+      await loadData();
+      alert(`Producto ${newCarouselStatus ? 'agregado al' : 'quitado del'} carrusel`);
+    } catch (error) {
+      console.error('Error updating carousel status:', error);
+      console.error('Error details:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          'Error al actualizar el estado del carrusel';
+      
+      alert(`Error al actualizar el estado del carrusel: ${errorMessage}`);
+    }
+  };
   const resetForm = () => {
     setFormData({
       name: '',
@@ -130,7 +212,8 @@ const ProductManagement = () => {
       stock: '',
       categoryId: '',
       brandId: '',
-      discount: 0
+      discount: 0,
+      showInCarousel: false
     });
     setProductImages([]);
     setEditingProduct(null);
@@ -149,12 +232,30 @@ const ProductManagement = () => {
     <div className="product-management">
       <div className="section-header">
         <h2>📦 Gestión de Productos</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowForm(true)}
-        >
-          ➕ Agregar Producto
-        </button>
+        <div className="header-actions">
+          <label className="filter-toggle">
+            <input
+              type="checkbox"
+              checked={showOutOfStock}
+              onChange={(e) => setShowOutOfStock(e.target.checked)}
+            />
+            <span>Mostrar productos sin stock</span>
+          </label>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowForm(true)}
+          >
+            ➕ Agregar Producto
+          </button>
+        </div>
+      </div>
+      
+      <div className="products-stats">
+        <p>
+          Total: {products.length} productos | 
+          Sin stock: {products.filter(p => p.stock === 0).length} | 
+          Con stock: {products.filter(p => p.stock > 0).length}
+        </p>
       </div>
       {showForm && (
         <div className="form-modal">
@@ -243,6 +344,21 @@ const ProductManagement = () => {
                   required
                 />
               </div>
+              
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={formData.showInCarousel}
+                    onChange={(e) => setFormData({...formData, showInCarousel: e.target.checked})}
+                    disabled={true}
+                  />
+                  <span className="checkbox-text">🎯 Mostrar en carrusel principal</span>
+                </label>
+                <small className="form-help">
+                  ⚠️ Funcionalidad temporalmente deshabilitada hasta que el backend soporte el campo showInCarousel
+                </small>
+              </div>
               {/* Componente para subir imágenes */}
               <ImageUploadTest
                 images={productImages}
@@ -261,8 +377,10 @@ const ProductManagement = () => {
         </div>
       )}
       <div className="products-grid">
-        {products.map(product => (
-          <div key={product.id} className="product-card">
+        {products
+          .filter(product => showOutOfStock || product.stock > 0)
+          .map(product => (
+          <div key={product.id} className={`product-card ${product.stock === 0 ? 'product-card--out-of-stock' : ''}`}>
             {/* Imagen del producto */}
             <div className="product-image">
               {product.images && product.images.length > 0 ? (
@@ -285,11 +403,23 @@ const ProductManagement = () => {
             
             <div className="product-info">
               <h3>{product.name}</h3>
+              {product.showInCarousel && (
+                <div className="carousel-badge">
+                  🎯 En carrusel
+                </div>
+              )}
+              {product.stock === 0 && (
+                <div className="out-of-stock-badge">
+                  ⚠️ Sin stock
+                </div>
+              )}
               <p className="product-price">{formatPrice(product.price)}</p>
               {product.discount > 0 && (
                 <p className="product-discount">Descuento: {product.discount}%</p>
               )}
-              <p className="product-stock">Stock: {product.stock}</p>
+              <p className={`product-stock ${product.stock === 0 ? 'product-stock--zero' : ''}`}>
+                Stock: {product.stock}
+              </p>
               <p className="product-category">
                 📂 {product.category?.description || 'Sin categoría'}
               </p>
@@ -300,6 +430,15 @@ const ProductManagement = () => {
             </div>
             
             <div className="product-actions">
+              <button 
+                className={`btn ${product.showInCarousel ? 'btn-carousel-active' : 'btn-carousel'}`}
+                onClick={() => handleToggleCarousel(product)}
+                title="Funcionalidad temporalmente deshabilitada"
+                disabled={true}
+                style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              >
+                {product.showInCarousel ? '🎯 En carrusel' : '🎯 Agregar'}
+              </button>
               <button 
                 className="btn btn-edit"
                 onClick={() => handleEdit(product)}

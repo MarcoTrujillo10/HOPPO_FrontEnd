@@ -97,6 +97,136 @@
   transform: translateY(-2px);
 }
 
+.btn-carousel {
+  background-color: #17a2b8;
+  color: white;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.btn-carousel:hover {
+  background-color: #138496;
+}
+
+.btn-carousel-active {
+  background-color: #28a745;
+  color: white;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.btn-carousel-active:hover {
+  background-color: #218838;
+}
+
+.carousel-badge {
+  display: inline-block;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #13a4ec;
+}
+
+.checkbox-text {
+  font-size: 1rem;
+}
+
+.form-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.out-of-stock-badge {
+  display: inline-block;
+  background: linear-gradient(45deg, #ffc107, #ffeb3b);
+  color: #856404;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+.product-stock--zero {
+  color: #dc3545;
+  font-weight: bold;
+  background-color: #f8d7da;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #f5c6cb;
+}
+
+.product-card--out-of-stock {
+  opacity: 0.8;
+  border: 2px solid #ffc107;
+}
+
+.product-card--out-of-stock .product-info h3 {
+  color: #856404;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.filter-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #13a4ec;
+}
+
+.filter-toggle span {
+  font-weight: 500;
+}
+
+.products-stats {
+  background-color: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #13a4ec;
+}
+
+.products-stats p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #495057;
+  font-weight: 500;
+}
+
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.8rem;
