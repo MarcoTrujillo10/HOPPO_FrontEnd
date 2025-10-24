@@ -25,7 +25,6 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    // Validar que las contraseñas coincidan
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       setLoading(false);

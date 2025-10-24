@@ -3,11 +3,13 @@ import { useCart } from '../hooks/useCart.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { paymentService } from '../services/api.js';
 import './PaymentForm.css';
+
 const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   const { cart, getCartTotal } = useCart();
   const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardHolderName: '',
@@ -19,6 +21,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
     postalCode: '',
     country: 'Argentina'
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,7 +29,6 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       [name]: value
     }));
     
-    // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -34,45 +36,55 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       }));
     }
   };
+
   const validateForm = () => {
     const newErrors = {};
-    // Validar número de tarjeta
+
+   
     if (!formData.cardNumber || formData.cardNumber.length !== 16) {
       newErrors.cardNumber = 'El número de tarjeta debe tener 16 ';
     }
-    // Validar nombre del titular
+
+    
     if (!formData.cardHolderName.trim()) {
       newErrors.cardHolderName = 'El nombre del titular es obligatorio';
     }
-    // Validar fecha de expiración
+
+   
     if (!formData.expiryDate || !/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(formData.expiryDate)) {
       newErrors.expiryDate = 'La fecha debe estar en formato MM/YY';
     }
-    // Validar CVV
+
+    
     if (!formData.cvv || (formData.cvv.length !== 3 && formData.cvv.length !== 4)) {
       newErrors.cvv = 'El CVV debe tener 3 o 4 dígitos';
     }
-    // Validar dirección
+
+    
     if (!formData.billingAddress.trim()) {
       newErrors.billingAddress = 'La dirección de facturación es obligatoria';
     }
-    // Validar ciudad
+
+    
     if (!formData.city.trim()) {
       newErrors.city = 'La ciudad es obligatoria';
     }
-    // Validar código postal
+
     if (!formData.postalCode.trim()) {
       newErrors.postalCode = 'El código postal es obligatorio';
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
+
     setLoading(true);
     
     try {
@@ -80,8 +92,10 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
         ...formData,
         totalAmount: getCartTotal()
       };
+
       const response = await paymentService.processPayment(paymentData);
       const result = response.data;
+
       if (result.success) {
         onPaymentSuccess(result);
       } else {
@@ -95,22 +109,25 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       setLoading(false);
     }
   };
+
   const formatCardNumber = (value) => {
-    // Remover espacios y limitar a 16 dígitos
+    
     const cleaned = value.replace(/\s/g, '').replace(/\D/g, '');
     if (cleaned.length <= 16) {
       return cleaned;
     }
     return cleaned.substring(0, 16);
   };
+
   const formatExpiryDate = (value) => {
-    // Formatear como MM/YY
+    
     const cleaned = value.replace(/\D/g, '');
     if (cleaned.length >= 2) {
       return `${cleaned.substring(0, 2)}/${cleaned.substring(2, 4)}`;
     }
     return cleaned;
   };
+
   if (!cart || cart.items.length === 0) {
     return (
       <div className="payment-form">
@@ -121,6 +138,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       </div>
     );
   }
+
   return (
     <div className="payment-form">
       <div className="payment-form__header">
@@ -129,13 +147,13 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
           Total: ${getCartTotal().toFixed(2)}
         </div>
       </div>
+
       <form onSubmit={handleSubmit} className="payment-form__form">
-        {/* Información de la tarjeta */}
         <div className="payment-form__section">
           <h3>Información de la Tarjeta</h3>
           
           <div className="payment-form__field">
-            <label htmlFor="cardNumber">Número de </label>
+            <label htmlFor="cardNumber">Número de Tarjeta</label>
             <input
               type="text"
               id="cardNumber"
@@ -151,6 +169,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
             />
             {errors.cardNumber && <span className="error-message">{errors.cardNumber}</span>}
           </div>
+
           <div className="payment-form__field">
             <label htmlFor="cardHolderName">Nombre del Titular</label>
             <input
@@ -164,6 +183,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
             />
             {errors.cardHolderName && <span className="error-message">{errors.cardHolderName}</span>}
           </div>
+
           <div className="payment-form__row">
             <div className="payment-form__field">
               <label htmlFor="expiryDate">Fecha de Expiración</label>
@@ -182,6 +202,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               />
               {errors.expiryDate && <span className="error-message">{errors.expiryDate}</span>}
             </div>
+
             <div className="payment-form__field">
               <label htmlFor="cvv">CVV</label>
               <input
@@ -200,6 +221,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               {errors.cvv && <span className="error-message">{errors.cvv}</span>}
             </div>
           </div>
+
           <div className="payment-form__field">
             <label htmlFor="paymentMethod">Método de Pago</label>
             <select
@@ -213,7 +235,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
             </select>
           </div>
         </div>
-        {/* Información de facturación */}
+
         <div className="payment-form__section">
           <h3>Dirección de Facturación</h3>
           
@@ -230,6 +252,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
             />
             {errors.billingAddress && <span className="error-message">{errors.billingAddress}</span>}
           </div>
+
           <div className="payment-form__row">
             <div className="payment-form__field">
               <label htmlFor="city">Ciudad</label>
@@ -244,6 +267,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               />
               {errors.city && <span className="error-message">{errors.city}</span>}
             </div>
+
             <div className="payment-form__field">
               <label htmlFor="postalCode">Código Postal</label>
               <input
@@ -258,6 +282,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               {errors.postalCode && <span className="error-message">{errors.postalCode}</span>}
             </div>
           </div>
+
           <div className="payment-form__field">
             <label htmlFor="country">País</label>
             <input
@@ -270,7 +295,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
             />
           </div>
         </div>
-        {/* Botones */}
+
         <div className="payment-form__actions">
           <button
             type="button"
@@ -292,4 +317,5 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
     </div>
   );
 };
+
 export default PaymentForm;

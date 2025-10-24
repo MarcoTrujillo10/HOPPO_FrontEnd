@@ -147,22 +147,6 @@ export const CartProvider = ({ children }) => {
     }
   };
  
-  const extendCartExpiration = async () => {
-    try {
-      await cartService.extendCartExpiration();
-      await loadCart();
-      return {
-        success: true,
-        message: 'Expiración del carrito extendida por 24 horas'
-      };
-    } catch (err) {
-      console.error('Error extendiendo carrito:', err);
-      return {
-        success: false,
-        error: 'Error al extender expiración del carrito'
-      };
-    }
-  };
  
   const clearCart = async () => {
     try {
@@ -225,13 +209,11 @@ export const CartProvider = ({ children }) => {
     addToCart,
     updateCartProduct,
     removeFromCart,
-    extendCartExpiration,
     clearCart,
     getCartTotals,
     getCartTotal,
     isCartEmpty: () => cartProducts.length === 0,
-    hasItems: cartProducts.length > 0,
-    refreshCart: loadCart
+    hasItems: cartProducts.length > 0
   };
  
   return (

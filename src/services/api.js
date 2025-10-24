@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8081';
 
-// Observer pattern para navegación
+
 let navigationCallback = null;
 
 export const setNavigationCallback = (callback) => {
@@ -29,7 +29,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Usar Virtual DOM a través del callback de navegación
+    
       if (navigationCallback) {
         navigationCallback('/login');
       }
@@ -67,7 +67,6 @@ export const brandService = {
 export const cartService = {
   getMyCart: () => api.get('/carts/my-cart'),
   createCart: (cartData) => api.post('/carts', cartData),
-  extendCartExpiration: () => api.post('/carts/my-cart/extend'),
 };
  
 export const cartProductService = {

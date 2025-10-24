@@ -14,7 +14,7 @@ const Footer = () => {
           <a href="#" aria-label="Instagram">📷</a>
           <a href="#" aria-label="LinkedIn">💼</a>
         </div>
-        <p className="ftr__copy">© 2025 HOPPO. Todos los derechos reservados.</p>
+        <p className="ftr__copy">©   Todos los derechos reservados.</p>
       </div>
     </footer>
   );

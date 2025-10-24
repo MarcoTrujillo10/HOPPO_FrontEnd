@@ -15,15 +15,13 @@ import Profile from "./views/Profile";
 import PCBuilder from "./views/PCBuilder";
 import Login from "./views/Login";
 import Register from "./views/Register";
-import ProfileSimple from "./views/ProfileSimple";
-import ProfileMinimal from "./views/ProfileMinimal";
 import AdminPanel from "./views/AdminPanel";
  
 const App = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Configurar el callback de navegación para los interceptores de API
+
     setNavigationCallback(navigate);
   }, [navigate]);
 
@@ -42,8 +40,6 @@ const App = () => {
           <Route path="/pc-builder" element={<PCBuilder />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile-simple" element={<ProfileSimple />} />
-          <Route path="/profile-minimal" element={<ProfileMinimal />} />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </CartProvider>

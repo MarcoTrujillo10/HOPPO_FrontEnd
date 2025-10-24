@@ -14,7 +14,6 @@ const ProductDetail = () => {
   
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
-  // Cargar producto del backend
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -32,7 +31,6 @@ const ProductDetail = () => {
       loadProduct();
     }
   }, [id]);
-  // Mostrar estado de carga
   if (loading) {
     return (
       <main className="pd container">
@@ -42,7 +40,6 @@ const ProductDetail = () => {
       </main>
     );
   }
-  // Si no se encuentra el producto, mostrar error
   if (error || !product) {
     return (
       <main className="pd container">
@@ -56,7 +53,6 @@ const ProductDetail = () => {
       </main>
     );
   }
-  // Mapear datos del backend
   const productData = {
     id: product.id,
     nombre: product.name,
@@ -72,16 +68,13 @@ const ProductDetail = () => {
     stock: product.stock || 0,
     images: product.images || []
   };
-  // Generar imágenes para la galería
   const images = productData.images.length > 0 
     ? productData.images.map(img => img.imageUrl)
     : ['https://via.placeholder.com/500x500?text=Sin+Imagen'];
   
-  // Si solo hay una imagen, duplicarla para la galería
   while (images.length < 4) {
     images.push(images[0]);
   }
-  // Función para agregar al carrito
   const handleAddToCart = async () => {
     if (!isAuthenticated()) {
       alert('Debes iniciar sesión para agregar productos al carrito');

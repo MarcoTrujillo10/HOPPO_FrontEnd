@@ -13,7 +13,7 @@ const AdminPanel = () => {
     return (
       <div className="admin-panel">
         <div className="access-denied">
-          <h2>🚫 Acceso Denegado</h2>
+          <h2>Acceso Denegado</h2>
           <p>Solo los vendedores pueden acceder a este panel de administración.</p>
         </div>
       </div>

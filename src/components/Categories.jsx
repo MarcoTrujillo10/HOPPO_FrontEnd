@@ -17,8 +17,9 @@ const getCategoryIcon = (category) => {
     "SSD": "💽",
     "HDD": "💽",
     "GPU": "🎮",
-    "PSU": "⚡"
+    
   };
+
   const peripheralIcons = {
     "Monitores": "🖥️",
     "Teclados": "⌨️",

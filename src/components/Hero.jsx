@@ -16,21 +16,17 @@ const Hero = () => {
     try {
       setLoading(true);
       
-      // Intentar obtener productos específicamente marcados para el carrusel
       let carouselProducts = [];
       
       try {
-        // Estrategia 1: Usar el endpoint específico para productos del carrusel
         const response = await productService.getCarouselProducts();
         carouselProducts = response.data.content || response.data || [];
       } catch (error) {
         try {
-          // Estrategia 2: Buscar productos con showInCarousel = true
           const response = await productService.getProducts({ showInCarousel: true });
           carouselProducts = response.data.content || response.data || [];
         } catch (error2) {
           try {
-            // Estrategia 3: Usar productos con descuento como fallback
             const response = await productService.getProducts({ discount: { gt: 0 } });
             carouselProducts = response.data.content || response.data || [];
           } catch (error3) {
@@ -39,12 +35,10 @@ const Hero = () => {
         }
       }
       
-      // Si no hay productos del carrusel, usar productos por defecto
       if (carouselProducts.length === 0) {
         carouselProducts = getDefaultProducts();
       }
       
-      setProducts(carouselProducts.slice(0, 5)); // Máximo 5 productos
     } catch (error) {
       console.error('Error loading carousel products:', error);
       setProducts(getDefaultProducts());

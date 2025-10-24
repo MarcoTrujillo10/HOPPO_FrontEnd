@@ -19,7 +19,7 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       alert(`Máximo ${maxImages} imágenes permitidas`);
       return;
     }
-    // Convertir archivos a URLs para preview
+  
     const newImageUrls = imageFiles.map(file => ({
       file: file,
       url: URL.createObjectURL(file),
@@ -57,7 +57,7 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
     if (files) {
       handleFileSelect(files);
     }
-    // Limpiar el input para permitir seleccionar el mismo archivo otra vez
+   
     e.target.value = '';
   };
   return (
@@ -68,7 +68,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       </p>
       
       <div className="image-upload-area">
-        {/* Área de drop */}
         <div
           className={`drop-zone ${dragOver ? 'drag-over' : ''}`}
           onDrop={handleDrop}
@@ -82,7 +81,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
             <small>JPG, PNG, GIF hasta 5MB cada una</small>
           </div>
         </div>
-        {/* Input oculto */}
         <input
           ref={fileInputRef}
           type="file"
@@ -91,7 +89,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           onChange={handleFileInputChange}
           style={{ display: 'none' }}
         />
-        {/* Preview de imágenes */}
         {images.length > 0 && (
           <div className="image-preview-grid">
             {images.map((image, index) => (
@@ -127,7 +124,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           </div>
         )}
       </div>
-      {/* Información adicional */}
       <div className="image-upload-info">
         <p><strong>Consejos:</strong></p>
         <ul>

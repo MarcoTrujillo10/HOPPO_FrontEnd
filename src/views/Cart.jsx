@@ -13,8 +13,6 @@ const Cart = () => {
     removeFromCart,
     getCartTotals,
     isCartEmpty,
-    extendCartExpiration,
-    refreshCart,
   } = useCart();
  
   const { isAuthenticated } = useAuth();
@@ -57,14 +55,6 @@ const Cart = () => {
     setPendingDeleteId(null);
   };
  
-  const handleExtendExpiration = async () => {
-    const result = await extendCartExpiration();
-    if (result.success) {
-      setStatus({ type: "success", message: result.message || "Carrito extendido" });
-    } else {
-      setStatus({ type: "error", message: result.error || "No se pudo extender el carrito" });
-    }
-  };
  
   const handleCheckout = () => {
     if (!isAuthenticated()) {
@@ -109,7 +99,7 @@ const Cart = () => {
         <div className="cart__error">
           <h1>Error</h1>
           <p>{error}</p>
-          <button onClick={refreshCart}>Reintentar</button>
+          <button onClick={() => window.location.reload()}>Reintentar</button>
         </div>
       </main>
     );
@@ -146,18 +136,6 @@ const Cart = () => {
         <section className="cart__items">
           <div className="cart__items-header">
             <h2>Productos ({cartProducts.length})</h2>
-            <div className="cart__header-actions">
-              <button className="refresh-btn" onClick={refreshCart} title="Refrescar carrito">
-                🔄 Refrescar
-              </button>
-              <button
-                className="extend-btn"
-                onClick={handleExtendExpiration}
-                title="Extender expiración del carrito"
-              >
-                ⏰ Extender carrito
-              </button>
-            </div>
           </div>
  
           <div className="cart__items-list">

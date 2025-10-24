@@ -51,7 +51,6 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validaciones básicas
     if (!formData.name.trim()) {
       setStatus({ type: 'error', message: 'El nombre del producto es requerido' });
       return;

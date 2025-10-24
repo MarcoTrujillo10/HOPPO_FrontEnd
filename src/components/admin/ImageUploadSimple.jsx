@@ -15,7 +15,7 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       alert(`Máximo ${maxImages} imágenes permitidas`);
       return;
     }
-    // Convertir archivos a URLs para preview
+
     const newImageUrls = imageFiles.map(file => ({
       file: file,
       url: URL.createObjectURL(file),
@@ -36,18 +36,15 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
     if (files) {
       handleFileSelect(files);
     }
-    // Limpiar el input para permitir seleccionar el mismo archivo otra vez
+  
     e.target.value = '';
   };
   return (
     <div className="image-upload-container">
       <label className="form-label">Imágenes del Producto</label>
-      <p className="form-help">
-        Puedes subir hasta {maxImages} imágenes. Haz clic para seleccionar archivos.
-      </p>
+      
       
       <div className="image-upload-area">
-        {/* Botón simple para seleccionar archivos */}
         <div
           className="drop-zone"
           onClick={openFileDialog}
@@ -58,7 +55,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
             <small>JPG, PNG, GIF hasta 5MB cada una</small>
           </div>
         </div>
-        {/* Input oculto */}
         <input
           ref={fileInputRef}
           type="file"
@@ -67,7 +63,6 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           onChange={handleFileInputChange}
           style={{ display: 'none' }}
         />
-        {/* Preview de imágenes */}
         {images.length > 0 && (
           <div className="image-preview-grid">
             {images.map((image, index) => (

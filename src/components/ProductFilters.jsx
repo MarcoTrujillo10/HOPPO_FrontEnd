@@ -14,19 +14,19 @@ export default function ProductFilters({
   marcasOpts = [],
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  // === DRAFT LOCAL PARA PRECIO ===
+
   const [priceDraft, setPriceDraft] = useState({
     min: filters.min ?? "",
     max: filters.max ?? "",
   });
-  // si desde afuera cambian los filtros (limpiar, etc.), sincronizo el draft
+  
   useEffect(() => {
     setPriceDraft({
       min: filters.min ?? "",
       max: filters.max ?? "",
     });
   }, [filters.min, filters.max]);
-  // handlers de filtro
+
   const onChangeSearch = (e) =>
     setFilters((f) => ({ ...f, q: e.target.value }));
   const onChangeCategoria = (e) =>
@@ -48,16 +48,16 @@ export default function ProductFilters({
       max: "",
       orden: "relevancia",
     });
-  // ordenar marcas para UX
+
   const marcasOrdenadas = useMemo(
     () => [...marcasOpts].sort((a, b) => a.localeCompare(b)),
     [marcasOpts]
   );
-  // evita que Enter envíe un form implícito y recargue la página
+ 
   const preventEnter = (e) => {
     if (e.key === "Enter") e.preventDefault();
   };
-  // aplicar precio: pasa de draft -> filters (dispara fetch 1 sola vez)
+
   const applyPrice = () => {
     const rawMin = priceDraft.min;
     const rawMax = priceDraft.max;
@@ -65,9 +65,9 @@ export default function ProductFilters({
       rawMin === "" ? "" : clamp(Number(rawMin) || 0, 0, 100000);
     const nextMax =
       rawMax === "" ? "" : clamp(Number(rawMax) || 0, 0, 100000);
-    // validación simple: si ambos existen y min > max, no aplicar
+    
     if (nextMin !== "" && nextMax !== "" && Number(nextMin) > Number(nextMax)) {
-      // opcional: mostrar toast/alert
+     
       return;
     }
     setFilters((f) => ({
@@ -76,7 +76,7 @@ export default function ProductFilters({
       max: nextMax,
     }));
   };
-  // aplicar con Enter dentro de los inputs de precio
+
   const onPriceKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -91,7 +91,6 @@ export default function ProductFilters({
           Limpiar
         </button>
       </div>
-      {/* === BUSCADOR === */}
       <div className="filters__block">
         <input
           className="filters__search"
@@ -104,7 +103,6 @@ export default function ProductFilters({
           onClick={(e) => e.stopPropagation()}
         />
       </div>
-      {/* === CATEGORÍA === */}
       <div className="filters__dropdown">
         <button
           type="button"
@@ -141,7 +139,6 @@ export default function ProductFilters({
           </select>
         </div>
       </div>
-      {/* === MARCA === */}
       <div className="filters__dropdown">
         <button
           type="button"
@@ -182,7 +179,6 @@ export default function ProductFilters({
           </div>
         </div>
       </div>
-      {/* === PRECIO === */}
       <div className="filters__dropdown">
         <button
           type="button"
@@ -254,7 +250,6 @@ export default function ProductFilters({
           </button>
         </div>
       </div>
-      {/* === ORDEN === */}
       <div className="filters__dropdown">
         <button
           type="button"
