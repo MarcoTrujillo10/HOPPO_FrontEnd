@@ -60,6 +60,7 @@ const ProductList = () => {
           page: 0,
           size: 1000, 
         };
+        
         if (q?.trim()) searchParams.name = q.trim();
         if (min !== "") searchParams.minPrice = Number(min);
         if (max !== "") searchParams.maxPrice = Number(max);
