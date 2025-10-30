@@ -1,5 +1,4 @@
 import "./Contact.css";
-
 const Contact = () => {
   return (
     <main className="contact">
@@ -12,5 +11,4 @@ const Contact = () => {
     </main>
   );
 };
-
 export default Contact;

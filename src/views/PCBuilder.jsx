@@ -1,8 +1,7 @@
-import { useState } from "react";
-import ComponentSelector from "../components/ComponentSelector";
-import PCConfiguration from "../components/PCConfiguration";
-import "./PCBuilder.css";
-
+import { useState } from 'react';
+import ComponentSelector from '../components/ComponentSelector';
+import PCConfiguration from '../components/PCConfiguration';
+import './PCBuilder.css';
 const PCBuilder = () => {
   const [selectedComponents, setSelectedComponents] = useState({
     cpu: null,
@@ -14,9 +13,7 @@ const PCBuilder = () => {
     case: null,
     cooling: null,
   });
-
   const [currentStep, setCurrentStep] = useState(0);
-
   const componentCategories = [
     { key: "cpu", name: "Procesador", icon: "🧠", required: true },
     { key: "motherboard", name: "Placa Madre", icon: "🔧", required: true },
@@ -27,7 +24,6 @@ const PCBuilder = () => {
     { key: "case", name: "Gabinete", icon: "📦", required: true },
     { key: "cooling", name: "Refrigeración", icon: "❄️", required: false },
   ];
-
   const updateComponent = (category, component) => {
     setSelectedComponents((prev) => ({ ...prev, [category]: component }));
     const idx = componentCategories.findIndex((c) => c.key === category);
@@ -36,13 +32,11 @@ const PCBuilder = () => {
       setTimeout(() => setCurrentStep(idx + 1), 120);
     }
   };
-
   const nextStep = () => {
     if (currentStep < componentCategories.length - 1) {
       setCurrentStep((s) => s + 1);
     }
   };
-
   const prevStep = () => {
     if (currentStep > 0) setCurrentStep((s) => s - 1);
   };
@@ -54,16 +48,23 @@ const PCBuilder = () => {
       .filter(Boolean)
       .reduce((t, c) => t + c.precio, 0);
 
+  const goToStep = (step) => {
+    setCurrentStep(step);
+  };
+  const calculateTotal = () => {
+    return Object.values(selectedComponents)
+      .filter(component => component !== null)
+      .reduce((total, component) => total + component.precio, 0);
+  };
   const isStepComplete = (step) => {
     const category = componentCategories[step];
     return category.required ? selectedComponents[category.key] !== null : true;
   };
-
-  const isBuildComplete = () =>
-    componentCategories
-      .filter((c) => c.required)
-      .every((c) => selectedComponents[c.key] !== null);
-
+  const isBuildComplete = () => {
+    return componentCategories
+      .filter(category => category.required)
+      .every(category => selectedComponents[category.key] !== null);
+  };
   return (
     <div className="pc-builder">
       <div className="container">
@@ -73,7 +74,6 @@ const PCBuilder = () => {
             Construí tu PC ideal paso a paso. Seleccioná cada componente y mirá el total en tiempo real.
           </p>
         </div>
-
         <div className="pc-builder__content">
           <div className="pc-builder__steps">
             {componentCategories.map((category, index) => (
@@ -91,7 +91,6 @@ const PCBuilder = () => {
               </div>
             ))}
           </div>
-
           <div className="pc-builder__main">
             <div className="pc-builder__selector">
               <ComponentSelector
@@ -105,7 +104,7 @@ const PCBuilder = () => {
                 }
               />
             </div>
-
+            {/* PC Configuration Summary */}
             <div className="pc-builder__config">
               <PCConfiguration
                 selectedComponents={selectedComponents}
@@ -114,7 +113,7 @@ const PCBuilder = () => {
               />
             </div>
           </div>
-
+          {/* Navigation */}
           <div className="pc-builder__navigation">
             <button
               className="pc-builder__nav-btn pc-builder__nav-btn--prev"
@@ -127,7 +126,6 @@ const PCBuilder = () => {
             <div className="pc-builder__step-info">
               Paso {currentStep + 1} de {componentCategories.length}
             </div>
-
             <button
               className="pc-builder__nav-btn pc-builder__nav-btn--next"
               onClick={nextStep}
@@ -145,5 +143,4 @@ const PCBuilder = () => {
     </div>
   );
 };
-
 export default PCBuilder;

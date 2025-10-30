@@ -1,70 +1,50 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Home from "./views/Home.jsx";
-import ProductList from "./views/ProductList.jsx";
-import ProductDetail from "./views/ProductDetail.jsx";
-import Cart from "./views/Cart.jsx";
-import Login from "./views/Login.jsx";
-import Register from "./views/Register.jsx";
-import Profile from "./views/Profile.jsx";
-import PCBuilder from "./views/PCBuilder.jsx";
-import Header from "./components/Header.jsx";
-import Footer from "./components/Footer.jsx";
-import { useAuth } from "./context/AuthContext.jsx";
-import ForgotPassword from "./views/ForgotPassword.jsx";
+import { useEffect } from "react";
+import "./App.css";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth.jsx";
+import { CartProvider } from "./hooks/useCart.jsx";
+import { setNavigationCallback } from "./services/api";
+import Header from "./components/Header";
+import Home from "./views/Home";
+import Contact from "./views/Contact";
+import ProductList from "./views/ProductList";
+import ProductDetail from "./views/ProductDetail";
+import Cart from "./views/Cart";
+import Checkout from "./views/Checkout";
+import Profile from "./views/Profile";
+import PCBuilder from "./views/PCBuilder";
+import Login from "./views/Login";
+import Register from "./views/Register";
+import AdminPanel from "./views/AdminPanel";
+ 
+const App = () => {
+  const navigate = useNavigate();
 
-function PrivateRoute({ children }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-}
+  useEffect(() => {
 
-// Rutas donde NO debe verse Header/Footer
-const AUTH_ROUTES = ["/login", "/registro", "/contraseña-olvidada"];
-
-export default function App() {
-  const location = useLocation();
-  const hideLayout = AUTH_ROUTES.includes(location.pathname);
+    setNavigationCallback(navigate);
+  }, [navigate]);
 
   return (
-    <>
-      {!hideLayout && <Header />}
-
-      <Routes>
-        {/* Arranque en /login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-
-        {/* Públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Register />} />
-        <Route path="/contraseña-olvidada" element={<ForgotPassword />} />
-        <Route path="/productos" element={<ProductList />} />
-        <Route path="/productos/:id" element={<ProductDetail />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/armador" element={<PCBuilder />} />
-
-        {/* Protegidas */}
-        <Route
-          path="/perfil"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/carrito"
-          element={
-            <PrivateRoute>
-              <Cart />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-
-      {!hideLayout && <Footer />}
-    </>
+    <AuthProvider>
+      <CartProvider>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/productos" element={<ProductList />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/productos/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/pc-builder" element={<PCBuilder />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<AdminPanel />} />
+        </Routes>
+      </CartProvider>
+    </AuthProvider>
   );
-}
+};
+ 
+export default App;

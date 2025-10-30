@@ -1,93 +1,94 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Login.css";
-import hoppoLogo from "../assets/image.png";
-import { useAuth } from "../context/AuthContext.jsx";
-
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.jsx';
+import './Auth.css';
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  // estado controlado para poder enviar el form
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  async function onSubmit(e) {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError(''); // Limpiar error al escribir
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
-      await login({ email, password });  
-      navigate("/home");                
+      const result = await login({
+        email: formData.email,
+        password: formData.password
+      });
+      
+      if (result.success) {
+        navigate('/'); // Redirigir al home después del login exitoso
+      } else {
+        setError(result.error);
+      }
     } catch (err) {
-      alert("No se pudo iniciar sesión.");
+      setError('Error inesperado al iniciar sesión');
+    } finally {
+      setLoading(false);
     }
-  }
-
+  };
   return (
-    <main className="login">
-      <div className="login__card">
-        <header className="login__header">
-          <Link className="brand" to="/login">
-            <img
-              src={hoppoLogo}
-              alt="HOPPO logo"
-              className="brand__icon"
-              width={32}
-              height={32}
-              loading="eager"
-              decoding="async"
-            />
-            <h2 className="brand__text">HOPPO</h2>
-          </Link>
-
-          <div className="login__nav">
-            <Link to="/productos" className="login__link">
-              Entrar sin iniciar sesión
-            </Link>
-          </div>
-        </header>
-
-        <section className="login__body">
-          <h2>Bienvenido a HOPPO</h2>
-          <p className="login__subtitle">
-            Inicia sesión para continuar o{" "}
-            <Link to="/registro" className="login__link">registrate</Link>
-          </p>
-
-          <form className="login__form" onSubmit={onSubmit}>
-            <label className="sr-only" htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e)=>setEmail(e.target.value)}
-              required
-            />
-
-            <label className="sr-only" htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e)=>setPassword(e.target.value)}
-              required
-            />
-
-            <div className="login__actions">
-              <Link to="/contraseña-olvidada" className="login__link">
-                ¿Olvidaste tu contraseña?
-              </Link>
+    <main className="auth-page">
+      <div className="auth-container">
+        <div className="auth-card">
+          <h1 className="auth-title">Iniciar Sesión</h1>
+          
+          {error && (
+            <div className="auth-error">
+              {error}
             </div>
-
-            <button type="submit" className="btn-primary">Iniciar sesión</button>
+          )}
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Contraseña</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+            <button 
+              type="submit" 
+              className="btn btn--primary auth-submit"
+              disabled={loading}
+            >
+              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            </button>
           </form>
-        </section>
+          <div className="auth-links">
+            <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
+          </div>
+        </div>
       </div>
     </main>
   );
 };
-
 export default Login;
