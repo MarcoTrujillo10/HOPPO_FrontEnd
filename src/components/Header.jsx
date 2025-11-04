@@ -117,7 +117,7 @@ const Header = () => {
             <input className="search__input" placeholder="Buscar" />
           </div>
  
-          {isAuthenticated() ? (
+                    {isAuthenticated() ? (
             <div className="user-menu">
               <span className="user-greeting">Hola, {user?.firstName || user?.name || 'Usuario'}</span>
               <Link to="/profile" className="iconbtn" title="Perfil">
@@ -154,17 +154,19 @@ const Header = () => {
               </Link>
             </div>
           )}
- 
-          <Link to="/cart" className="iconbtn cart-btn" title="Carrito">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="9" cy="21" r="1" fill="currentColor"/>
-              <circle cx="20" cy="21" r="1" fill="currentColor"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            {cartTotals.itemCount > 0 && (
-              <span className="cart-badge">{cartTotals.itemCount}</span>
-            )}
-          </Link>
+
+          {pathname !== '/admin' && (
+            <Link to="/cart" className="iconbtn cart-btn" title="Carrito">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="21" r="1" fill="currentColor"/>
+                <circle cx="20" cy="21" r="1" fill="currentColor"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {cartTotals.itemCount > 0 && (
+                <span className="cart-badge">{cartTotals.itemCount}</span>
+              )}
+            </Link>
+          )}
  
           <button
             className={`hamburger ${isMobileMenuOpen ? 'hamburger--active' : ''}`}

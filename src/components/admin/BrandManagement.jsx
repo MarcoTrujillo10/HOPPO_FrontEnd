@@ -156,7 +156,7 @@ const BrandManagement = () => {
                 className="btn btn-edit"
                 onClick={() => handleEdit(brand)}
               >
-                ✏️ Editar
+                 Editar
               </button>
               <button 
                 className="btn btn-delete"
