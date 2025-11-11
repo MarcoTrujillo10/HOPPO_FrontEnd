@@ -11,6 +11,17 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
       alert('Por favor selecciona solo archivos de imagen');
       return;
     }
+    
+    // Validar tamaño de archivos (10MB máximo)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB en bytes
+    const oversizedFiles = imageFiles.filter(file => file.size > MAX_FILE_SIZE);
+    
+    if (oversizedFiles.length > 0) {
+      const fileNames = oversizedFiles.map(f => f.name).join(', ');
+      alert(`Los siguientes archivos exceden el tamaño máximo de 10MB:\n${fileNames}\n\nPor favor, comprime las imágenes o selecciona archivos más pequeños.`);
+      return;
+    }
+    
     if (images.length + imageFiles.length > maxImages) {
       alert(`Máximo ${maxImages} imágenes permitidas`);
       return;
@@ -52,7 +63,7 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
           <div className="drop-zone-content">
             <div className="drop-zone-icon">📷</div>
             <p>Haz clic para seleccionar imágenes</p>
-            <small>JPG, PNG, GIF hasta 5MB cada una</small>
+            <small>JPG, PNG, GIF hasta 10MB cada una</small>
           </div>
         </div>
         <input

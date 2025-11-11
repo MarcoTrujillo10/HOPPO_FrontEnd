@@ -21,7 +21,8 @@ const ProductManagement = () => {
     stock: '',
     categoryId: '',
     brandId: '',
-    discount: 0
+    discount: 0,
+    showInCarousel: false
   });
   const [productImages, setProductImages] = useState([]);
  
@@ -92,6 +93,7 @@ const ProductManagement = () => {
         categoryId: parseInt(formData.categoryId, 10),
         brandId: parseInt(formData.brandId, 10),
         discount: parseInt(formData.discount, 10) || 0,
+        showInCarousel: formData.showInCarousel || false,
         imageUrls
       };
  
@@ -132,7 +134,8 @@ const ProductManagement = () => {
       stock: product.stock,
       categoryId: product.category?.id || '',
       brandId: product.brand?.id || '',
-      discount: product.discount || 0
+      discount: product.discount || 0,
+      showInCarousel: product.showInCarousel || false
     });
  
     if (product.images && product.images.length > 0) {
@@ -182,7 +185,8 @@ const ProductManagement = () => {
       stock: '',
       categoryId: '',
       brandId: '',
-      discount: 0
+      discount: 0,
+      showInCarousel: false
     });
     setProductImages([]);
     setEditingProduct(null);
@@ -313,7 +317,21 @@ const ProductManagement = () => {
                 images={productImages}
                 onImagesChange={setProductImages}
               />
- 
+
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={formData.showInCarousel}
+                    onChange={(e) => setFormData({ ...formData, showInCarousel: e.target.checked })}
+                  />
+                  <span>Mostrar en carrusel principal</span>
+                </label>
+                <p className="form-help">
+                  Los productos marcados aparecerán en el carrusel de la página principal
+                </p>
+              </div>
+
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -358,6 +376,9 @@ const ProductManagement = () => {
               <p className="product-stock">Stock: {product.stock}</p>
               <p className="product-category">📂 {product.category?.description || 'Sin categoría'}</p>
               <p className="product-brand">🏷️ {product.brand?.name || 'Sin marca'}</p>
+              {product.showInCarousel && (
+                <p className="carousel-badge">🎠 En carrusel</p>
+              )}
               <p className="product-description">{product.description}</p>
             </div>
  

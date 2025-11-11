@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8081';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
 
 
 let navigationCallback = null;
@@ -44,6 +44,7 @@ export const productService = {
   createProduct: (productData) => api.post('/products', productData),
   updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
   deleteProduct: (id) => api.delete(`/products/${id}`),
+  getCarouselProducts: () => api.get('/products/carousel'),
 };
  
 export const categoryService = {

@@ -16,59 +16,47 @@ const Hero = () => {
     try {
       setLoading(true);
       
+      console.log('Loading carousel products...');
+      const response = await productService.getCarouselProducts();
+      console.log('Carousel response:', response);
+      
       let carouselProducts = [];
       
-      try {
-        const response = await productService.getCarouselProducts();
-        carouselProducts = response.data.content || response.data || [];
-      } catch (error) {
-        try {
-          const response = await productService.getProducts({ showInCarousel: true });
-          carouselProducts = response.data.content || response.data || [];
-        } catch (error2) {
-          try {
-            const response = await productService.getProducts({ discount: { gt: 0 } });
-            carouselProducts = response.data.content || response.data || [];
-          } catch (error3) {
-            carouselProducts = getDefaultProducts();
-          }
-        }
+      if (response && response.data) {
+        carouselProducts = Array.isArray(response.data) ? response.data : [];
+        console.log('Carousel products loaded:', carouselProducts.length);
       }
       
-      if (carouselProducts.length === 0) {
-        carouselProducts = getDefaultProducts();
-      }
+      // Filtrar productos que tengan imágenes
+      carouselProducts = carouselProducts.filter(product => 
+        product.images && product.images.length > 0 && product.images[0].imageUrl
+      );
       
+      // Construir URLs completas para las imágenes
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+      carouselProducts = carouselProducts.map(product => ({
+        ...product,
+        images: product.images.map(img => ({
+          ...img,
+          imageUrl: img.imageUrl.startsWith('http') 
+            ? img.imageUrl 
+            : `${API_BASE_URL}${img.imageUrl}`
+        }))
+      }));
+      
+      console.log('Processed carousel products:', carouselProducts);
+      console.log('Products with images:', carouselProducts.length);
+      
+      setProducts(carouselProducts);
     } catch (error) {
       console.error('Error loading carousel products:', error);
-      setProducts(getDefaultProducts());
+      console.error('Error details:', error.response?.data || error.message);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDefaultProducts = () => [
-    {
-      id: "pc-gamer",
-      name: "PC Gamer de Alto Rendimiento",
-      description: "Sistema completo con RTX 4080, Intel i7 y 32GB RAM DDR5",
-      price: 1599,
-      discount: 20,
-      images: [{
-        imageUrl: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=1200&h=600&fit=crop&crop=center"
-      }]
-    },
-    {
-      id: "gpu-rtx",
-      name: "NVIDIA RTX 4080",
-      description: "16GB GDDR6X, ray tracing avanzado y DLSS 3.0",
-      price: 1499,
-      discount: 15,
-      images: [{
-        imageUrl: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=1200&h=600&fit=crop&crop=center"
-      }]
-    }
-  ];
 
   useEffect(() => {
     if (products.length > 0) {
@@ -129,47 +117,75 @@ const Hero = () => {
     );
   }
 
-  const currentProduct = products[currentSlide];
-  const discountedPrice = calculateDiscountedPrice(currentProduct.price, currentProduct.discount || 0);
+  // Asegurar que tenemos una URL válida para la imagen
+  const getImageUrl = (product) => {
+    if (!product.images || product.images.length === 0) {
+      return null;
+    }
+    const imageUrl = product.images[0].imageUrl;
+    if (!imageUrl) return null;
+    
+    // Si ya es una URL completa, retornarla
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Construir URL completa
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+    return `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+  };
+
+  const imageUrl = getImageUrl(currentProduct);
   
   return (
     <section className="hero">
       <div className="hero__carousel">
-        <div 
-          className="hero__slide active"
-          style={{ 
-            backgroundImage: `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.5)), url("${currentProduct.images?.[0]?.imageUrl || '/placeholder-product.jpg'}")`
-          }}
-        >
-          <div className="hero__content">
-            {currentProduct.discount > 0 && (
-              <div className="hero__badge">
-                <span className="hero__discount">{currentProduct.discount}% OFF</span>
+        {products.map((product, index) => {
+          const productImageUrl = getImageUrl(product);
+          const productDiscountedPrice = calculateDiscountedPrice(product.price, product.discount || 0);
+          const isActive = index === currentSlide;
+          
+          return (
+            <div 
+              key={product.id}
+              className={`hero__slide ${isActive ? 'active' : ''}`}
+              style={{ 
+                backgroundImage: productImageUrl 
+                  ? `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.5)), url("${productImageUrl}")`
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+              }}
+            >
+              <div className="hero__content">
+                {product.discount > 0 && (
+                  <div className="hero__badge">
+                    <span className="hero__discount">{product.discount}% OFF</span>
+                  </div>
+                )}
+                
+                <h1 className="hero__title">{product.name}</h1>
+                <p className="hero__subtitle">{product.category?.description || 'Producto destacado'}</p>
+                
+                <div className="hero__price-section">
+                  <span className="hero__price">{formatPrice(productDiscountedPrice)}</span>
+                  {product.discount > 0 && (
+                    <span className="hero__old-price">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="hero__actions">
+                  <Link to={`/productos/${product.id}`} className="hero__btn hero__btn--primary">
+                    Ver producto
+                  </Link>
+                  <Link to="/productos" className="hero__btn hero__btn--secondary">
+                    Explorar todos
+                  </Link>
+                </div>
               </div>
-            )}
-            
-            <h1 className="hero__title">{currentProduct.name}</h1>
-            <p className="hero__subtitle">{currentProduct.category?.description || 'Producto destacado'}</p>
-            
-            <div className="hero__price-section">
-              <span className="hero__price">{formatPrice(discountedPrice)}</span>
-              {currentProduct.discount > 0 && (
-                <span className="hero__old-price">
-                  {formatPrice(currentProduct.price)}
-                </span>
-              )}
             </div>
-            
-            <div className="hero__actions">
-              <Link to={`/productos/${currentProduct.id}`} className="hero__btn hero__btn--primary">
-                Ver producto
-              </Link>
-              <Link to="/productos" className="hero__btn hero__btn--secondary">
-                Explorar todos
-              </Link>
-            </div>
-          </div>
-        </div>
+          );
+        })}
         
         {products.length > 1 && (
           <>
