@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { productService } from "../services/api";
+import { carouselService } from "../services/api";
 import "./Hero.css";
 
 const Hero = () => {
@@ -16,41 +16,40 @@ const Hero = () => {
     try {
       setLoading(true);
       
-      console.log('Loading carousel products...');
-      const response = await productService.getCarouselProducts();
-      console.log('Carousel response:', response);
+      const response = await carouselService.getActiveCarousel();
       
-      let carouselProducts = [];
+      let carouselItems = [];
       
       if (response && response.data) {
-        carouselProducts = Array.isArray(response.data) ? response.data : [];
-        console.log('Carousel products loaded:', carouselProducts.length);
+        carouselItems = Array.isArray(response.data) ? response.data : [];
       }
       
-      // Filtrar productos que tengan imágenes
-      carouselProducts = carouselProducts.filter(product => 
-        product.images && product.images.length > 0 && product.images[0].imageUrl
-      );
-      
-      // Construir URLs completas para las imágenes
+      // Convertir items del carrusel a productos para el componente
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
-      carouselProducts = carouselProducts.map(product => ({
-        ...product,
-        images: product.images.map(img => ({
+      const processedProducts = carouselItems.map(item => {
+        const product = item.product || {};
+        const images = (product.images || []).map(img => ({
           ...img,
-          imageUrl: img.imageUrl.startsWith('http') 
+          imageUrl: img.imageUrl?.startsWith('http') 
             ? img.imageUrl 
             : `${API_BASE_URL}${img.imageUrl}`
-        }))
-      }));
+        }));
+
+        return {
+          ...product,
+          id: product.id,
+          name: item.customTitle || product.name,
+          category: {
+            ...product.category,
+            description: item.customSubtitle || product.category?.description || 'Producto destacado'
+          },
+          images: images
+        };
+      });
       
-      console.log('Processed carousel products:', carouselProducts);
-      console.log('Products with images:', carouselProducts.length);
-      
-      setProducts(carouselProducts);
+      setProducts(processedProducts);
     } catch (error) {
-      console.error('Error loading carousel products:', error);
-      console.error('Error details:', error.response?.data || error.message);
+      console.error('Error loading carousel:', error);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -107,9 +106,15 @@ const Hero = () => {
     return (
       <section className="hero">
         <div className="hero__empty">
-          <h2>No hay productos destacados</h2>
-          <p>Los vendedores pueden agregar productos al carrusel desde el panel de administración.</p>
-          <Link to="/productos" className="btn btn--primary">
+          <h2>No hay productos en el carrusel</h2>
+          <p>Para mostrar productos en el carrusel:</p>
+          <ol style={{ textAlign: 'left', display: 'inline-block', marginTop: '1rem' }}>
+            <li>Ve al Panel de Administración</li>
+            <li>Selecciona la pestaña "Carrusel" 🎠</li>
+            <li>Agrega productos al carrusel</li>
+            <li>Asegúrate de que los productos tengan imágenes</li>
+          </ol>
+          <Link to="/productos" className="btn btn--primary" style={{ marginTop: '1rem' }}>
             Ver todos los productos
           </Link>
         </div>
@@ -134,8 +139,6 @@ const Hero = () => {
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
     return `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
   };
-
-  const imageUrl = getImageUrl(currentProduct);
   
   return (
     <section className="hero">

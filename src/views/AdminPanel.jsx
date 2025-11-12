@@ -4,6 +4,7 @@ import ProductManagement from '../components/admin/ProductManagement';
 import CategoryManagement from '../components/admin/CategoryManagement';
 import BrandManagement from '../components/admin/BrandManagement';
 import OrderManagement from '../components/admin/OrderManagement';
+import CarouselManagement from '../components/admin/CarouselManagement';
 import './AdminPanel.css';
 const AdminPanel = () => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const AdminPanel = () => {
     { id: 'products', label: 'Productos', icon: '📦' },
     { id: 'categories', label: 'Categorías', icon: '📂' },
     { id: 'brands', label: 'Marcas', icon: '🏷️' },
+    { id: 'carousel', label: 'Carrusel', icon: '🎠' },
     { id: 'orders', label: 'Órdenes', icon: '📋' },
   ];
   const renderActiveTab = () => {
@@ -33,6 +35,8 @@ const AdminPanel = () => {
         return <CategoryManagement />;
       case 'brands':
         return <BrandManagement />;
+      case 'carousel':
+        return <CarouselManagement />;
       case 'orders':
         return <OrderManagement />;
       default:

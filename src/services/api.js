@@ -44,7 +44,15 @@ export const productService = {
   createProduct: (productData) => api.post('/products', productData),
   updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
   deleteProduct: (id) => api.delete(`/products/${id}`),
-  getCarouselProducts: () => api.get('/products/carousel'),
+};
+
+export const carouselService = {
+  getActiveCarousel: () => api.get('/carousel'),
+  getAllCarouselItems: () => api.get('/admin/carousel'),
+  getCarouselItemById: (id) => api.get(`/admin/carousel/${id}`),
+  createCarouselItem: (itemData) => api.post('/admin/carousel', itemData),
+  updateCarouselItem: (id, itemData) => api.put(`/admin/carousel/${id}`, itemData),
+  deleteCarouselItem: (id) => api.delete(`/admin/carousel/${id}`),
 };
  
 export const categoryService = {

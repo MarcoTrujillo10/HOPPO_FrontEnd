@@ -21,8 +21,7 @@ const ProductManagement = () => {
     stock: '',
     categoryId: '',
     brandId: '',
-    discount: 0,
-    showInCarousel: false
+    discount: 0
   });
   const [productImages, setProductImages] = useState([]);
  
@@ -93,10 +92,9 @@ const ProductManagement = () => {
         categoryId: parseInt(formData.categoryId, 10),
         brandId: parseInt(formData.brandId, 10),
         discount: parseInt(formData.discount, 10) || 0,
-        showInCarousel: formData.showInCarousel || false,
         imageUrls
       };
- 
+
       if (editingProduct?.id) {
         await productService.updateProduct(editingProduct.id, productData);
         setStatus({ type: 'success', message: 'Producto actualizado exitosamente' });
@@ -104,7 +102,7 @@ const ProductManagement = () => {
         await productService.createProduct(productData);
         setStatus({ type: 'success', message: 'Producto creado exitosamente' });
       }
- 
+
       await loadData();
       resetForm();
     } catch (error) {
@@ -134,8 +132,7 @@ const ProductManagement = () => {
       stock: product.stock,
       categoryId: product.category?.id || '',
       brandId: product.brand?.id || '',
-      discount: product.discount || 0,
-      showInCarousel: product.showInCarousel || false
+      discount: product.discount || 0
     });
  
     if (product.images && product.images.length > 0) {
@@ -185,8 +182,7 @@ const ProductManagement = () => {
       stock: '',
       categoryId: '',
       brandId: '',
-      discount: 0,
-      showInCarousel: false
+      discount: 0
     });
     setProductImages([]);
     setEditingProduct(null);
@@ -318,20 +314,6 @@ const ProductManagement = () => {
                 onImagesChange={setProductImages}
               />
 
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.showInCarousel}
-                    onChange={(e) => setFormData({ ...formData, showInCarousel: e.target.checked })}
-                  />
-                  <span>Mostrar en carrusel principal</span>
-                </label>
-                <p className="form-help">
-                  Los productos marcados aparecerán en el carrusel de la página principal
-                </p>
-              </div>
-
               <div className="form-actions">
                 <button type="button" onClick={resetForm} className="btn btn-secondary">
                   Cancelar
@@ -376,9 +358,6 @@ const ProductManagement = () => {
               <p className="product-stock">Stock: {product.stock}</p>
               <p className="product-category">📂 {product.category?.description || 'Sin categoría'}</p>
               <p className="product-brand">🏷️ {product.brand?.name || 'Sin marca'}</p>
-              {product.showInCarousel && (
-                <p className="carousel-badge">🎠 En carrusel</p>
-              )}
               <p className="product-description">{product.description}</p>
             </div>
  

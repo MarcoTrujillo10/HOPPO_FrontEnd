@@ -34,9 +34,12 @@ export const CartProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Error cargando carrito:', err);
-      if (err.response?.status !== 404) {
+      // 403 = Forbidden (usuario no tiene rol COMPRADOR, probablemente es VENDEDOR)
+      // 404 = Not Found (no hay carrito, es normal)
+      if (err.response?.status !== 404 && err.response?.status !== 403) {
         setError('Error al cargar el carrito');
       }
+      // Si es 403, el usuario probablemente es VENDEDOR y no necesita carrito
       setCart(null);
       setCartProducts([]);
     } finally {
