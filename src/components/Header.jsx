@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { useCart } from "../hooks/useCart.jsx";
 import { categoryService } from "../services/api";
@@ -7,9 +7,11 @@ import "./Header.css";
  
 const Header = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user, isAuthenticated, logout } = useAuth();
   const { getCartTotals } = useCart();
   const cartTotals = getCartTotals();
@@ -44,6 +46,20 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     closeMobileMenu();
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/productos?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
   };
  
   return (
@@ -109,13 +125,19 @@ const Header = () => {
         </div>
  
         <div className="hdr__right">
-          <div className="search">
-            <svg className="search__icon" viewBox="0 0 24 24" fill="none">
+          <form className="search" onSubmit={handleSearch}>
+            <svg className="search__icon" viewBox="0 0 24 24" fill="none" onClick={handleSearch} style={{ cursor: 'pointer' }}>
               <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
               <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            <input className="search__input" placeholder="Buscar" />
-          </div>
+            <input 
+              className="search__input" 
+              placeholder="Buscar productos..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+            />
+          </form>
  
                     {isAuthenticated() ? (
             <div className="user-menu">

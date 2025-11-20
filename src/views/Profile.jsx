@@ -8,6 +8,7 @@ const Profile = () => {
   const { getCartTotals } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
   // Eliminamos activeTab ya que no usaremos pestañas
   // Manejar cartTotals de forma segura
   let cartTotals;
@@ -67,6 +68,10 @@ const Profile = () => {
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
+
+  const toggleOrderDetails = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
@@ -92,22 +97,24 @@ const Profile = () => {
           </h1>
           <p className="profile__email">{user?.email}</p>
           <p className="profile__username">@{user?.username}</p>
-          <div className="profile__stats">
-            <div className="stat">
-              <span className="stat__number">{orders.length}</span>
-              <span className="stat__label">Pedidos</span>
+          {user?.role !== 'VENDEDOR' && (
+            <div className="profile__stats">
+              <div className="stat">
+                <span className="stat__number">{orders.length}</span>
+                <span className="stat__label">Pedidos</span>
+              </div>
+              <div className="stat">
+                <span className="stat__number">
+                  {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
+                </span>
+                <span className="stat__label">Total gastado</span>
+              </div>
+              <div className="stat">
+                <span className="stat__number">{cartTotals.itemCount}</span>
+                <span className="stat__label">En carrito</span>
+              </div>
             </div>
-            <div className="stat">
-              <span className="stat__number">
-                {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
-              </span>
-              <span className="stat__label">Total gastado</span>
-            </div>
-            <div className="stat">
-              <span className="stat__number">{cartTotals.itemCount}</span>
-              <span className="stat__label">En carrito</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
       <div className="profile__content">
@@ -145,86 +152,126 @@ const Profile = () => {
                   </a>
                 </div>
               )}
-              <div className="info-section">
-                <h3>🛒 Carrito Actual</h3>
-                {cartTotals.itemCount > 0 ? (
-                  <div className="cart-summary">
-                    <p><strong>Items:</strong> {cartTotals.itemCount}</p>
-                    <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
-                    <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
-                    <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
+              {user?.role !== 'VENDEDOR' && (
+                <>
+                  <div className="info-section">
+                    <h3>🛒 Carrito Actual</h3>
+                    {cartTotals.itemCount > 0 ? (
+                      <div className="cart-summary">
+                        <p><strong>Items:</strong> {cartTotals.itemCount}</p>
+                        <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
+                        <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
+                        <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
+                      </div>
+                    ) : (
+                      <p>Tu carrito está vacío.</p>
+                    )}
                   </div>
-                ) : (
-                  <p>Tu carrito está vacío.</p>
-                )}
-              </div>
-              <div className="info-section">
-                <h3>📦 Mis Pedidos</h3>
-                {loading ? (
-                  <p>Cargando órdenes...</p>
-                ) : orders.length > 0 ? (
-                  <div className="orders-list">
-                    {orders.map(order => (
-                      <div key={order.id} className="order-card">
-                        <div className="order-header">
-                          <div className="order-info">
-                            <h3 className="order-id">Pedido #{order.id}</h3>
-                            <p className="order-date">
-                              {formatDate(order.orderDate || order.createdAt)}
-                            </p>
+                  <div className="info-section">
+                    <h3>📦 Mis Pedidos</h3>
+                    {loading ? (
+                      <p>Cargando órdenes...</p>
+                    ) : orders.length > 0 ? (
+                      <div className="orders-list">
+                        {orders.map(order => (
+                          <div key={order.id} className="order-card">
+                            <div className="order-header">
+                              <div className="order-info">
+                                <h3 className="order-id">Pedido #{order.id}</h3>
+                                <p className="order-date">
+                                  {formatDate(order.orderDate || order.createdAt)}
+                                </p>
+                              </div>
+                              <div className="order-status">
+                                {getStatusBadge(order.status)}
+                                <span className="order-total">{formatPrice(order.total)}</span>
+                                <button
+                                  className="btn btn-info btn-sm"
+                                  onClick={() => toggleOrderDetails(order.id)}
+                                  style={{ marginLeft: '8px', fontSize: '0.85rem', padding: '4px 8px' }}
+                                >
+                                  {expandedOrderId === order.id ? '▼' : '▶'} Detalles
+                                </button>
+                              </div>
+                            </div>
+                            {expandedOrderId === order.id && order.items && order.items.length > 0 && (
+                              <div className="order-details">
+                                <h4 style={{ margin: '16px 0 12px 0', fontSize: '1rem', color: '#1f2937' }}>
+                                  📦 Artículos del Pedido
+                                </h4>
+                                <div className="order-items-list">
+                                  {order.items.map((item, index) => (
+                                    <div key={index} className="order-item-card">
+                                      <div className="order-item-info">
+                                        <strong>{item.productName || 'Producto'}</strong>
+                                        <div className="order-item-details">
+                                          <span>Cantidad: {item.quantity}</span>
+                                          <span>Precio unitario: {formatPrice(item.price)}</span>
+                                          <span>Subtotal: {formatPrice(item.price * item.quantity)}</span>
+                                          {item.discount > 0 && (
+                                            <span className="discount-badge">Descuento: {item.discount}%</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="order-summary">
+                                  <div className="order-summary-line">
+                                    <span>Dirección de envío:</span>
+                                    <span>{order.address}</span>
+                                  </div>
+                                  <div className="order-summary-line">
+                                    <span>Método de envío:</span>
+                                    <span>{order.shipping}</span>
+                                  </div>
+                                  <div className="order-summary-line order-total">
+                                    <span>Total:</span>
+                                    <span>{formatPrice(order.total)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <div className="order-status">
-                            {getStatusBadge(order.status)}
-                            <span className="order-total">{formatPrice(order.total)}</span>
-                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="empty-state">
+                        <p>No tienes órdenes registradas.</p>
+                        <a href="/productos" className="btn btn--primary">Ver Productos</a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="info-section">
+                    <h3>📊 Mis Estadísticas</h3>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-icon">📦</div>
+                        <div className="stat-info">
+                          <span className="stat-number">{orders.length}</span>
+                          <span className="stat-label">Órdenes Realizadas</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty-state">
-                    <p>No tienes órdenes registradas.</p>
-                    <a href="/productos" className="btn btn--primary">Ver Productos</a>
-                  </div>
-                )}
-              </div>
-              <div className="info-section">
-                <h3>📊 Mis Estadísticas</h3>
-                <div className="stats-grid">
-                  <div className="stat-card">
-                    <div className="stat-icon">📦</div>
-                    <div className="stat-info">
-                      <span className="stat-number">{orders.length}</span>
-                      <span className="stat-label">Órdenes Realizadas</span>
+                      <div className="stat-card">
+                        <div className="stat-icon">💰</div>
+                        <div className="stat-info">
+                          <span className="stat-number">
+                            {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
+                          </span>
+                          <span className="stat-label">Total Gastado</span>
+                        </div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon">🛒</div>
+                        <div className="stat-info">
+                          <span className="stat-number">{cartTotals.itemCount}</span>
+                          <span className="stat-label">Items en Carrito</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="stat-card">
-                    <div className="stat-icon">💰</div>
-                    <div className="stat-info">
-                      <span className="stat-number">
-                        {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
-                      </span>
-                      <span className="stat-label">Total Gastado</span>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-icon">🛒</div>
-                    <div className="stat-info">
-                      <span className="stat-number">{cartTotals.itemCount}</span>
-                      <span className="stat-label">Items en Carrito</span>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-icon">📅</div>
-                    <div className="stat-info">
-                      <span className="stat-number">
-                        {user?.createdAt ? formatDate(user.createdAt) : 'N/A'}
-                      </span>
-                      <span className="stat-label">Usuario desde</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

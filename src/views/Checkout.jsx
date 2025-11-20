@@ -1,15 +1,31 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 import PaymentForm from '../components/PaymentForm.jsx';
 import './Checkout.css';
  
 const Checkout = () => {
   const { cart, clearCart, loadCart } = useCart();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [status, setStatus] = useState({ type: '', message: '' });
  
   const handlePaymentSuccess = async (paymentResult) => {
+    // Mostrar notificación toast de éxito
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS'
+      }).format(price);
+    };
+    
+    showToast(
+      `¡Compra realizada exitosamente! Orden #${paymentResult.orderId} - ${formatPrice(paymentResult.amount)}`,
+      'success',
+      5000
+    );
+    
     setStatus({
       type: 'success',
       message: `¡Pago procesado exitosamente! ID Transacción: ${paymentResult.transactionId} · ID Orden: ${paymentResult.orderId} · Monto: $${paymentResult.amount.toFixed(2)}`

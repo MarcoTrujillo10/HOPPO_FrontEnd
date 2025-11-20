@@ -48,7 +48,7 @@ const ProductManagement = () => {
     try {
       setLoading(true);
       const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        productService.getProducts(),
+        productService.getProducts({ includeOutOfStock: true, size: 1000 }),
         categoryService.getCategories(),
         brandService.getBrands()
       ]);

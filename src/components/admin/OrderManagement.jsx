@@ -5,6 +5,7 @@ import './AdminComponents.css';
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
   const { showToast } = useToast();
   useEffect(() => {
     loadOrders();
@@ -55,6 +56,10 @@ const OrderManagement = () => {
     const config = statusConfig[status] || { text: status, class: 'status-default' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
+
+  const toggleOrderDetails = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
   if (loading) {
     return <div className="loading">Cargando órdenes...</div>;
   }
@@ -83,38 +88,87 @@ const OrderManagement = () => {
           </thead>
           <tbody>
             {orders.map(order => (
-              <tr key={order.id}>
-                <td>#{order.id}</td>
-                <td>
-                  <div className="customer-info">
-                    <strong>{order.user?.name} {order.user?.lastName}</strong>
-                    <small>{order.user?.email}</small>
-                  </div>
-                </td>
-                <td>{formatPrice(order.total)}</td>
-                <td>{getStatusBadge(order.status)}</td>
-                <td>{formatDate(order.createdAt)}</td>
-                <td>
-                  <div className="order-actions">
-                    {order.status === 'CREATED' && (
-                      <>
-                        <button 
-                          className="btn btn-success btn-sm"
-                          onClick={() => handleUpdateOrderStatus(order.id, 'COMPLETED')}
-                        >
-                          ✅ Completar
-                        </button>
-                        <button 
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleUpdateOrderStatus(order.id, 'CANCELLED')}
-                        >
-                          ❌ Cancelar
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
+              <>
+                <tr key={order.id}>
+                  <td>#{order.id}</td>
+                  <td>
+                    <div className="customer-info">
+                      <strong>{order.user?.name} {order.user?.lastName}</strong>
+                      <small>{order.user?.email}</small>
+                    </div>
+                  </td>
+                  <td>{formatPrice(order.total)}</td>
+                  <td>{getStatusBadge(order.status)}</td>
+                  <td>{formatDate(order.orderDate || order.createdAt)}</td>
+                  <td>
+                    <div className="order-actions">
+                      <button
+                        className="btn btn-info btn-sm"
+                        onClick={() => toggleOrderDetails(order.id)}
+                        title="Ver detalles"
+                      >
+                        {expandedOrderId === order.id ? '▼' : '▶'} Detalles
+                      </button>
+                      {order.status === 'CREATED' && (
+                        <>
+                          <button 
+                            className="btn btn-success btn-sm"
+                            onClick={() => handleUpdateOrderStatus(order.id, 'COMPLETED')}
+                          >
+                            ✅ Completar
+                          </button>
+                          <button 
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleUpdateOrderStatus(order.id, 'CANCELLED')}
+                          >
+                            ❌ Cancelar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+                {expandedOrderId === order.id && order.items && order.items.length > 0 && (
+                  <tr>
+                    <td colSpan="6" className="order-details-cell">
+                      <div className="order-details">
+                        <h4>📦 Artículos de la Orden</h4>
+                        <div className="order-items-list">
+                          {order.items.map((item, index) => (
+                            <div key={index} className="order-item-card">
+                              <div className="order-item-info">
+                                <strong>{item.productName || 'Producto'}</strong>
+                                <div className="order-item-details">
+                                  <span>Cantidad: {item.quantity}</span>
+                                  <span>Precio unitario: {formatPrice(item.price)}</span>
+                                  <span>Subtotal: {formatPrice(item.price * item.quantity)}</span>
+                                  {item.discount > 0 && (
+                                    <span className="discount-badge">Descuento: {item.discount}%</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="order-summary">
+                          <div className="order-summary-line">
+                            <span>Dirección de envío:</span>
+                            <span>{order.address}</span>
+                          </div>
+                          <div className="order-summary-line">
+                            <span>Método de envío:</span>
+                            <span>{order.shipping}</span>
+                          </div>
+                          <div className="order-summary-line order-total">
+                            <span>Total:</span>
+                            <span>{formatPrice(order.total)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>

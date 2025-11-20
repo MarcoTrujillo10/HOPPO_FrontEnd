@@ -1,13 +1,22 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProductFilters from "../components/ProductFilters";
 import ProductGrid from "../components/ProductGrid";
 import { productService, categoryService, brandService } from "../services/api";
 import "./ProductList.css";
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 const ProductList = () => {
+  const [searchParams] = useSearchParams();
+  
+  // Leer parámetros de la URL
+  const categoriaParam = searchParams.get("categoria");
+  const tipoParam = searchParams.get("tipo");
+  const qParam = searchParams.get("q");
+  
   const [filters, setFilters] = useState({
-    q: "",
-    categoria: "Todos",
+    q: qParam || "",
+    categoria: categoriaParam || "Todos",
+    tipo: tipoParam || null,
     marcas: [],
     min: "",
     max: "",
@@ -18,6 +27,7 @@ const ProductList = () => {
   const [marcasOpts, setMarcasOpts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -30,11 +40,35 @@ const ProductList = () => {
           categoriesResponse?.data?.content ??
           categoriesResponse?.data ??
           [];
+        
+        // Si hay un tipo en la URL, filtrar categorías por tipo
+        let filteredCategories = categoriesArray;
+        if (tipoParam) {
+          filteredCategories = categoriesArray.filter(
+            (cat) => cat.type === tipoParam
+          );
+        }
+        
         const categoriesData = [
           "Todos",
-          ...categoriesArray.map((cat) => cat.description),
+          ...filteredCategories.map((cat) => cat.description),
         ];
         setCategorias(categoriesData);
+        
+        // Si hay una categoría en la URL, verificar que existe
+        if (categoriaParam) {
+          const categoryExists = filteredCategories.some(
+            (cat) => cat.description === categoriaParam
+          );
+          if (categoryExists) {
+            setFilters((prev) => ({
+              ...prev,
+              categoria: categoriaParam,
+              tipo: tipoParam,
+            }));
+          }
+        }
+        
         const brandsArray = brandsResponse?.data ?? [];
         const brandsData = brandsArray.map((brand) => brand.name);
         setMarcasOpts(brandsData);
@@ -50,7 +84,38 @@ const ProductList = () => {
       }
     };
     loadInitialData();
-  }, []);
+  }, [categoriaParam, tipoParam]);
+  
+  // Actualizar filtros cuando cambian los parámetros de la URL
+  useEffect(() => {
+    const categoriaFromUrl = searchParams.get("categoria");
+    const tipoFromUrl = searchParams.get("tipo");
+    const qFromUrl = searchParams.get("q");
+    
+    setFilters((prev) => {
+      const updates = { ...prev };
+      let hasChanges = false;
+      
+      // Actualizar categoría
+      if (categoriaFromUrl && categoriaFromUrl !== prev.categoria) {
+        updates.categoria = categoriaFromUrl;
+        updates.tipo = tipoFromUrl || prev.tipo;
+        hasChanges = true;
+      } else if (!categoriaFromUrl && prev.categoria !== "Todos") {
+        updates.categoria = "Todos";
+        updates.tipo = null;
+        hasChanges = true;
+      }
+      
+      // Actualizar búsqueda
+      if (qFromUrl !== prev.q) {
+        updates.q = qFromUrl || "";
+        hasChanges = true;
+      }
+      
+      return hasChanges ? updates : prev;
+    });
+  }, [searchParams]);
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -71,9 +136,17 @@ const ProductList = () => {
             categoriesResponse?.data?.content ??
             categoriesResponse?.data ??
             [];
-          const selectedCategory = pool.find(
+          
+          // Si hay un tipo en los filtros, filtrar por tipo también
+          let filteredPool = pool;
+          if (filters.tipo) {
+            filteredPool = pool.filter((cat) => cat.type === filters.tipo);
+          }
+          
+          const selectedCategory = filteredPool.find(
             (cat) => cat.description === categoria
           );
+          
           if (selectedCategory) {
             const productsResponse =
               await categoryService.getProductsByCategory(
