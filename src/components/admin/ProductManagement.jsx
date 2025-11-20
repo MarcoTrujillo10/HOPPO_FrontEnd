@@ -83,6 +83,7 @@ const ProductManagement = () => {
       return;
     }
     
+    let productData = null;
     try {
       const imgs = Array.isArray(productImages) ? productImages : [];
       const newFiles = imgs
@@ -100,7 +101,7 @@ const ProductManagement = () => {
  
       const imageUrls = [...existingUrls, ...uploadedUrls];
  
-      const productData = {
+      productData = {
         ...formData,
         price: Number(formData.price) || 0,
         stock: parseInt(formData.stock, 10) || 0,
