@@ -15,39 +15,44 @@ const Hero = () => {
   const loadCarouselProducts = async () => {
     try {
       setLoading(true);
-      
       const response = await carouselService.getActiveCarousel();
       
       let carouselItems = [];
-      
       if (response && response.data) {
         carouselItems = Array.isArray(response.data) ? response.data : [];
+      } else if (Array.isArray(response)) {
+        carouselItems = response;
       }
       
-      // Convertir items del carrusel a productos para el componente
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
-      const processedProducts = carouselItems.map(item => {
-        const product = item.product || {};
-        const images = (product.images || []).map(img => ({
-          ...img,
-          imageUrl: img.imageUrl?.startsWith('http') 
-            ? img.imageUrl 
-            : `${API_BASE_URL}${img.imageUrl}`
-        }));
+      const processedProducts = carouselItems
+        .filter(item => item && item.product)
+        .map(item => {
+          const product = item.product || {};
+          const images = (product.images || []).map(img => {
+            let imageUrl = img.imageUrl || img.url || '';
+            if (imageUrl && !imageUrl.startsWith('http')) {
+              imageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+              imageUrl = `${API_BASE_URL}${imageUrl}`;
+            }
+            return {
+              ...img,
+              imageUrl: imageUrl
+            };
+          });
 
-        return {
-          ...product,
-          id: product.id,
-          name: item.customTitle || product.name,
-          category: {
-            ...product.category,
-            description: item.customSubtitle || product.category?.description || 'Producto destacado'
-          },
-          images: images
-        };
-      });
+          return {
+            ...product,
+            id: product.id,
+            name: product.name || 'Producto',
+            images: images
+          };
+        });
       
       setProducts(processedProducts);
+      if (processedProducts.length > 0) {
+        setCurrentSlide(0);
+      }
     } catch (error) {
       console.error('Error loading carousel:', error);
       setProducts([]);
@@ -56,13 +61,14 @@ const Hero = () => {
     }
   };
 
-
   useEffect(() => {
-    if (products.length > 0) {
+    if (products.length > 1) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % products.length);
       }, 5000);
       return () => clearInterval(timer);
+    } else if (products.length === 1) {
+      setCurrentSlide(0);
     }
   }, [products.length]);
 
@@ -81,14 +87,30 @@ const Hero = () => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
+    if (!price && price !== 0) return '$0';
+    return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'ARS'
     }).format(price);
   };
 
-  const calculateDiscountedPrice = (price, discount) => {
-    return price * (1 - discount / 100);
+  const getImageUrl = (product) => {
+    if (!product || !product.images || product.images.length === 0) {
+      return null;
+    }
+    
+    const firstImage = product.images[0];
+    let imageUrl = firstImage.imageUrl || firstImage.url || '';
+    
+    if (!imageUrl) return null;
+    
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+    imageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    return `${API_BASE_URL}${imageUrl}`;
   };
 
   if (loading) {
@@ -105,84 +127,49 @@ const Hero = () => {
   if (products.length === 0) {
     return (
       <section className="hero">
-        <div className="hero__empty">
-          <h2>No hay productos en el carrusel</h2>
-          <p>Para mostrar productos en el carrusel:</p>
-          <ol style={{ textAlign: 'left', display: 'inline-block', marginTop: '1rem' }}>
-            <li>Ve al Panel de Administración</li>
-            <li>Selecciona la pestaña "Carrusel" 🎠</li>
-            <li>Agrega productos al carrusel</li>
-            <li>Asegúrate de que los productos tengan imágenes</li>
-          </ol>
-          <Link to="/productos" className="btn btn--primary" style={{ marginTop: '1rem' }}>
-            Ver todos los productos
-          </Link>
+        <div className="hero__banner">
+          <div className="hero__content">
+            <h1 className="hero__title">Bienvenido a HOPPO</h1>
+            <p className="hero__subtitle">Tu tienda de componentes y periféricos</p>
+            <div className="hero__actions">
+              <Link to="/productos" className="hero__btn hero__btn--primary">
+                Ver productos
+              </Link>
+              <Link to="/pc-builder" className="hero__btn hero__btn--secondary">
+                Construir PC
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     );
   }
-
-  // Asegurar que tenemos una URL válida para la imagen
-  const getImageUrl = (product) => {
-    if (!product.images || product.images.length === 0) {
-      return null;
-    }
-    const imageUrl = product.images[0].imageUrl;
-    if (!imageUrl) return null;
-    
-    // Si ya es una URL completa, retornarla
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl;
-    }
-    
-    // Construir URL completa
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
-    return `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-  };
   
   return (
     <section className="hero">
       <div className="hero__carousel">
         {products.map((product, index) => {
           const productImageUrl = getImageUrl(product);
-          const productDiscountedPrice = calculateDiscountedPrice(product.price, product.discount || 0);
           const isActive = index === currentSlide;
           
           return (
             <div 
-              key={product.id}
+              key={product.id || `product-${index}`}
               className={`hero__slide ${isActive ? 'active' : ''}`}
               style={{ 
                 backgroundImage: productImageUrl 
-                  ? `linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.5)), url("${productImageUrl}")`
+                  ? `linear-gradient(rgba(0,0,0,.4), rgba(0,0,0,.6)), url("${productImageUrl}")`
                   : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
               }}
             >
               <div className="hero__content">
-                {product.discount > 0 && (
-                  <div className="hero__badge">
-                    <span className="hero__discount">{product.discount}% OFF</span>
-                  </div>
-                )}
-                
                 <h1 className="hero__title">{product.name}</h1>
-                <p className="hero__subtitle">{product.category?.description || 'Producto destacado'}</p>
-                
                 <div className="hero__price-section">
-                  <span className="hero__price">{formatPrice(productDiscountedPrice)}</span>
-                  {product.discount > 0 && (
-                    <span className="hero__old-price">
-                      {formatPrice(product.price)}
-                    </span>
-                  )}
+                  <span className="hero__price">{formatPrice(product.price || 0)}</span>
                 </div>
-                
                 <div className="hero__actions">
                   <Link to={`/productos/${product.id}`} className="hero__btn hero__btn--primary">
                     Ver producto
-                  </Link>
-                  <Link to="/productos" className="hero__btn hero__btn--secondary">
-                    Explorar todos
                   </Link>
                 </div>
               </div>
@@ -215,5 +202,5 @@ const Hero = () => {
     </section>
   );
 };
-  
+
 export default Hero;

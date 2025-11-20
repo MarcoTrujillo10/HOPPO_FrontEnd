@@ -49,12 +49,13 @@ export const productService = {
 export const carouselService = {
   getActiveCarousel: () => api.get('/carousel'),
   getAllCarouselItems: () => api.get('/admin/carousel'),
-  getCarouselItemById: (id) => api.get(`/admin/carousel/${id}`),
-  createCarouselItem: (itemData) => api.post('/admin/carousel', itemData),
-  updateCarouselItem: (id, itemData) => api.put(`/admin/carousel/${id}`, itemData),
-  deleteCarouselItem: (id) => api.delete(`/admin/carousel/${id}`),
+  addProductToCarousel: (productId) => api.post(`/admin/carousel/add/${productId}`),
+  removeProductFromCarousel: (productId) => api.delete(`/admin/carousel/remove/${productId}`),
+  reorderCarouselItems: (carouselItemIds) => api.put('/admin/carousel/reorder', { carouselItemIds: carouselItemIds }),
+  checkProductInCarousel: (productId) => api.get(`/admin/carousel/check/${productId}`),
+  getCarouselItemCount: () => api.get('/admin/carousel/count'),
 };
- 
+
 export const categoryService = {
   getCategories: (params = {}) => api.get('/categories', { params }),
   getCategoriesByType: (type, params = {}) => api.get('/categories', { params: { ...params, type } }),

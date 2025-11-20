@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 import './Auth.css';
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { register } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({
@@ -40,8 +42,10 @@ const Register = () => {
       });
       
       if (result.success) {
-        alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-        navigate('/login');
+        showToast('¡Registro exitoso! Ahora puedes iniciar sesión.', 'success');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
         setError(result.error);
       }

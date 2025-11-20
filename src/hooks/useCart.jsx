@@ -154,17 +154,41 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      // Si no hay productos, ya está limpio
+      if (cartProducts.length === 0) {
+        setCart(null);
+        setCartProducts([]);
+        return {
+          success: true,
+          message: 'Carrito limpiado'
+        };
+      }
+      
+      // Eliminar todos los productos del carrito
       const deletePromises = cartProducts.map(cp =>
         cartProductService.removeFromCart(cp.id)
       );
       await Promise.all(deletePromises);
-      await loadCartProducts();
+      
+      // Recargar el carrito para sincronizar con el backend
+      await loadCart();
+      
+      // Asegurar que el estado esté limpio
+      setCartProducts([]);
+      if (cart) {
+        setCart({ ...cart, items: [], quantity: 0 });
+      }
+      
       return {
         success: true,
         message: 'Carrito limpiado'
       };
     } catch (err) {
       console.error('Error limpiando carrito:', err);
+      // Aún así, intentar recargar el carrito
+      await loadCart();
       return {
         success: false,
         error: 'Error al limpiar carrito'

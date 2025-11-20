@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useCart } from '../hooks/useCart.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 import { paymentService } from '../services/api.js';
 import './PaymentForm.css';
 
 const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   const { cart, getCartTotal } = useCart();
   const { getToken } = useAuth();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -99,12 +101,12 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       if (result.success) {
         onPaymentSuccess(result);
       } else {
-        alert(`Error en el pago: ${result.message}`);
+        showToast(`Error en el pago: ${result.message}`, 'error');
       }
     } catch (error) {
       console.error('Error procesando pago:', error);
       const errorMessage = error.response?.data?.message || 'Error procesando el pago. Inténtalo de nuevo.';
-      alert(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }

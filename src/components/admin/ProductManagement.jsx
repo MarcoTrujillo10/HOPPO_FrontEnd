@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { productService, categoryService, brandService, uploadService } from '../../services/api';
+import { productService, categoryService, brandService, uploadService, carouselService } from '../../services/api';
 import ImageUploadSimple from './ImageUploadSimple';
 import './AdminComponents.css';
  
@@ -24,10 +24,25 @@ const ProductManagement = () => {
     discount: 0
   });
   const [productImages, setProductImages] = useState([]);
+  const [isInCarousel, setIsInCarousel] = useState(false);
+  const [carouselCount, setCarouselCount] = useState(0);
  
   useEffect(() => {
     loadData();
+    loadCarouselCount();
   }, []);
+
+  const loadCarouselCount = async () => {
+    try {
+      const response = await carouselService.getCarouselItemCount();
+      // La respuesta puede venir como response.data.count o directamente response.data
+      setCarouselCount(response.data?.count || response.data || 0);
+    } catch (error) {
+      console.error('Error loading carousel count:', error);
+      // Si falla, no mostramos error, solo dejamos el contador en 0
+      setCarouselCount(0);
+    }
+  };
  
   const loadData = async () => {
     try {
@@ -104,6 +119,7 @@ const ProductManagement = () => {
       }
 
       await loadData();
+      await loadCarouselCount();
       resetForm();
     } catch (error) {
       console.error('Error saving product:', error);
@@ -123,7 +139,7 @@ const ProductManagement = () => {
     }
   };
  
-  const handleEdit = (product) => {
+  const handleEdit = async (product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
@@ -134,7 +150,7 @@ const ProductManagement = () => {
       brandId: product.brand?.id || '',
       discount: product.discount || 0
     });
- 
+
     if (product.images && product.images.length > 0) {
       const existingImages = product.images.map(img => ({
         url: img.imageUrl,
@@ -145,7 +161,21 @@ const ProductManagement = () => {
     } else {
       setProductImages([]);
     }
- 
+
+    // Verificar si el producto está en el carrusel
+    try {
+      const response = await carouselService.checkProductInCarousel(product.id);
+      // La respuesta puede venir como response.data.isInCarousel o directamente response.data
+      setIsInCarousel(response.data?.isInCarousel ?? response.data ?? false);
+    } catch (error) {
+      console.error('Error checking carousel status:', error);
+      // Si el endpoint no existe (404), simplemente asumimos que no está en el carrusel
+      setIsInCarousel(false);
+    }
+
+    // Recargar el conteo del carrusel
+    await loadCarouselCount();
+
     setShowForm(true);
   };
  
@@ -174,6 +204,51 @@ const ProductManagement = () => {
     setPendingDeleteId(null);
   };
  
+  const handleCarouselToggle = async (e) => {
+    const checked = e.target.checked;
+    if (!editingProduct?.id) return;
+
+    try {
+      if (checked) {
+        console.log('Adding product to carousel:', editingProduct.id);
+        const response = await carouselService.addProductToCarousel(editingProduct.id);
+        console.log('Add response:', response);
+        setStatus({ type: 'success', message: 'Producto agregado al carrusel exitosamente' });
+        setIsInCarousel(true);
+      } else {
+        console.log('Removing product from carousel:', editingProduct.id);
+        const response = await carouselService.removeProductFromCarousel(editingProduct.id);
+        console.log('Remove response:', response);
+        setStatus({ type: 'success', message: 'Producto removido del carrusel exitosamente' });
+        setIsInCarousel(false);
+      }
+      await loadCarouselCount();
+    } catch (error) {
+      console.error('Error toggling carousel:', error);
+      console.error('Error config:', error.config);
+      console.error('Error URL:', error.config?.url);
+      console.error('Error baseURL:', error.config?.baseURL);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      
+      let errorMessage = 'Error al modificar el carrusel';
+      if (error.response?.status === 404) {
+        errorMessage = 'Endpoint no encontrado. Verifica que el servidor backend esté corriendo y reiniciado.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setStatus({ type: 'error', message: errorMessage });
+      // Revertir el checkbox si hay error
+      e.target.checked = !checked;
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -185,6 +260,7 @@ const ProductManagement = () => {
       discount: 0
     });
     setProductImages([]);
+    setIsInCarousel(false);
     setEditingProduct(null);
     setShowForm(false);
   };
@@ -308,6 +384,36 @@ const ProductManagement = () => {
                   required
                 />
               </div>
+
+              {editingProduct && (
+                <div className="form-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={isInCarousel}
+                      onChange={handleCarouselToggle}
+                      disabled={carouselCount >= 5 && !isInCarousel}
+                    />
+                    <span>
+                      Agregar al carrusel principal
+                      {carouselCount >= 5 && !isInCarousel && (
+                        <span style={{ color: '#e74c3c', fontSize: '0.9em', marginLeft: '8px' }}>
+                          (Máximo 5 productos - {carouselCount}/5)
+                        </span>
+                      )}
+                      {isInCarousel && (
+                        <span style={{ color: '#27ae60', fontSize: '0.9em', marginLeft: '8px' }}>
+                          ✓ En el carrusel ({carouselCount}/5)
+                        </span>
+                      )}
+                    </span>
+                  </label>
+                  <p className="form-help" style={{ marginTop: '4px', fontSize: '0.85em', color: '#666' }}>
+                    El carrusel muestra hasta 5 productos destacados en la página principal. 
+                    Solo productos con stock e imágenes pueden agregarse.
+                  </p>
+                </div>
+              )}
  
               <ImageUploadSimple
                 images={productImages}

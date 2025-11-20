@@ -109,11 +109,48 @@ const Cart = () => {
     return (
       <main className="cart container">
         <div className="cart__empty">
-          <h1>Tu carrito está vacío</h1>
-          <p>Agrega algunos productos para comenzar tu compra.</p>
-          <Link to="/productos" className="btn btn--primary">
-            Ver Productos
-          </Link>
+          <div className="cart__empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="9" cy="21" r="1" fill="currentColor"/>
+              <circle cx="20" cy="21" r="1" fill="currentColor"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h1 className="cart__empty-title">Tu carrito está vacío</h1>
+          <p className="cart__empty-message">
+            Parece que aún no has agregado ningún producto a tu carrito.
+            <br />
+            ¡Explora nuestra tienda y encuentra los mejores productos!
+          </p>
+          <div className="cart__empty-actions">
+            <Link to="/productos" className="btn btn--primary cart__empty-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Explorar Productos
+            </Link>
+            <Link to="/" className="btn btn--ghost cart__empty-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="9 22 9 12 15 12 15 22" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Volver al Inicio
+            </Link>
+          </div>
+          <div className="cart__empty-features">
+            <div className="cart__empty-feature">
+              <span className="cart__empty-feature-icon">🚚</span>
+              <span>Envío gratis en compras mayores a $500</span>
+            </div>
+            <div className="cart__empty-feature">
+              <span className="cart__empty-feature-icon">🔄</span>
+              <span>Devolución gratuita</span>
+            </div>
+            <div className="cart__empty-feature">
+              <span className="cart__empty-feature-icon">💳</span>
+              <span>Múltiples métodos de pago</span>
+            </div>
+          </div>
         </div>
       </main>
     );

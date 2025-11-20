@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { orderService } from '../../services/api';
+import { useToast } from '../../contexts/ToastContext.jsx';
 import './AdminComponents.css';
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
   useEffect(() => {
     loadOrders();
   }, []);
@@ -28,10 +30,10 @@ const OrderManagement = () => {
     try {
       await orderService.updateOrder(orderId, { status: newStatus });
       await loadOrders();
-      alert('Estado de orden actualizado exitosamente');
+      showToast('Estado de orden actualizado exitosamente', 'success');
     } catch (error) {
       console.error('Error updating order:', error);
-      alert('Error al actualizar la orden');
+      showToast('Error al actualizar la orden', 'error');
     }
   };
   const formatPrice = (price) => {

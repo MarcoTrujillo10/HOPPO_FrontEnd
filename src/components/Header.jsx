@@ -155,7 +155,7 @@ const Header = () => {
             </div>
           )}
 
-          {pathname !== '/admin' && (
+          {pathname !== '/admin' && user?.role !== 'VENDEDOR' && (
             <Link to="/cart" className="iconbtn cart-btn" title="Carrito">
               <svg viewBox="0 0 24 24" fill="none">
                 <circle cx="9" cy="21" r="1" fill="currentColor"/>

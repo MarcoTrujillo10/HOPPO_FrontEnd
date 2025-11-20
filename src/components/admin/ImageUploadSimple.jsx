@@ -1,14 +1,16 @@
 import { useState, useRef } from 'react';
+import { useToast } from '../../contexts/ToastContext.jsx';
 import './AdminComponents.css';
 const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
   const fileInputRef = useRef(null);
+  const { showToast } = useToast();
 
   const handleFileSelect = (files) => {
     const fileArray = Array.from(files);
     const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
     
     if (imageFiles.length === 0) {
-      alert('Por favor selecciona solo archivos de imagen');
+      showToast('Por favor selecciona solo archivos de imagen', 'error');
       return;
     }
     
@@ -18,12 +20,12 @@ const ImageUpload = ({ images = [], onImagesChange, maxImages = 5 }) => {
     
     if (oversizedFiles.length > 0) {
       const fileNames = oversizedFiles.map(f => f.name).join(', ');
-      alert(`Los siguientes archivos exceden el tamaño máximo de 10MB:\n${fileNames}\n\nPor favor, comprime las imágenes o selecciona archivos más pequeños.`);
+      showToast(`Los siguientes archivos exceden el tamaño máximo de 10MB: ${fileNames}. Por favor, comprime las imágenes o selecciona archivos más pequeños.`, 'error', 5000);
       return;
     }
     
     if (images.length + imageFiles.length > maxImages) {
-      alert(`Máximo ${maxImages} imágenes permitidas`);
+      showToast(`Máximo ${maxImages} imágenes permitidas`, 'error');
       return;
     }
 

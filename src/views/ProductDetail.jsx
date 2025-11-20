@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { productService } from "../services/api";
 import { useCart } from "../hooks/useCart.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
+import { useToast } from "../contexts/ToastContext.jsx";
 import "./ProductDetail.css";
 const ProductDetail = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const ProductDetail = () => {
   
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -77,7 +79,7 @@ const ProductDetail = () => {
   }
   const handleAddToCart = async () => {
     if (!isAuthenticated()) {
-      alert('Debes iniciar sesión para agregar productos al carrito');
+      showToast('Debes iniciar sesión para agregar productos al carrito', 'info');
       return;
     }
     try {
@@ -85,13 +87,13 @@ const ProductDetail = () => {
       const result = await addToCart(productData.id, quantity);
       
       if (result.success) {
-        alert(`Se agregaron ${quantity} unidad(es) al carrito`);
+        showToast(`Se agregaron ${quantity} unidad(es) al carrito`, 'success');
         setQuantity(1); // Resetear cantidad
       } else {
-        alert(result.error || 'Error al agregar al carrito');
+        showToast(result.error || 'Error al agregar al carrito', 'error');
       }
     } catch (err) {
-      alert('Error al agregar al carrito');
+      showToast('Error al agregar al carrito', 'error');
     } finally {
       setAddingToCart(false);
     }

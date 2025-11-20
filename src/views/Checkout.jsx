@@ -5,17 +5,30 @@ import PaymentForm from '../components/PaymentForm.jsx';
 import './Checkout.css';
  
 const Checkout = () => {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, loadCart } = useCart();
   const navigate = useNavigate();
   const [status, setStatus] = useState({ type: '', message: '' });
  
-  const handlePaymentSuccess = (paymentResult) => {
+  const handlePaymentSuccess = async (paymentResult) => {
     setStatus({
       type: 'success',
       message: `¡Pago procesado exitosamente! ID Transacción: ${paymentResult.transactionId} · ID Orden: ${paymentResult.orderId} · Monto: $${paymentResult.amount.toFixed(2)}`
     });
-    clearCart?.();
-    navigate('/');
+    
+    // Limpiar el carrito y esperar a que se complete
+    if (clearCart) {
+      await clearCart();
+    }
+    
+    // Recargar el carrito para asegurar que el estado esté actualizado
+    if (loadCart) {
+      await loadCart();
+    }
+    
+    // Navegar después de un pequeño delay para que el usuario vea el mensaje
+    setTimeout(() => {
+      navigate('/');
+    }, 2000);
   };
  
   const handlePaymentCancel = () => {
