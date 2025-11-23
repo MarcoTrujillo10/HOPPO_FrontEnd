@@ -436,7 +436,7 @@ const ProductManagement = () => {
  
       <div className="products-grid">
         {products.map(product => (
-          <div key={product.id} className="product-card">
+          <div key={product.id} className={`product-card ${product.stock === 0 ? 'out-of-stock' : product.stock <= 5 ? 'low-stock' : ''}`}>
             <div className="product-image">
               {product.images && product.images.length > 0 ? (
                 <img
@@ -454,15 +454,29 @@ const ProductManagement = () => {
                   +{product.images.length - 1}
                 </div>
               )}
+              {product.stock === 0 && (
+                <div className="stock-badge out-of-stock-badge">
+                  ⚠️ SIN STOCK
+                </div>
+              )}
+              {product.stock > 0 && product.stock <= 5 && (
+                <div className="stock-badge low-stock-badge">
+                  ⚡ Stock Bajo ({product.stock})
+                </div>
+              )}
             </div>
- 
+
             <div className="product-info">
               <h3>{product.name}</h3>
               <p className="product-price">{formatPrice(product.price)}</p>
               {product.discount > 0 && (
                 <p className="product-discount">Descuento: {product.discount}%</p>
               )}
-              <p className="product-stock">Stock: {product.stock}</p>
+              <p className={`product-stock ${product.stock === 0 ? 'stock-zero' : product.stock <= 5 ? 'stock-low' : 'stock-ok'}`}>
+                Stock: {product.stock}
+                {product.stock === 0 && ' - ⚠️ Sin disponibilidad'}
+                {product.stock > 0 && product.stock <= 5 && ' - ⚡ Bajo'}
+              </p>
               <p className="product-category">📂 {product.category?.description || 'Sin categoría'}</p>
               <p className="product-brand">🏷️ {product.brand?.name || 'Sin marca'}</p>
               <p className="product-description">{product.description}</p>
