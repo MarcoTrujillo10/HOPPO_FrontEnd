@@ -148,11 +148,40 @@
   margin: 0 0 0.5rem 0;
 }
  
-.cart-item__price {
-  font-weight: 600;
+.cart-item__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.cart-item__discount-badge {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.cart-item__price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.cart-item__price-original {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.cart-item__price-current {
+  font-weight: 700;
   color: #13a4ec;
-  margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
  
 .cart-item__quantity {
@@ -199,11 +228,25 @@
   text-align: right;
 }
  
+.cart-item__total-original {
+  display: block;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
 .cart-item__total-price {
   font-weight: 700;
   font-size: 1.125rem;
   color: #1f2937;
   margin: 0;
+}
+
+.cart-item__total-savings {
+  display: block;
+  font-size: 0.875rem;
+  color: #059669;
+  font-weight: 600;
 }
  
 .cart-item__actions {

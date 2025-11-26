@@ -163,9 +163,19 @@ const Hero = () => {
               }}
             >
               <div className="hero__content">
+                {product.hasDiscount && (
+                  <div className="hero__badge">
+                    <span className="hero__discount">-{product.discount}% OFF</span>
+                  </div>
+                )}
                 <h1 className="hero__title">{product.name}</h1>
                 <div className="hero__price-section">
-                  <span className="hero__price">{formatPrice(product.price || 0)}</span>
+                  {product.hasDiscount && (
+                    <span className="hero__old-price">{formatPrice(product.price || 0)}</span>
+                  )}
+                  <span className="hero__price">
+                    {formatPrice(product.discountedPrice || product.price || 0)}
+                  </span>
                 </div>
                 <div className="hero__actions">
                   <Link to={`/productos/${product.id}`} className="hero__btn hero__btn--primary">

@@ -23,6 +23,12 @@ const Cart = () => {
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
  
   const totals = getCartTotals();
+
+  const formatCurrency = (value = 0) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value || 0);
  
   const handleUpdateQuantity = async (cartProductId, newQuantity) => {
     const result = await updateCartProduct(cartProductId, newQuantity);
@@ -176,74 +182,112 @@ const Cart = () => {
           </div>
  
           <div className="cart__items-list">
-            {cartProducts.map((cartProduct) => (
-              <article key={cartProduct.id} className="cart-item">
-                <div className="cart-item__image">
-                  <img
-                    src={
-                      cartProduct.product.images?.[0]?.url ||
-                      cartProduct.product.images?.[0]?.imageUrl ||
-                      "https://via.placeholder.com/100x100?text=Sin+Imagen"
-                    }
-                    alt={cartProduct.product.name}
-                  />
-                </div>
+            {cartProducts.map((cartProduct) => {
+              const product = cartProduct.product || {};
+              const image =
+                product.images?.[0]?.imageUrl ||
+                product.images?.[0]?.url ||
+                "https://via.placeholder.com/100x100?text=Sin+Imagen";
+              const hasDiscount = product.hasDiscount;
+              const discountPercent = product.discount || 0;
+              const originalPrice = product.price || 0;
+              const discountedPrice =
+                product.discountedPrice !== undefined
+                  ? product.discountedPrice
+                  : originalPrice;
+              const unitPrice = hasDiscount ? discountedPrice : originalPrice;
+              const originalTotal = originalPrice * cartProduct.quantity;
+              const discountedTotal = unitPrice * cartProduct.quantity;
+              const totalSavings = hasDiscount ? originalTotal - discountedTotal : 0;
+
+              return (
+                <article key={cartProduct.id} className="cart-item">
+                  <div className="cart-item__image">
+                    <img src={image} alt={product.name} />
+                  </div>
+
+                  <div className="cart-item__info">
+                    <Link
+                      to={`/productos/${product.id}`}
+                      className="cart-item__name"
+                    >
+                      {product.name}
+                    </Link>
+                    <p className="cart-item__detail">{product.description || ""}</p>
+
+                    <div className="cart-item__pricing">
+                      {hasDiscount && (
+                        <span className="cart-item__discount-badge">
+                          -{discountPercent}% OFF
+                        </span>
+                      )}
+                      <div className="cart-item__price-group">
+                        {hasDiscount && (
+                          <span className="cart-item__price-original">
+                            {formatCurrency(originalPrice)}
+                          </span>
+                        )}
+                        <span className="cart-item__price-current">
+                          {formatCurrency(unitPrice)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="cart-item__stock">
+                      Stock: {product.stock} unidades
+                    </p>
+                  </div>
  
-                <div className="cart-item__info">
-                  <Link
-                    to={`/productos/${cartProduct.product.id}`}
-                    className="cart-item__name"
-                  >
-                    {cartProduct.product.name}
-                  </Link>
-                  <p className="cart-item__detail">{cartProduct.product.description || ""}</p>
-                  <p className="cart-item__price">
-                    ${cartProduct.product.price.toFixed(2)}
-                  </p>
-                  <p className="cart-item__stock">
-                    Stock: {cartProduct.product.stock} unidades
-                  </p>
-                </div>
- 
-                <div className="cart-item__quantity">
-                  <button
-                    className="quantity-btn"
-                    onClick={() =>
-                      handleUpdateQuantity(cartProduct.id, cartProduct.quantity - 1)
-                    }
-                    disabled={cartProduct.quantity <= 1}
-                  >
-                    -
-                  </button>
-                  <span className="quantity-value">{cartProduct.quantity}</span>
-                  <button
-                    className="quantity-btn"
-                    onClick={() =>
-                      handleUpdateQuantity(cartProduct.id, cartProduct.quantity + 1)
-                    }
-                    disabled={cartProduct.quantity >= cartProduct.product.stock}
-                  >
-                    +
-                  </button>
-                </div>
- 
-                <div className="cart-item__total">
-                  <p className="cart-item__total-price">
-                    ${(cartProduct.product.price * cartProduct.quantity).toFixed(2)}
-                  </p>
-                </div>
- 
-                <div className="cart-item__actions">
-                  <button
-                    className="remove-btn"
-                    title="Eliminar del carrito"
-                    onClick={() => requestRemoveProduct(cartProduct.id)}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </article>
-            ))}
+                  <div className="cart-item__quantity">
+                    <button
+                      className="quantity-btn"
+                      onClick={() =>
+                        handleUpdateQuantity(cartProduct.id, cartProduct.quantity - 1)
+                      }
+                      disabled={cartProduct.quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="quantity-value">{cartProduct.quantity}</span>
+                    <button
+                      className="quantity-btn"
+                      onClick={() =>
+                        handleUpdateQuantity(cartProduct.id, cartProduct.quantity + 1)
+                      }
+                      disabled={cartProduct.quantity >= product.stock}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div className="cart-item__total">
+                    {hasDiscount && (
+                      <span className="cart-item__total-original">
+                        {formatCurrency(originalTotal)}
+                      </span>
+                    )}
+                    <p className="cart-item__total-price">
+                      {formatCurrency(discountedTotal)}
+                    </p>
+                    {hasDiscount && (
+                      <span className="cart-item__total-savings">
+                        Ahorras {formatCurrency(totalSavings)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="cart-item__actions">
+                    <button
+                      className="remove-btn"
+                      title="Eliminar del carrito"
+                      onClick={() => requestRemoveProduct(cartProduct.id)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
  
           <div className="cart__coupon">
