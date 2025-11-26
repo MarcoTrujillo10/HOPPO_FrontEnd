@@ -32,28 +32,21 @@ const ProductList = () => {
     const updates = {};
     let shouldUpdate = false;
 
-    if (qParam !== null && qParam !== filters.q) {
+    if (qParam !== null) {
       updates.q = qParam || "";
-      shouldUpdate = true;
-    } else if (qParam === null && filters.q !== "") {
-      updates.q = "";
       shouldUpdate = true;
     }
 
-    if (categoriaParam && categoriaParam !== filters.categoria) {
+    if (categoriaParam) {
       updates.categoria = categoriaParam;
       updates.tipo = tipoParam || null;
-      shouldUpdate = true;
-    } else if (!categoriaParam && filters.categoria !== "Todos") {
-      updates.categoria = "Todos";
-      updates.tipo = null;
       shouldUpdate = true;
     }
 
     if (shouldUpdate) {
       dispatch(setFilters(updates));
     }
-  }, [categoriaParam, tipoParam, qParam, filters.categoria, filters.q, dispatch]);
+  }, [categoriaParam, tipoParam, qParam, dispatch]);
 
   useEffect(() => {
     dispatch(fetchCatalogProducts());

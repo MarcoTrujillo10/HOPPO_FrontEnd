@@ -1,43 +1,40 @@
-import { useState } from 'react';
-import { useCart } from '../hooks/useCart.jsx';
-import { useAuth } from '../hooks/useAuth.jsx';
-import { useToast } from '../contexts/ToastContext.jsx';
-import { paymentService } from '../services/api.js';
-import './PaymentForm.css';
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useCart } from "../hooks/useCart.jsx";
+import { useToast } from "../contexts/ToastContext.jsx";
+import {
+  selectCheckoutState,
+  updateCheckoutField,
+  setCheckoutErrors,
+  resetCheckoutState,
+  processCheckoutPayment,
+} from "../redux/checkoutSlice";
+import "./PaymentForm.css";
 
 const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   const { cart, getCartTotal } = useCart();
-  const { getToken } = useAuth();
   const { showToast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const dispatch = useDispatch();
+  const { formData, errors, loading } = useSelector(selectCheckoutState);
 
-  const [formData, setFormData] = useState({
-    cardNumber: '',
-    cardHolderName: '',
-    expiryDate: '',
-    cvv: '',
-    paymentMethod: 'credit_card',
-    billingAddress: '',
-    city: '',
-    postalCode: '',
-    country: 'Argentina'
-  });
+  const clearFieldError = useCallback(
+    (field) => {
+      if (!errors[field]) return;
+      const nextErrors = { ...errors };
+      delete nextErrors[field];
+      dispatch(setCheckoutErrors(nextErrors));
+    },
+    [dispatch, errors]
+  );
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+  const handleInputChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      dispatch(updateCheckoutField({ name, value }));
+      clearFieldError(name);
+    },
+    [dispatch, clearFieldError]
+  );
 
   const validateForm = () => {
     const newErrors = {};
@@ -76,7 +73,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       newErrors.postalCode = 'El código postal es obligatorio';
     }
 
-    setErrors(newErrors);
+    dispatch(setCheckoutErrors(newErrors));
     return Object.keys(newErrors).length === 0;
   };
 
@@ -87,34 +84,34 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
       return;
     }
 
-    setLoading(true);
-    
     try {
-      const paymentData = {
-        ...formData,
-        totalAmount: getCartTotal()
-      };
-
-      const response = await paymentService.processPayment(paymentData);
-      const result = response.data;
+      const result = await dispatch(
+        processCheckoutPayment({ totalAmount: getCartTotal() })
+      ).unwrap();
 
       if (result.success) {
         onPaymentSuccess(result);
+        dispatch(resetCheckoutState());
       } else {
-        showToast(`Error en el pago: ${result.message}`, 'error');
+        showToast(`Error en el pago: ${result.message}`, "error");
       }
     } catch (error) {
-      console.error('Error procesando pago:', error);
-      const errorMessage = error.response?.data?.message || 'Error procesando el pago. Inténtalo de nuevo.';
-      showToast(errorMessage, 'error');
-    } finally {
-      setLoading(false);
+      const errorMessage =
+        typeof error === "string"
+          ? error
+          : error?.message || "Error procesando el pago. Inténtalo de nuevo.";
+      showToast(errorMessage, "error");
+      dispatch(
+        setCheckoutErrors({
+          ...errors,
+          submit: errorMessage,
+        })
+      );
     }
   };
 
   const formatCardNumber = (value) => {
-    
-    const cleaned = value.replace(/\s/g, '').replace(/\D/g, '');
+    const cleaned = value.replace(/\s/g, "").replace(/\D/g, "");
     if (cleaned.length <= 16) {
       return cleaned;
     }
@@ -122,8 +119,7 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
   };
 
   const formatExpiryDate = (value) => {
-    
-    const cleaned = value.replace(/\D/g, '');
+    const cleaned = value.replace(/\D/g, "");
     if (cleaned.length >= 2) {
       return `${cleaned.substring(0, 2)}/${cleaned.substring(2, 4)}`;
     }
@@ -161,15 +157,22 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
               id="cardNumber"
               name="cardNumber"
               value={formData.cardNumber}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                cardNumber: formatCardNumber(e.target.value)
-              }))}
+              onChange={(e) => {
+                dispatch(
+                  updateCheckoutField({
+                    name: "cardNumber",
+                    value: formatCardNumber(e.target.value),
+                  })
+                );
+                clearFieldError("cardNumber");
+              }}
               placeholder="1234567890123456"
               maxLength="16"
-              className={errors.cardNumber ? 'error' : ''}
+              className={errors.cardNumber ? "error" : ""}
             />
-            {errors.cardNumber && <span className="error-message">{errors.cardNumber}</span>}
+            {errors.cardNumber && (
+              <span className="error-message">{errors.cardNumber}</span>
+            )}
           </div>
 
           <div className="payment-form__field">
@@ -194,15 +197,22 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
                 id="expiryDate"
                 name="expiryDate"
                 value={formData.expiryDate}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  expiryDate: formatExpiryDate(e.target.value)
-                }))}
+              onChange={(e) => {
+                dispatch(
+                  updateCheckoutField({
+                    name: "expiryDate",
+                    value: formatExpiryDate(e.target.value),
+                  })
+                );
+                clearFieldError("expiryDate");
+              }}
                 placeholder="MM/YY"
                 maxLength="5"
-                className={errors.expiryDate ? 'error' : ''}
+              className={errors.expiryDate ? "error" : ""}
               />
-              {errors.expiryDate && <span className="error-message">{errors.expiryDate}</span>}
+            {errors.expiryDate && (
+              <span className="error-message">{errors.expiryDate}</span>
+            )}
             </div>
 
             <div className="payment-form__field">
@@ -212,15 +222,22 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
                 id="cvv"
                 name="cvv"
                 value={formData.cvv}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  cvv: e.target.value.replace(/\D/g, '').substring(0, 4)
-                }))}
+              onChange={(e) => {
+                dispatch(
+                  updateCheckoutField({
+                    name: "cvv",
+                    value: e.target.value.replace(/\D/g, "").substring(0, 4),
+                  })
+                );
+                clearFieldError("cvv");
+              }}
                 placeholder="123"
                 maxLength="4"
-                className={errors.cvv ? 'error' : ''}
+              className={errors.cvv ? "error" : ""}
               />
-              {errors.cvv && <span className="error-message">{errors.cvv}</span>}
+            {errors.cvv && (
+              <span className="error-message">{errors.cvv}</span>
+            )}
             </div>
           </div>
 
@@ -301,7 +318,10 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
         <div className="payment-form__actions">
           <button
             type="button"
-            onClick={onPaymentCancel}
+            onClick={() => {
+              dispatch(resetCheckoutState());
+              onPaymentCancel();
+            }}
             className="btn btn--ghost"
             disabled={loading}
           >
@@ -314,6 +334,9 @@ const PaymentForm = ({ onPaymentSuccess, onPaymentCancel }) => {
           >
             {loading ? 'Procesando...' : 'Procesar Pago'}
           </button>
+          {errors.submit && (
+            <span className="error-message submit-error">{errors.submit}</span>
+          )}
         </div>
       </form>
     </div>
