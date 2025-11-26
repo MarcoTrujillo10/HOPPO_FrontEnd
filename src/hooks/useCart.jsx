@@ -27,7 +27,7 @@ const getErrorText = (error, fallback) => {
   if (error.message) return error.message;
   return fallback;
 };
-
+ 
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
@@ -35,7 +35,7 @@ export const useCart = () => {
   }
   return context;
 };
-
+ 
 export const CartProvider = ({ children }) => {
   const dispatch = useDispatch();
   const { token } = useAuth();
@@ -45,9 +45,9 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       dispatch(fetchCart());
-    } else {
+      } else {
       dispatch(resetCartState());
-    }
+      }
   }, [token, dispatch]);
 
   const loadCart = useCallback(async () => {
@@ -64,27 +64,27 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = useCallback(
     async (productId, quantity = 1) => {
-      try {
+    try {
         const existingProduct = cartProducts.find(
           (cp) => cp.product?.id === productId
         );
-        if (existingProduct) {
+      if (existingProduct) {
           await dispatch(
             updateCartItem({
               cartProductId: existingProduct.id,
               quantity: existingProduct.quantity + quantity,
             })
           ).unwrap();
-        } else {
+      } else {
           await dispatch(addItemToCart({ productId, quantity })).unwrap();
         }
         return {
           success: true,
           message: `Se agregaron ${quantity} unidad(es) al carrito`,
         };
-      } catch (err) {
-        return {
-          success: false,
+    } catch (err) {
+      return {
+        success: false,
           error: getErrorText(err, "Error al agregar producto al carrito"),
         };
       }
@@ -94,25 +94,25 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = useCallback(
     async (cartProductId) => {
-      try {
+    try {
         await dispatch(removeCartItem({ cartProductId })).unwrap();
-        return {
-          success: true,
+      return {
+        success: true,
           message: "Producto eliminado del carrito",
-        };
-      } catch (err) {
-        return {
-          success: false,
+      };
+    } catch (err) {
+      return {
+        success: false,
           error: getErrorText(err, "Error al eliminar producto"),
         };
-      }
+    }
     },
     [dispatch]
   );
-
+ 
   const updateCartProduct = useCallback(
     async (cartProductId, newQuantity) => {
-      try {
+    try {
         if (newQuantity <= 0) {
           return await removeFromCart(cartProductId);
         }
@@ -148,12 +148,12 @@ export const CartProvider = ({ children }) => {
       };
     }
   }, [dispatch]);
-
+ 
   const getCartTotals = useCallback(
     () => calculateCartTotals(cartProducts),
     [cartProducts]
   );
-
+ 
   const getCartTotal = useCallback(() => {
     if (cart && cart.totalPrice !== undefined) {
       return cart.totalPrice;
@@ -179,21 +179,21 @@ export const CartProvider = ({ children }) => {
       hasItems: cartProducts.length > 0,
     }),
     [
-      cart,
-      cartProducts,
-      loading,
-      error,
-      loadCart,
-      addToCart,
-      updateCartProduct,
-      removeFromCart,
-      clearCart,
-      getCartTotals,
-      getCartTotal,
+    cart,
+    cartProducts,
+    loading,
+    error,
+    loadCart,
+    addToCart,
+    updateCartProduct,
+    removeFromCart,
+    clearCart,
+    getCartTotals,
+    getCartTotal,
       dispatch,
     ]
   );
-
+ 
   return (
     <CartContext.Provider value={value}>{children}</CartContext.Provider>
   );

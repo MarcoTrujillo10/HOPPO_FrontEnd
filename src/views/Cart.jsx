@@ -23,7 +23,7 @@ const Cart = () => {
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
  
   const totals = getCartTotals();
-
+ 
   const formatCurrency = (value = 0) =>
     new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -201,18 +201,18 @@ const Cart = () => {
               const totalSavings = hasDiscount ? originalTotal - discountedTotal : 0;
 
               return (
-                <article key={cartProduct.id} className="cart-item">
-                  <div className="cart-item__image">
+              <article key={cartProduct.id} className="cart-item">
+                <div className="cart-item__image">
                     <img src={image} alt={product.name} />
-                  </div>
-
-                  <div className="cart-item__info">
-                    <Link
+                </div>
+ 
+                <div className="cart-item__info">
+                  <Link
                       to={`/productos/${product.id}`}
-                      className="cart-item__name"
-                    >
+                    className="cart-item__name"
+                  >
                       {product.name}
-                    </Link>
+                  </Link>
                     <p className="cart-item__detail">{product.description || ""}</p>
 
                     <div className="cart-item__pricing">
@@ -233,59 +233,59 @@ const Cart = () => {
                       </div>
                     </div>
 
-                    <p className="cart-item__stock">
+                  <p className="cart-item__stock">
                       Stock: {product.stock} unidades
-                    </p>
-                  </div>
+                  </p>
+                </div>
  
-                  <div className="cart-item__quantity">
-                    <button
-                      className="quantity-btn"
-                      onClick={() =>
-                        handleUpdateQuantity(cartProduct.id, cartProduct.quantity - 1)
-                      }
-                      disabled={cartProduct.quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span className="quantity-value">{cartProduct.quantity}</span>
-                    <button
-                      className="quantity-btn"
-                      onClick={() =>
-                        handleUpdateQuantity(cartProduct.id, cartProduct.quantity + 1)
-                      }
+                <div className="cart-item__quantity">
+                  <button
+                    className="quantity-btn"
+                    onClick={() =>
+                      handleUpdateQuantity(cartProduct.id, cartProduct.quantity - 1)
+                    }
+                    disabled={cartProduct.quantity <= 1}
+                  >
+                    -
+                  </button>
+                  <span className="quantity-value">{cartProduct.quantity}</span>
+                  <button
+                    className="quantity-btn"
+                    onClick={() =>
+                      handleUpdateQuantity(cartProduct.id, cartProduct.quantity + 1)
+                    }
                       disabled={cartProduct.quantity >= product.stock}
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="cart-item__total">
+                  >
+                    +
+                  </button>
+                </div>
+ 
+                <div className="cart-item__total">
                     {hasDiscount && (
                       <span className="cart-item__total-original">
                         {formatCurrency(originalTotal)}
                       </span>
                     )}
-                    <p className="cart-item__total-price">
+                  <p className="cart-item__total-price">
                       {formatCurrency(discountedTotal)}
-                    </p>
+                  </p>
                     {hasDiscount && (
                       <span className="cart-item__total-savings">
                         Ahorras {formatCurrency(totalSavings)}
                       </span>
                     )}
-                  </div>
-
-                  <div className="cart-item__actions">
-                    <button
-                      className="remove-btn"
-                      title="Eliminar del carrito"
-                      onClick={() => requestRemoveProduct(cartProduct.id)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </article>
+                </div>
+ 
+                <div className="cart-item__actions">
+                  <button
+                    className="remove-btn"
+                    title="Eliminar del carrito"
+                    onClick={() => requestRemoveProduct(cartProduct.id)}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </article>
               );
             })}
           </div>

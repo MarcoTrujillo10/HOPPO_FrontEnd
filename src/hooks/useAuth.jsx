@@ -48,21 +48,21 @@ export const AuthProvider = ({ children }) => {
         // already handled in slice
       } finally {
         dispatch(completeInitialization());
-      }
+          }
     };
     bootstrapAuth();
   }, [dispatch]);
 
   const login = useCallback(
     async (credentials) => {
-      try {
+    try {
         const result = await dispatch(loginThunk(credentials)).unwrap();
         return { success: true, data: result };
       } catch (err) {
-        return {
-          success: false,
+      return {
+        success: false,
           error: getErrorMessage(err, "Error al iniciar sesión"),
-        };
+      };
       }
     },
     [dispatch]
@@ -70,14 +70,14 @@ export const AuthProvider = ({ children }) => {
 
   const register = useCallback(
     async (payload) => {
-      try {
+    try {
         const result = await dispatch(registerThunk(payload)).unwrap();
         return { success: true, data: result };
       } catch (err) {
-        return {
-          success: false,
+      return {
+        success: false,
           error: getErrorMessage(err, "Error al registrar usuario"),
-        };
+      };
       }
     },
     [dispatch]
@@ -108,11 +108,11 @@ export const AuthProvider = ({ children }) => {
     }),
     [
       authState,
-      login,
-      register,
-      logout,
+    login,
+    register,
+    logout,
       isAuthenticatedSelector,
-      hasRole,
+    hasRole,
       dispatch,
     ]
   );
