@@ -125,7 +125,6 @@
   animation: slideOut 0.3s ease-out forwards;
 }
 
-/* Responsive */
 @media (max-width: 640px) {
   .toast-container {
     top: 70px;
