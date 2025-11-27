@@ -1,9 +1,29 @@
-import { useState } from "react";
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useAuth } from '../hooks/useAuth.jsx';
+import { useCart } from '../hooks/useCart.jsx';
+import {
+  fetchUserOrders,
+  toggleOrderDetails,
+  selectUserOrders,
+  selectUserOrdersLoading,
+  selectExpandedOrderId,
+  selectUserOrdersStats,
+} from '../redux/ordersSlice';
 import "./Profile.css";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState("profile");
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useAuth();
+  const { getCartTotals } = useCart();
+  
+  // Selectores de Redux para órdenes
+  const orders = useSelector(selectUserOrders);
+  const loading = useSelector(selectUserOrdersLoading);
+  const expandedOrderId = useSelector(selectExpandedOrderId);
+  const orderStats = useSelector(selectUserOrdersStats);
 
+<<<<<<< HEAD
   const userData = {
     nombre: "Juan Bautista",
     apellido: "Espino",
@@ -60,324 +80,262 @@ const Profile = () => {
       img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAB9-3XqvgCJAPM9ivAYfCA5VvWZSF6eXGgfbMlqrQ_PGxqgqwLiuZlcAFiJj-RXcHbtw2y0D1vc_49tFS0izptLZnoz8SiCDNEPAuKDWKx0gI5bvKhWIwz8MEadfnVYn6TlR8kVoly8TtUDOKg0Yd_GFGqr79tWrbVzAv7eEEv50Y9d6-Gf2LRpnD-4TFubIcFE2VIP5MYT-vJXGLpcEiLQEr2qEFescMW8IWZvIH7Aux8DJ98HD4crvlYGPQkXmNhfhDtouCBDlY"
     }
   ];
+=======
+  // Manejar cartTotals de forma segura
+  let cartTotals;
+  try {
+    cartTotals = getCartTotals();
+  } catch (error) {
+    console.error('Error getting cart totals:', error);
+    cartTotals = {
+      subtotal: 0,
+      shipping: 0,
+      tax: 0,
+      total: 0,
+      itemCount: 0
+    };
+  }
 
-  const tabs = [
-    { id: "profile", label: "Perfil", icon: "👤" },
-    { id: "orders", label: "Pedidos", icon: "📦" },
-    { id: "favorites", label: "Favoritos", icon: "❤️" },
-    { id: "settings", label: "Configuración", icon: "⚙️" }
-  ];
+  useEffect(() => {
+    if (isAuthenticated()) {
+      dispatch(fetchUserOrders());
+    }
+  }, [dispatch, isAuthenticated]);
+
+  const handleToggleDetails = (orderId) => {
+    dispatch(toggleOrderDetails(orderId));
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(price);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('es-AR');
+  };
+>>>>>>> origin/Bauti
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      'CREATED': { text: 'Creada', class: 'status-created' },
+      'COMPLETED': { text: 'Completada', class: 'status-completed' },
+      'CANCELLED': { text: 'Cancelada', class: 'status-cancelled' }
+    };
+    
+    const config = statusConfig[status] || { text: status, class: 'status-default' };
+    return <span className={`status-badge ${config.class}`}>{config.text}</span>;
+  };
+
+  if (!isAuthenticated()) {
+    return (
+      <main className="profile container">
+        <div className="profile__not-authenticated">
+          <h1>🔒 Acceso Requerido</h1>
+          <p>Debes iniciar sesión para ver tu perfil.</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="profile container">
       <div className="profile__header">
         <div className="profile__avatar">
-          <img src={userData.avatar} alt="Avatar" />
-          <button className="avatar-edit">✏️</button>
+          <div className="avatar-placeholder">
+            {user?.firstName?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
         </div>
         <div className="profile__info">
           <h1 className="profile__name">
-            {userData.nombre} {userData.apellido}
+            {user?.firstName} {user?.lastName}
           </h1>
-          <p className="profile__email">{userData.email}</p>
-          <div className="profile__stats">
-            <div className="stat">
-              <span className="stat__number">{userData.totalCompras}</span>
-              <span className="stat__label">Pedidos</span>
+          <p className="profile__email">{user?.email}</p>
+          <p className="profile__username">@{user?.username}</p>
+          {user?.role !== 'VENDEDOR' && (
+            <div className="profile__stats">
+              <div className="stat">
+                <span className="stat__number">{orderStats.totalOrders}</span>
+                <span className="stat__label">Pedidos</span>
+              </div>
+              <div className="stat">
+                <span className="stat__number">
+                  {formatPrice(orderStats.totalSpent)}
+                </span>
+                <span className="stat__label">Total gastado</span>
+              </div>
+              <div className="stat">
+                <span className="stat__number">{cartTotals.itemCount}</span>
+                <span className="stat__label">En carrito</span>
+              </div>
             </div>
-            <div className="stat">
-              <span className="stat__number">${userData.totalGastado.toFixed(2)}</span>
-              <span className="stat__label">Total gastado</span>
-            </div>
-            <div className="stat">
-              <span className="stat__number">{favorites.length}</span>
-              <span className="stat__label">Favoritos</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div className="profile__content">
-        <nav className="profile__tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`tab ${activeTab === tab.id ? "tab--active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span className="tab__icon">{tab.icon}</span>
-              <span className="tab__label">{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-
         <div className="profile__panel">
-          {activeTab === "profile" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Información Personal</h2>
-              <form className="profile-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="nombre">Nombre</label>
-                    <input
-                      type="text"
-                      id="nombre"
-                      defaultValue={userData.nombre}
-                      className="form-input"
-                    />
+          <div className="panel-content">
+            <h2 className="panel-title">Información Personal</h2>
+            <div className="profile-info-display">
+              <div className="info-section">
+                <h3>👤 Datos Personales</h3>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>Nombre:</label>
+                    <span>{user?.firstName} {user?.lastName}</span>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="apellido">Apellido</label>
-                    <input
-                      type="text"
-                      id="apellido"
-                      defaultValue={userData.apellido}
-                      className="form-input"
-                    />
+                  <div className="info-item">
+                    <label>Username:</label>
+                    <span>@{user?.username}</span>
                   </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      defaultValue={userData.email}
-                      className="form-input"
-                    />
+                  <div className="info-item">
+                    <label>Email:</label>
+                    <span>{user?.email}</span>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="telefono">Teléfono</label>
-                    <input
-                      type="tel"
-                      id="telefono"
-                      defaultValue={userData.telefono}
-                      className="form-input"
-                    />
+                  <div className="info-item">
+                    <label>Rol:</label>
+                    <span className="role-badge">{user?.role}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="fechaNacimiento">Fecha de nacimiento</label>
-                  <input
-                    type="date"
-                    id="fechaNacimiento"
-                    defaultValue={userData.fechaNacimiento}
-                    className="form-input"
-                  />
+              {user?.role === 'VENDEDOR' && (
+                <div className="info-section">
+                  <h3>🛠️ Acceso de Vendedor</h3>
+                  <p>Como vendedor, tienes acceso a funciones administrativas especiales.</p>
+                  <a href="/admin" className="btn btn--primary">
+                    Ir al Panel de Admin
+                  </a>
                 </div>
+              )}
 
-                <div className="form-section">
-                  <h3>Dirección</h3>
-                  <div className="form-row">
-                    <div className="form-group form-group--wide">
-                      <label htmlFor="calle">Calle</label>
-                      <input
-                        type="text"
-                        id="calle"
-                        defaultValue={userData.direccion.calle}
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="ciudad">Ciudad</label>
-                      <input
-                        type="text"
-                        id="ciudad"
-                        defaultValue={userData.direccion.ciudad}
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="codigoPostal">Código Postal</label>
-                      <input
-                        type="text"
-                        id="codigoPostal"
-                        defaultValue={userData.direccion.codigoPostal}
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="pais">País</label>
-                      <input
-                        type="text"
-                        id="pais"
-                        defaultValue={userData.direccion.pais}
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button type="submit" className="btn btn--primary">
-                    Guardar cambios
-                  </button>
-                  <button type="button" className="btn btn--ghost">
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {activeTab === "orders" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Mis Pedidos</h2>
-              <div className="orders-list">
-                {orders.map((order) => (
-                  <div key={order.id} className="order-card">
-                    <div className="order-header">
-                      <div className="order-info">
-                        <h3 className="order-id">Pedido #{order.id}</h3>
-                        <p className="order-date">
-                          {new Date(order.fecha).toLocaleDateString('es-AR')}
-                        </p>
+              {user?.role !== 'VENDEDOR' && (
+                <>
+                  <div className="info-section">
+                    <h3>🛒 Carrito Actual</h3>
+                    {cartTotals.itemCount > 0 ? (
+                      <div className="cart-summary">
+                        <p><strong>Items:</strong> {cartTotals.itemCount}</p>
+                        <p><strong>Subtotal:</strong> {formatPrice(cartTotals.subtotal)}</p>
+                        <p><strong>Total:</strong> {formatPrice(cartTotals.total)}</p>
+                        <a href="/cart" className="btn btn--ghost">Ver Carrito</a>
                       </div>
-                      <div className="order-status">
-                        <span className={`status-badge status-${order.estado.toLowerCase().replace(' ', '-')}`}>
-                          {order.estado}
-                        </span>
-                        <span className="order-total">${order.total.toFixed(2)}</span>
+                    ) : (
+                      <p>Tu carrito está vacío.</p>
+                    )}
+                  </div>
+
+                  <div className="info-section">
+                    <h3>📦 Mis Pedidos</h3>
+                    {loading ? (
+                      <p>Cargando órdenes...</p>
+                    ) : orders.length > 0 ? (
+                      <div className="orders-list">
+                        {orders.map(order => (
+                          <div key={order.id} className="order-card">
+                            <div className="order-header">
+                              <div className="order-info">
+                                <h3 className="order-id">Pedido #{order.id}</h3>
+                                <p className="order-date">
+                                  {formatDate(order.orderDate || order.createdAt)}
+                                </p>
+                              </div>
+                              <div className="order-status">
+                                {getStatusBadge(order.status)}
+                                <span className="order-total">{formatPrice(order.total)}</span>
+                                <button
+                                  className="btn btn-info btn-sm"
+                                  onClick={() => handleToggleDetails(order.id)}
+                                  style={{ marginLeft: '8px', fontSize: '0.85rem', padding: '4px 8px' }}
+                                >
+                                  {expandedOrderId === order.id ? '▼' : '▶'} Detalles
+                                </button>
+                              </div>
+                            </div>
+                            {expandedOrderId === order.id && order.items && order.items.length > 0 && (
+                              <div className="order-details">
+                                <h4 style={{ margin: '16px 0 12px 0', fontSize: '1rem', color: '#1f2937' }}>
+                                  📦 Artículos del Pedido
+                                </h4>
+                                <div className="order-items-list">
+                                  {order.items.map((item, index) => (
+                                    <div key={index} className="order-item-card">
+                                      <div className="order-item-info">
+                                        <strong>{item.productName || 'Producto'}</strong>
+                                        <div className="order-item-details">
+                                          <span>Cantidad: {item.quantity}</span>
+                                          <span>Precio unitario: {formatPrice(item.price)}</span>
+                                          <span>Subtotal: {formatPrice(item.price * item.quantity)}</span>
+                                          {item.discount > 0 && (
+                                            <span className="discount-badge">Descuento: {item.discount}%</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="order-summary">
+                                  <div className="order-summary-line">
+                                    <span>Dirección de envío:</span>
+                                    <span>{order.address}</span>
+                                  </div>
+                                  <div className="order-summary-line">
+                                    <span>Método de envío:</span>
+                                    <span>{order.shipping}</span>
+                                  </div>
+                                  <div className="order-summary-line order-total">
+                                    <span>Total:</span>
+                                    <span>{formatPrice(order.total)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                    <div className="order-products">
-                      {order.productos.map((product, index) => (
-                        <div key={index} className="order-product">
-                          <span className="product-quantity">{product.cantidad}x</span>
-                          <span className="product-name">{product.nombre}</span>
-                          <span className="product-price">${product.precio.toFixed(2)}</span>
+                    ) : (
+                      <div className="empty-state">
+                        <p>No tienes órdenes registradas.</p>
+                        <a href="/productos" className="btn btn--primary">Ver Productos</a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="info-section">
+                    <h3>📊 Mis Estadísticas</h3>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-icon">📦</div>
+                        <div className="stat-info">
+                          <span className="stat-number">{orderStats.totalOrders}</span>
+                          <span className="stat-label">Órdenes Realizadas</span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="order-actions">
-                      <button className="btn btn--ghost btn--small">
-                        Ver detalles
-                      </button>
-                      <button className="btn btn--ghost btn--small">
-                        Rastrear envío
-                      </button>
-                      {order.estado === "Entregado" && (
-                        <button className="btn btn--ghost btn--small">
-                          Comprar de nuevo
-                        </button>
-                      )}
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon">💰</div>
+                        <div className="stat-info">
+                          <span className="stat-number">
+                            {formatPrice(orderStats.totalSpent)}
+                          </span>
+                          <span className="stat-label">Total Gastado</span>
+                        </div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon">🛒</div>
+                        <div className="stat-info">
+                          <span className="stat-number">{cartTotals.itemCount}</span>
+                          <span className="stat-label">Items en Carrito</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
-          )}
-
-          {activeTab === "favorites" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Mis Favoritos</h2>
-              <div className="favorites-grid">
-                {favorites.map((item) => (
-                  <div key={item.id} className="favorite-item">
-                    <div className="favorite-item__image">
-                      <img src={item.img} alt={item.nombre} />
-                      <button className="favorite-remove" title="Quitar de favoritos">
-                        ❤️
-                      </button>
-                    </div>
-                    <div className="favorite-item__info">
-                      <h3 className="favorite-item__name">{item.nombre}</h3>
-                      <p className="favorite-item__price">${item.precio.toFixed(2)}</p>
-                    </div>
-                    <div className="favorite-item__actions">
-                      <button className="btn btn--primary btn--small">
-                        Agregar al carrito
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="panel-content">
-              <h2 className="panel-title">Configuración</h2>
-              <div className="settings-sections">
-                <div className="settings-section">
-                  <h3>Notificaciones</h3>
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <h4>Ofertas y promociones</h4>
-                      <p>Recibe notificaciones sobre ofertas especiales</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <h4>Estado del pedido</h4>
-                      <p>Notificaciones sobre el estado de tus pedidos</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <h4>Newsletter</h4>
-                      <p>Recibe nuestro newsletter semanal</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="settings-section">
-                  <h3>Privacidad</h3>
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <h4>Perfil público</h4>
-                      <p>Permitir que otros usuarios vean tu perfil</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <h4>Compartir datos de uso</h4>
-                      <p>Ayúdanos a mejorar compartiendo datos anónimos</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="settings-section">
-                  <h3>Cuenta</h3>
-                  <div className="setting-actions">
-                    <button className="btn btn--ghost">
-                      Cambiar contraseña
-                    </button>
-                    <button className="btn btn--ghost">
-                      Descargar mis datos
-                    </button>
-                    <button className="btn btn--danger">
-                      Eliminar cuenta
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </main>

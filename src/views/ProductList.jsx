@@ -1,8 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import ProductFilters from "../components/ProductFilters";
 import ProductGrid from "../components/ProductGrid";
+import {
+  fetchCatalogMeta,
+  fetchCatalogProducts,
+  selectCatalogState,
+  setFilters,
+  replaceFilters,
+  clearFilters,
+} from "../redux/catalogSlice";
 import "./ProductList.css";
 
+<<<<<<< HEAD
 const RAW = [
   { id: "cpu-i7", nombre: "Intel Core i7", detalle: "12C/24T", categoria: "Componentes", marca: "Intel", precio: 350, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAeEZ3wJRC_iZRmm61SLDO7Hi9nNZH8JXC79xQghK3aAPKFAla1BuCoEgF5u9KSYQAnDjHh-gD84neVLlw7nMMWa0oOyQHLLoWj3ginyHsAyba8OqVibkfYkqt8MLJBoFUICfeCyD4kFYmUULzHUFKxjQHqe9tdal1DYaiEZ4nTUK61Wp6fsDFeSL_a5O-doU0VUWN6fijTVSN6Zv-6JTBy0GmLzOUp5TyXFK6GVPzbuUsj8oR_2cBz50PDnE_ex-kGcPRG5Ad2r-4" },
   { id: "gpu-3080", nombre: "NVIDIA RTX 3080", detalle: "10 GB GDDR6X", categoria: "Componentes", marca: "NVIDIA", precio: 1200, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAQ3WJvAue9tfr-7SvXGxS5UadyO2OGS21_qDzIY-w_NKQkCDS46H7JrkLa1fmVVHYcXSB3A5SYgNcf2Y9h7hMnlJzYKi8h8RQuMQ5Bmt2NLL4bUrNR4HNK804Agij6KzPhlrT0xE6X8HDN6BFRmHORKpki6uymsi6a8T29f_OUUfrwVgWjJqOjjoubpI5qJsO7JwrnUZtNvMr-VTmhwXx2TAJC17cNqTNCm9SnTLbnVE7swMulVPoEkmnlmtPtSmxNidAEIMvlZgk" },
@@ -79,28 +90,100 @@ const ProductList = () => {
     setFilters((f) => ({ ...f, min: v === "" ? "" : clamp(+v, 0, 100000) }));
   const clampMax = (v) =>
     setFilters((f) => ({ ...f, max: v === "" ? "" : clamp(+v, 0, 100000) }));
+=======
+const ProductList = () => {
+  const [searchParams] = useSearchParams();
+  const dispatch = useDispatch();
+  const catalogState = useSelector(selectCatalogState);
+  const { filters, productos, categorias, marcasOpts, loading, metaLoading, error } =
+    catalogState;
 
+  const categoriaParam = searchParams.get("categoria");
+  const tipoParam = searchParams.get("tipo");
+  const qParam = searchParams.get("q");
+
+  useEffect(() => {
+    dispatch(fetchCatalogMeta({ tipoParam }));
+  }, [dispatch, tipoParam]);
+
+  useEffect(() => {
+    const updates = {};
+    let shouldUpdate = false;
+
+    if (qParam !== null) {
+      updates.q = qParam || "";
+      shouldUpdate = true;
+    }
+
+    if (categoriaParam) {
+      updates.categoria = categoriaParam;
+      updates.tipo = tipoParam || null;
+      shouldUpdate = true;
+    }
+
+    if (shouldUpdate) {
+      dispatch(setFilters(updates));
+    }
+  }, [categoriaParam, tipoParam, qParam, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchCatalogProducts());
+  }, [dispatch, filters]);
+
+  const handleSetFilters = useCallback(
+    (updater) => {
+      if (typeof updater === "function") {
+        const nextFilters = updater(filters);
+        dispatch(replaceFilters(nextFilters));
+      } else if (updater === null) {
+        dispatch(clearFilters());
+      } else {
+        dispatch(replaceFilters(updater));
+      }
+    },
+    [dispatch, filters]
+  );
+>>>>>>> origin/Bauti
+
+  if ((loading || metaLoading) && productos.length === 0) {
+    return (
+      <main className="productList">
+        <div className="loading">
+          <h2>Cargando productos...</h2>
+        </div>
+      </main>
+    );
+  }
+  if (error) {
+    return (
+      <main className="productList">
+        <div className="error">
+          <h2>Error</h2>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Reintentar</button>
+        </div>
+      </main>
+    );
+  }
   return (
     <main className="productList">
       <ProductFilters
         filters={filters}
-        setFilters={setFilters}
+        setFilters={handleSetFilters}
         categorias={categorias}
         marcasOpts={marcasOpts}
-        clampMin={clampMin}
-        clampMax={clampMax}
       />
-
-      <section className="list">
+      <section className="list" style={{ position: "relative", zIndex: 1 }}>
         <div className="list__head">
           <h2 className="list__title">Productos</h2>
-          <span className="list__count">{productos.length} resultados</span>
+          <span className="list__count">
+            {productos.length} resultados
+            {loading && " (cargando...)"}
+          </span>
         </div>
-
         <ProductGrid productos={productos} />
       </section>
     </main>
   );
 };
-
 export default ProductList;

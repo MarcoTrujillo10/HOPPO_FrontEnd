@@ -1,45 +1,84 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { productService } from "../services/api";
 import "./Featured.css";
-
-const ITEMS = [
-  {
-    id: "pc-gamer",
-    title: "PC Gamer de Alto Rendimiento",
-    desc: "Experimenta el máximo rendimiento.",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAgepR1Gxi_5yNZIaoyoofizPVZqQQXg66gjBNvQEE_sobqKqIMMio19fHcFRBLp1wZsuBJg3bY-n7_lCp-4hR672a79S9C946YZo-8srxa55nfagG2_qTWhluKDKbJh_ALIRnVIBLweXFDvMb3n2wc6axImEPorjnBWygfMSF-rePU06FnA4Ur0i-qGQmSdNGDD02u3gwtVMcnOVkA0J2_ft8dHyYbXJO3giEegLIUvALYD_5W2hjpKxcAdI4NmOXCmz2m1rOlEH8",
-  },
-  {
-    id: "teclado-mecanico",
-    title: "Teclado Mecánico Ergonómico",
-    desc: "Mejora tu productividad y comodidad.",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAuDXH6AMkSbr_QQsAtXnG9I6gcrudg0ZVXvYU5A2BX5v_BLpnxiJXer2C992yysfJXi3sAhsiRwrthhe6eFXRYsSg6GFYrV5-Tniuj6deZfTnSR2ru3AHzIx6l5V9-QgTlR4ARfwyfgg_4F6_IhZ-364BGex8ygRJURGy9VsXuKHZihLj30sN7F0hF6KCJAgmhTFDRUMa7igqdb7AaXKMMMbS9EiD4mngRR7bD0FTXo9ckYVYJtFEqwF4sz8u5LKFCFudlvwlflP8",
-  },
-  {
-    id: "mouse-gaming",
-    title: "Mouse Inalámbrico para Gaming",
-    desc: "Precisión y libertad de movimiento.",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGEieVtrRLLArEzSrZ3aLFQdunn3Y28vNghRlyaLrEzmaQFvyfiO3o0nffXNEzaabJ39g0MJ_nbsizraX_ij9xOFwDbDal8ydAdqu96lqemRbS5_-HVx6rN5e306FRQs8schpF5FuHOKsREbFydyVmOWIid8U5j5su9d-8cN9LQk9kCC3x5QP-fIkN0_-tIhpspHcz3clNkNEreSU6iqmTfrNvcQE8_GVYiUK8bHH55mVSUN8O_nhnkcTzJVomTV7xVyIMPqIpBM0",
-  },
-  {
-    id: "monitor-curvo",
-    title: "Monitor Curvo para Gaming",
-    desc: "Sumérgete en tus juegos favoritos.",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCp89u2vodRuvxvhhTbVkEtcsPekPrNb3iea15bjcNuUr3I2xlcP5pg01E_XLPCPjH86FWdoY5lnfTPjNEsmOvSTzh-vY95Fvq4S2qXGsj3qNUjVYgQ02mQ4IdSpKYpGo19gZTT5YzvyAltAm63te_BNHFEHsxyGUIp0JQCBOB_Sg9vTUQ1Hy-PcfAEHCm0y5NCaHbkizoFLK1ZhQJqmi5NT5qtevTnxjgcKJaoKyXYNWEPuUIEm4bMjN4mAs3irPopZBds2jvrMqA",
-  },
-];
-
-const Featured = () =>{
+const Featured = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const loadFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await productService.getProducts({ limit: 4 });
+        setProducts(response.data.content || response.data || []);
+      } catch (error) {
+        console.error('Error loading featured products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFeaturedProducts();
+  }, []);
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(price);
+  };
+  if (loading) {
+    return (
+      <section className="feat">
+        <h2 className="feat__title">Productos destacados</h2>
+        <div className="feat__grid">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="card loading">
+              <div className="card__img loading-placeholder"></div>
+              <div className="card__body">
+                <div className="loading-text"></div>
+                <div className="loading-text short"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+  if (products.length === 0) {
+    return (
+      <section className="feat">
+        <h2 className="feat__title">Productos destacados</h2>
+        <div className="empty-state">
+          <p>No hay productos disponibles en este momento.</p>
+          <p>Los vendedores pueden agregar productos desde el panel de administración.</p>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="feat">
       <h2 className="feat__title">Productos destacados</h2>
       <div className="feat__grid">
-        {ITEMS.map((it) => (
-          <article key={it.id} className="card">
-            <Link to={`/productos/${it.id}`} className="card__link">
-              <div className="card__img" style={{ backgroundImage: `url("${it.img}")` }} />
+        {products.map((product) => (
+          <article key={product.id} className="card">
+            <Link to={`/productos/${product.id}`} className="card__link">
+              <div 
+                className="card__img" 
+                style={{ 
+                  backgroundImage: `url("${product.images && product.images.length > 0 
+                    ? product.images[0].imageUrl 
+                    : 'https://via.placeholder.com/300x300?text=Sin+Imagen'}")` 
+                }} 
+              />
               <div className="card__body">
-                <h3 className="card__h">{it.title}</h3>
-                <p className="card__p">{it.desc}</p>
+                <h3 className="card__h">{product.name}</h3>
+                <p className="card__p">{product.description}</p>
+                <div className="card__price">{formatPrice(product.price)}</div>
+                {product.stock > 0 ? (
+                  <div className="card__stock">Stock: {product.stock}</div>
+                ) : (
+                  <div className="card__stock out">Sin stock</div>
+                )}
               </div>
             </Link>
           </article>
