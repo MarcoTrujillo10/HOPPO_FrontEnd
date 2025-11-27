@@ -1,51 +1,58 @@
-import { useState, useEffect } from 'react';
-import { orderService } from '../../services/api';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  fetchAdminOrders,
+  updateOrderStatus,
+  toggleOrderDetails,
+  selectAdminOrders,
+  selectAdminOrdersLoading,
+  selectExpandedOrderId,
+} from '../../redux/ordersSlice';
 import { useToast } from '../../contexts/ToastContext.jsx';
 import './AdminComponents.css';
+
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const dispatch = useDispatch();
   const { showToast } = useToast();
+  
+  // Selectores de Redux
+  const orders = useSelector(selectAdminOrders);
+  const loading = useSelector(selectAdminOrdersLoading);
+  const expandedOrderId = useSelector(selectExpandedOrderId);
+
   useEffect(() => {
-    loadOrders();
-  }, []);
-  const loadOrders = async () => {
-    try {
-      setLoading(true);
-      console.log('🛒 OrderManagement: Cargando órdenes...');
-      const response = await orderService.getOrders();
-      console.log('🛒 OrderManagement: Respuesta del backend:', response);
-      // El backend devuelve una respuesta paginada con content
-      const orders = response.data?.content || response.data || [];
-      console.log('🛒 OrderManagement: Órdenes extraídas:', orders);
-      setOrders(orders);
-    } catch (error) {
-      console.error('Error loading orders:', error);
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(fetchAdminOrders());
+  }, [dispatch]);
+
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      await orderService.updateOrder(orderId, { status: newStatus });
-      await loadOrders();
+      await dispatch(updateOrderStatus({ orderId, status: newStatus })).unwrap();
       showToast('Estado de orden actualizado exitosamente', 'success');
     } catch (error) {
       console.error('Error updating order:', error);
       showToast('Error al actualizar la orden', 'error');
     }
   };
+
+  const handleRefresh = () => {
+    dispatch(fetchAdminOrders());
+  };
+
+  const handleToggleDetails = (orderId) => {
+    dispatch(toggleOrderDetails(orderId));
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -57,23 +64,23 @@ const OrderManagement = () => {
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
 
-  const toggleOrderDetails = (orderId) => {
-    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
-  };
-  if (loading) {
+  if (loading && orders.length === 0) {
     return <div className="loading">Cargando órdenes...</div>;
   }
+
   return (
     <div className="order-management">
       <div className="section-header">
         <h2>📋 Gestión de Órdenes</h2>
         <button 
           className="btn btn-secondary"
-          onClick={loadOrders}
+          onClick={handleRefresh}
+          disabled={loading}
         >
-          🔄 Actualizar
+          {loading ? '⏳ Cargando...' : '🔄 Actualizar'}
         </button>
       </div>
+
       <div className="orders-table-container">
         <table className="orders-table">
           <thead>
@@ -104,7 +111,7 @@ const OrderManagement = () => {
                     <div className="order-actions">
                       <button
                         className="btn btn-info btn-sm"
-                        onClick={() => toggleOrderDetails(order.id)}
+                        onClick={() => handleToggleDetails(order.id)}
                         title="Ver detalles"
                       >
                         {expandedOrderId === order.id ? '▼' : '▶'} Detalles
@@ -129,7 +136,7 @@ const OrderManagement = () => {
                   </td>
                 </tr>
                 {expandedOrderId === order.id && order.items && order.items.length > 0 && (
-                  <tr>
+                  <tr key={`${order.id}-details`}>
                     <td colSpan="6" className="order-details-cell">
                       <div className="order-details">
                         <h4>📦 Artículos de la Orden</h4>
@@ -173,7 +180,8 @@ const OrderManagement = () => {
           </tbody>
         </table>
       </div>
-      {orders.length === 0 && (
+
+      {orders.length === 0 && !loading && (
         <div className="empty-state">
           <p>No hay órdenes registradas.</p>
         </div>
@@ -181,4 +189,5 @@ const OrderManagement = () => {
     </div>
   );
 };
+
 export default OrderManagement;

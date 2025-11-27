@@ -1,15 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useCart } from '../hooks/useCart.jsx';
-import { orderService } from '../services/api';
+import {
+  fetchUserOrders,
+  toggleOrderDetails,
+  selectUserOrders,
+  selectUserOrdersLoading,
+  selectExpandedOrderId,
+  selectUserOrdersStats,
+} from '../redux/ordersSlice';
 import "./Profile.css";
+
 const Profile = () => {
+  const dispatch = useDispatch();
   const { user, isAuthenticated } = useAuth();
   const { getCartTotals } = useCart();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
-  // Eliminamos activeTab ya que no usaremos pestañas
+  
+  // Selectores de Redux para órdenes
+  const orders = useSelector(selectUserOrders);
+  const loading = useSelector(selectUserOrdersLoading);
+  const expandedOrderId = useSelector(selectExpandedOrderId);
+  const orderStats = useSelector(selectUserOrdersStats);
+
   // Manejar cartTotals de forma segura
   let cartTotals;
   try {
@@ -24,40 +37,28 @@ const Profile = () => {
       itemCount: 0
     };
   }
+
   useEffect(() => {
     if (isAuthenticated()) {
-      loadUserOrders();
+      dispatch(fetchUserOrders());
     }
-  }, [user, isAuthenticated]);
-  const loadUserOrders = async () => {
-    try {
-      setLoading(true);
-      const response = await orderService.getMyOrders();
-      // El backend retorna {content: [], pageable: {...}}, necesitamos extraer content
-      const ordersData = response.data?.content || response.data || [];
-      setOrders(ordersData);
-    } catch (error) {
-      console.error('Error loading orders:', error);
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
+  }, [dispatch, isAuthenticated]);
+
+  const handleToggleDetails = (orderId) => {
+    dispatch(toggleOrderDetails(orderId));
   };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(price);
   };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR');
   };
-  console.log('Profile component rendering:', {
-    isAuthenticated: isAuthenticated(),
-    user,
-    cartTotals,
-    loading
-  });
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       'CREATED': { text: 'Creada', class: 'status-created' },
@@ -69,9 +70,6 @@ const Profile = () => {
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
 
-  const toggleOrderDetails = (orderId) => {
-    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
-  };
   if (!isAuthenticated()) {
     return (
       <main className="profile container">
@@ -82,7 +80,7 @@ const Profile = () => {
       </main>
     );
   }
-  // Eliminamos las tabs ya que no las usaremos
+
   return (
     <main className="profile container">
       <div className="profile__header">
@@ -100,12 +98,12 @@ const Profile = () => {
           {user?.role !== 'VENDEDOR' && (
             <div className="profile__stats">
               <div className="stat">
-                <span className="stat__number">{orders.length}</span>
+                <span className="stat__number">{orderStats.totalOrders}</span>
                 <span className="stat__label">Pedidos</span>
               </div>
               <div className="stat">
                 <span className="stat__number">
-                  {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
+                  {formatPrice(orderStats.totalSpent)}
                 </span>
                 <span className="stat__label">Total gastado</span>
               </div>
@@ -117,6 +115,7 @@ const Profile = () => {
           )}
         </div>
       </div>
+
       <div className="profile__content">
         <div className="profile__panel">
           <div className="panel-content">
@@ -143,6 +142,7 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
+
               {user?.role === 'VENDEDOR' && (
                 <div className="info-section">
                   <h3>🛠️ Acceso de Vendedor</h3>
@@ -152,6 +152,7 @@ const Profile = () => {
                   </a>
                 </div>
               )}
+
               {user?.role !== 'VENDEDOR' && (
                 <>
                   <div className="info-section">
@@ -167,6 +168,7 @@ const Profile = () => {
                       <p>Tu carrito está vacío.</p>
                     )}
                   </div>
+
                   <div className="info-section">
                     <h3>📦 Mis Pedidos</h3>
                     {loading ? (
@@ -187,7 +189,7 @@ const Profile = () => {
                                 <span className="order-total">{formatPrice(order.total)}</span>
                                 <button
                                   className="btn btn-info btn-sm"
-                                  onClick={() => toggleOrderDetails(order.id)}
+                                  onClick={() => handleToggleDetails(order.id)}
                                   style={{ marginLeft: '8px', fontSize: '0.85rem', padding: '4px 8px' }}
                                 >
                                   {expandedOrderId === order.id ? '▼' : '▶'} Detalles
@@ -242,13 +244,14 @@ const Profile = () => {
                       </div>
                     )}
                   </div>
+
                   <div className="info-section">
                     <h3>📊 Mis Estadísticas</h3>
                     <div className="stats-grid">
                       <div className="stat-card">
                         <div className="stat-icon">📦</div>
                         <div className="stat-info">
-                          <span className="stat-number">{orders.length}</span>
+                          <span className="stat-number">{orderStats.totalOrders}</span>
                           <span className="stat-label">Órdenes Realizadas</span>
                         </div>
                       </div>
@@ -256,7 +259,7 @@ const Profile = () => {
                         <div className="stat-icon">💰</div>
                         <div className="stat-info">
                           <span className="stat-number">
-                            {formatPrice(orders.reduce((total, order) => total + (order.total || 0), 0))}
+                            {formatPrice(orderStats.totalSpent)}
                           </span>
                           <span className="stat-label">Total Gastado</span>
                         </div>
@@ -279,4 +282,5 @@ const Profile = () => {
     </main>
   );
 };
+
 export default Profile;
